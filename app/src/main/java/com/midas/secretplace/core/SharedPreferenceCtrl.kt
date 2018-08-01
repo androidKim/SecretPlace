@@ -1,4 +1,4 @@
-package com.midas.secretplace.ui.core
+package com.midas.secretplace.core
 
 import android.content.Context
 import android.content.SharedPreferences

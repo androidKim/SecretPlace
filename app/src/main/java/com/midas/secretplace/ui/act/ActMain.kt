@@ -30,11 +30,10 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.database.*
 import com.midas.secretplace.R
+import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
-import com.midas.secretplace.ui.structure.core.place_list
 import kotlinx.android.synthetic.main.act_main.*
 import kotlinx.android.synthetic.main.ly_main.*
-
 
 
 class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener
@@ -56,8 +55,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     private val FASTEST_INTERVAL: Long = 2000 /* 2 sec */
 
     lateinit var locationManager: LocationManager
-
-
     /*********************** Controller ***********************/
     private var m_btn_SaveLocation: Button?=null
 
@@ -163,7 +160,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
 
         navigation_view.setNavigationItemSelectedListener(this)
     }
-
     //--------------------------------------------------------------
     //
     fun settingView()
@@ -198,44 +194,52 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     {
         Toast.makeText(m_Context, "save lat lng", Toast.LENGTH_SHORT).show()
 
-        m_DbReference = this.m_FirebaseDb!!.getReference("place_list")
-        m_DbReference!!.child("list").orderByChild("name")
+        m_DbReference = this.m_FirebaseDb!!.getReference("place_list").child("list")
+        //m_DbReference!!.child("list").orderByChild("name")
+        var pInfo:place = place()
+        pInfo.place("1111","2222","리으스아팉")
+
+        var newRef:DatabaseReference  = m_DbReference!!.push()
+        newRef.setValue(pInfo)
+
         m_DbReference!!.addValueEventListener(messageListener)
-
-
+        
         onLocationChanged(mLocation)
     }
-
-    val messageListener = object : ValueEventListener {
-
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-            if (dataSnapshot.exists()) {
-                val pArray: place_list = dataSnapshot.getValue(place_list::class.java)!!
+    //--------------------------------------------------------------
+    //
+    val messageListener = object : ValueEventListener
+    {
+        override fun onDataChange(dataSnapshot: DataSnapshot)
+        {
+            if (dataSnapshot.exists())
+            {
+                //val pArray: place_list = dataSnapshot.getValue(place_list::class.java)!!
                 Toast.makeText(m_Context, "onDataChange", Toast.LENGTH_SHORT).show()
                 // ...
             }
         }
 
-        override fun onCancelled(databaseError: DatabaseError) {
+        override fun onCancelled(databaseError: DatabaseError)
+        {
             // Failed to read value
         }
     }
-
-
-
-
+    //--------------------------------------------------------------
     //location...
     override fun onConnectionSuspended(p0: Int)
     {
         Log.i("", "Connection Suspended")
         mGoogleApiClient.connect()
     }
-
+    //--------------------------------------------------------------
+    //
     override fun onConnectionFailed(connectionResult: ConnectionResult)
     {
         Log.i("", "Connection failed. Error: " + connectionResult.getErrorCode());
     }
-
+    //--------------------------------------------------------------
+    //
     override fun onLocationChanged(location: Location)
     {
         var msg = "Updated Location: Latitude " + location.longitude.toString() + location.longitude;
@@ -243,7 +247,8 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         txt_longitude.setText(""+location.longitude);
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
-
+    //--------------------------------------------------------------
+    //
     override fun onConnected(p0: Bundle?)
     {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)

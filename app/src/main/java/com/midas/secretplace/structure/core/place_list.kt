@@ -1,4 +1,4 @@
-package com.midas.secretplace.ui.structure.core
+package com.midas.secretplace.structure.core
 
 class place_list
 {

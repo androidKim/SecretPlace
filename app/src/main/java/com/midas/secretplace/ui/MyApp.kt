@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
+import com.midas.secretplace.core.SharedPreferenceCtrl
 import com.midas.secretplace.ui.act.ActLogin
 import com.midas.secretplace.ui.act.ActMain
-import com.midas.secretplace.ui.core.SharedPreferenceCtrl
 
 
 
@@ -31,7 +31,6 @@ class MyApp:MultiDexApplication()
             //sharedPreference..
             m_SpCtrl = SharedPreferenceCtrl()
             m_SpCtrl!!.init(m_Context!!)
-
 
             //localDb.
 
