@@ -44,7 +44,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     private var m_App: MyApp? = null
     private var m_Context: Context? = null
     private var m_FirebaseDb:FirebaseDatabase ?= null
-    private var m_DbReference: DatabaseReference ?= null
     //location..
     private lateinit var mGoogleApiClient: GoogleApiClient
     private var mLocationManager: LocationManager? = null
@@ -138,7 +137,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     //
     fun initLayout()
     {
-        m_btn_SaveLocation = findViewById(R.id.btn_SaveLocation)
+        m_btn_SaveLocation = this.findViewById(R.id.btn_SaveLocation)
 
         //listener..
         m_btn_SaveLocation?.setOnClickListener(onClickListener)
@@ -194,18 +193,62 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     {
         Toast.makeText(m_Context, "save lat lng", Toast.LENGTH_SHORT).show()
 
-        m_DbReference = this.m_FirebaseDb!!.getReference("place_list").child("list")
-        //m_DbReference!!.child("list").orderByChild("name")
-        var pInfo:place = place()
-        pInfo.place("1111","2222","리으스아팉")
+        var pDbRefList = this.m_FirebaseDb!!.getReference("place_list")
 
-        var newRef:DatabaseReference  = m_DbReference!!.push()
+        var pInfo:place = place()
+        pInfo.place("12387128937","222asdfasfdsaf2","safdsafasfasdf")
+
+        var newRef:DatabaseReference  = pDbRefList!!.push()
         newRef.setValue(pInfo)
 
-        m_DbReference!!.addValueEventListener(messageListener)
-        
+
+        var pDbRefResult = FirebaseDatabase.getInstance().getReference("place_list")
+        pDbRefResult!!.addChildEventListener(childEventListener)
+
         onLocationChanged(mLocation)
     }
+
+
+    var m_pArr:ArrayList<place> = ArrayList()
+    val childEventListener = object : ChildEventListener {
+        override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?) {
+            // A new message has been added
+            // onChildAdded() will be called for each node at the first time
+
+            val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
+            m_pArr.add(pInfo)
+            Toast.makeText(m_Context, "onDataChange", Toast.LENGTH_SHORT).show()
+            //val message = dataSnapshot!!.getValue(Message::class.java)
+            //messageList.add(message!!)
+        }
+
+        override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?) {
+            //Log.e(TAG, "onChildChanged:" + dataSnapshot!!.key)
+
+            // A message has changed
+            //val message = dataSnapshot.getValue(Message::class.java)
+        }
+
+        override fun onChildRemoved(dataSnapshot: DataSnapshot?) {
+            //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
+
+            // A message has been removed
+            //val message = dataSnapshot.getValue(Message::class.java)
+        }
+
+        override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?) {
+            //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
+
+            // A message has changed position
+            //val message = dataSnapshot.getValue(Message::class.java)
+        }
+
+        override fun onCancelled(databaseError: DatabaseError?) {
+            //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+        }
+    }
+
+
     //--------------------------------------------------------------
     //
     val messageListener = object : ValueEventListener
@@ -214,7 +257,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         {
             if (dataSnapshot.exists())
             {
-                //val pArray: place_list = dataSnapshot.getValue(place_list::class.java)!!
+
                 Toast.makeText(m_Context, "onDataChange", Toast.LENGTH_SHORT).show()
                 // ...
             }
@@ -225,6 +268,10 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
             // Failed to read value
         }
     }
+
+
+
+
     //--------------------------------------------------------------
     //location...
     override fun onConnectionSuspended(p0: Int)

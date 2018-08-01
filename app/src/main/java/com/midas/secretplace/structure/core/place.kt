@@ -6,6 +6,9 @@ class place
     var lat:String? = null
     var lng:String? = null
 
+    constructor() {
+
+    }
 
     fun place(name:String, lat:String, lng:String)
     {
