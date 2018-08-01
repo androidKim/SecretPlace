@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">SecretPlace</string>
+    <string name="option_one">Opcion Uno</string>
+    <string name="option_two">Opcion Dos</string>
+    <string name="option_three">Opcion Tres</string>
+    <string name="other_option_one">Otra Opcion Uno</string>
+    <string name="other_option_two">Otra Opcion Dos</string>
+    <string name="other_option_three">Otra Opcion Tres</string>
+    <string name="navigation_drawer_open">Navigation Drawer Is Open</string>
+    <string name="navigation_drawer_close">Navigation Drawer Is Close</string>
+
+    <string name="str_ok">Ok</string>
+    <string name="str_no">No</string>
+    <string name="str_cancel">Cancel</string>
+    <string name="str_msg_1">로그아웃</string>
+    <string name="str_msg_2">로그아웃 하시겠습니까?</string>
+</resources>

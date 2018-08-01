@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "824079944018",
+    "firebase_url": "https://secretplace-29d5e.firebaseio.com",
+    "project_id": "secretplace-29d5e",
+    "storage_bucket": "secretplace-29d5e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:824079944018:android:c16e21a1020f754f",
+        "android_client_info": {
+          "package_name": "com.midas.secretplace"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "824079944018-ggfakmieabvdcv5niojm7m1l47f5mm8i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.midas.secretplace",
+            "certificate_hash": "f472f409fbd2efc28d48cc6318ae74286da966cc"
+          }
+        },
+        {
+          "client_id": "824079944018-ej8i5s4s6lqd2prs8gmffp9kva8o8foo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtbMkveLaoHDA18vK7GZKFK8E7IW3Wi6M"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "824079944018-ej8i5s4s6lqd2prs8gmffp9kva8o8foo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/menu_option_one"
+            android:title="@string/option_one"
+            android:icon="@drawable/ic_launcher_background"/>
+
+        <item
+            android:id="@+id/menu_option_two"
+            android:title="@string/option_two"
+            android:icon="@drawable/ic_launcher_background"/>
+
+        <item
+            android:id="@+id/menu_option_three"
+            android:title="@string/option_three"
+            android:icon="@drawable/ic_launcher_background"/>
+
+    </group>
+
+    <item
+        android:id="@+id/other_options"
+        android:title="Otras Opciones">
+
+        <menu>
+
+            <item
+                android:id="@+id/other_menu_option_one"
+                android:title="@string/other_option_one"
+                android:icon="@drawable/ic_launcher_background"/>
+
+            <item
+                android:id="@+id/other_menu_option_two"
+                android:title="@string/other_option_two"
+                android:icon="@drawable/ic_launcher_background"/>
+
+            <item
+                android:id="@+id/other_menu_option_three"
+                android:title="@string/other_option_three"
+                android:icon="@drawable/ic_launcher_background"/>
+
+            <item
+                android:id="@+id/logout"
+                android:title="로그아웃"
+                android:icon="@drawable/ic_launcher_background"/>
+
+        </menu>
+
+    </item>
+
+</menu>
