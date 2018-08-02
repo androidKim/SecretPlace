@@ -10,7 +10,7 @@ class place
 
     }
 
-    fun place(name:String, lat:String, lng:String)
+    constructor(name:String, lat:String, lng:String)
     {
         this.name = name
         this.lat = lat

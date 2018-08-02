@@ -13,6 +13,7 @@ import android.provider.Settings
 import android.support.design.widget.NavigationView
 import android.support.multidex.MultiDex
 import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.ActionBarDrawerToggle
@@ -34,6 +35,7 @@ import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import kotlinx.android.synthetic.main.act_main.*
@@ -89,8 +91,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
 
         mLocationManager = this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-        checkLocation()
-
         initValue()
         recvIntentData()
         initLayout()
@@ -128,7 +128,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
             super.onBackPressed()
         }
     }
-
     /*********************** Location Function ***********************/
     //--------------------------------------------------------------
     //location...
@@ -198,6 +197,40 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         settingView()
         settingRecyclerView()
     }
+
+    //--------------------------------------------------------------
+    //
+    private fun checkPermissionLocation()
+    {
+        val permissionCoarseLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        val permissionFineLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (permissionCoarseLocation != PackageManager.PERMISSION_GRANTED )//
+        {
+            requestCoarseLocation()
+        }
+        else if(permissionFineLocation != PackageManager.PERMISSION_GRANTED)
+        {
+            requestFineLocation()
+        }
+        else//
+        {
+            saveLocation()
+        }
+    }
+
+    //--------------------------------------------------------------
+    //
+    private fun requestCoarseLocation()
+    {
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), Constant.PERMISSION_ACCESS_COARSE_LOCATION)
+    }
+    //--------------------------------------------------------------
+    //
+    private fun requestFineLocation()
+    {
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), Constant.PERMISSION_ACCESS_FINE_LOCATION)
+    }
+
     //--------------------------------------------------------------
     //
     fun settingRecyclerView()
@@ -238,21 +271,24 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         getPlaceList()
     }
 
+
+    //--------------------------------------------------------------
+    //
+
+
     //--------------------------------------------------------------
     //
     fun saveLocation()
     {
-        onLocationChanged(mLocation)
-        var lat:Double = mLocation.latitude
-        var lng:Double = mLocation.longitude
+        if(checkLocation())
+        {
+            onLocationChanged(mLocation)
+            var lat:Double = mLocation.latitude
+            var lng:Double = mLocation.longitude
 
-        var pInfo:place = place()
-        pInfo.place(
-                "",
-                String.format("%s",lat),
-                String.format("%s",lng))
-
-        showPlaceInputDialog(pInfo)
+            var pInfo:place = place("", String.format("%s",lat), String.format("%s",lng))
+            showPlaceInputDialog(pInfo)
+        }
     }
     //--------------------------------------------------------------
     //
@@ -443,7 +479,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
 
         when (view.getId())
         {
-            R.id.btn_SaveLocation -> saveLocation()
+            R.id.btn_SaveLocation -> checkPermissionLocation()
         }
     }
     //--------------------------------------------------------------

@@ -14,6 +14,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.common.api.ResultCallback
 import com.google.android.gms.common.api.Status
 import com.midas.secretplace.R
+import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 
 
@@ -145,8 +146,16 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
             setRefreshUi(true)
 
             val acct = result.signInAccount
-            var strUserKey:String? = acct?.id
-            m_App?.m_SpCtrl?.setSpUserKey(strUserKey!!)
+            var strUserKey:String? = acct!!.id
+            var strUserName:String? = acct!!.displayName
+            var strImgUrl: String? = acct!!.photoUrl.toString()
+            if(strImgUrl == null)
+                strImgUrl = ""
+
+            var pInfo:user = user(user.JOIN_TYPE_GOOGLE, strUserKey!!, strUserName!!, strImgUrl)
+            m_App!!.m_FirebaseDbCtrl!!.setUser(pInfo)
+
+            m_App!!.m_SpCtrl!!.setSpUserKey(strUserKey!!)
             m_App!!.goMain(m_Context!!)
         }
     }
