@@ -10,6 +10,12 @@ class SharedPreferenceCtrl
     private val SP_USER_JOIN_TYPE = "SP_USER_JOIN_TYPE";
 
     private lateinit var preference: SharedPreferences
+
+    public constructor()
+    {
+
+    }
+
     public fun init(pContext:Context)
     {
         preference = pContext.getSharedPreferences("prefs", Context.MODE_PRIVATE)

@@ -14,4 +14,6 @@
     <string name="str_cancel">Cancel</string>
     <string name="str_msg_1">로그아웃</string>
     <string name="str_msg_2">로그아웃 하시겠습니까?</string>
+    <string name="str_msg_3">현재 장소를 저장하시겠습니까?</string>
+    <string name="str_msg_4">장소 닉네임을 입력해주세요</string>
 </resources>

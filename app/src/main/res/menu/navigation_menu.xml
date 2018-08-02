@@ -43,7 +43,7 @@
 
             <item
                 android:id="@+id/logout"
-                android:title="로그아웃"
+                android:title="@string/str_msg_1"
                 android:icon="@drawable/ic_launcher_background"/>
 
         </menu>

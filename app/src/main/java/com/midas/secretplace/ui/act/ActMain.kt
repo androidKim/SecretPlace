@@ -14,13 +14,16 @@ import android.support.design.widget.NavigationView
 import android.support.multidex.MultiDex
 import android.support.v4.app.ActivityCompat
 import android.support.v4.view.GravityCompat
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -29,6 +32,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.database.*
+import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
@@ -36,14 +40,18 @@ import kotlinx.android.synthetic.main.act_main.*
 import kotlinx.android.synthetic.main.ly_main.*
 
 
-class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener
+class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, SwipeRefreshLayout.OnRefreshListener
 {
+
     /*********************** Define ***********************/
 
     /*********************** Member ***********************/
     private var m_App: MyApp? = null
     private var m_Context: Context? = null
-    private var m_FirebaseDb:FirebaseDatabase ?= null
+
+    private var m_arrPlace:ArrayList<place>? = null
+    var m_Adapter:PlaceRvAdapter? = null
+    var m_strStartKey:String? = null
     //location..
     private lateinit var mGoogleApiClient: GoogleApiClient
     private var mLocationManager: LocationManager? = null
@@ -120,12 +128,53 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
             super.onBackPressed()
         }
     }
+
+    /*********************** Location Function ***********************/
+    //--------------------------------------------------------------
+    //location...
+    override fun onConnectionSuspended(p0: Int)
+    {
+        Log.i("", "Connection Suspended")
+        mGoogleApiClient.connect()
+    }
+    //--------------------------------------------------------------
+    //
+    override fun onConnectionFailed(connectionResult: ConnectionResult)
+    {
+        Log.i("", "Connection failed. Error: " + connectionResult.getErrorCode());
+    }
+    //--------------------------------------------------------------
+    //
+    override fun onLocationChanged(location: Location)
+    {
+        var msg = "Updated Location: Latitude " + location.longitude.toString() + location.longitude;
+    }
+    //--------------------------------------------------------------
+    //
+    override fun onConnected(p0: Bundle?)
+    {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            return
+        }
+        startLocationUpdates()
+
+        var fusedLocationProviderClient : FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationProviderClient .getLastLocation().addOnSuccessListener(this, OnSuccessListener<Location> { location ->
+            // Got last known location. In some rare situations this can be null.
+            if (location != null)
+            {
+                // Logic to handle location object
+                mLocation = location
+            }
+        })
+    }
     /*********************** User Function ***********************/
     //--------------------------------------------------------------
     //
     fun initValue()
     {
-        m_FirebaseDb = FirebaseDatabase.getInstance()
+        m_arrPlace = ArrayList<place>()
     }
     //--------------------------------------------------------------
     //
@@ -137,13 +186,36 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     //
     fun initLayout()
     {
-        m_btn_SaveLocation = this.findViewById(R.id.btn_SaveLocation)
+        //event..
+        ly_SwipeRefresh.setOnRefreshListener(this)
+
+        m_btn_SaveLocation = findViewById(R.id.btn_SaveLocation)
 
         //listener..
         m_btn_SaveLocation?.setOnClickListener(onClickListener)
 
         settingDrawer()
         settingView()
+        settingRecyclerView()
+    }
+    //--------------------------------------------------------------
+    //
+    fun settingRecyclerView()
+    {
+        m_Adapter = PlaceRvAdapter(this, m_arrPlace!!)
+        recyclerView.adapter = m_Adapter
+
+        var nSpanCnt = 3
+        /*
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode..
+        {
+            nSpanCnt = 4
+        }
+        */
+
+        val pLayoutManager = GridLayoutManager(this, nSpanCnt)
+        recyclerView.layoutManager = pLayoutManager
+        recyclerView.setHasFixedSize(true)
     }
     //--------------------------------------------------------------
     //
@@ -163,14 +235,102 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     //
     fun settingView()
     {
+        getPlaceList()
+    }
 
+    //--------------------------------------------------------------
+    //
+    fun saveLocation()
+    {
+        onLocationChanged(mLocation)
+        var lat:Double = mLocation.latitude
+        var lng:Double = mLocation.longitude
+
+        var pInfo:place = place()
+        pInfo.place(
+                "",
+                String.format("%s",lat),
+                String.format("%s",lng))
+
+        showPlaceInputDialog(pInfo)
+    }
+    //--------------------------------------------------------------
+    //
+    fun getPlaceList()
+    {
+        if(m_strStartKey == null)
+            m_strStartKey = ""
+
+        var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(m_strStartKey!!)
+        pQuery!!.addChildEventListener(childEventListener)
+    }
+
+    //--------------------------------------------------------------
+    //
+    private fun checkLocation(): Boolean
+    {
+        if(!isLocationEnabled())
+            showAlert()
+
+        return isLocationEnabled()
+    }
+    //--------------------------------------------------------------
+    //
+    private fun isLocationEnabled(): Boolean
+    {
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+    //--------------------------------------------------------------
+    //
+    protected fun startLocationUpdates()
+    {
+        // Create the location request
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(UPDATE_INTERVAL)
+                .setFastestInterval(FASTEST_INTERVAL)
+        // Request location updates
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            return
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this)
+    }
+
+    //--------------------------------------------------------------
+    //
+    fun showPlaceInputDialog(pInfo:place)
+    {
+        if(pInfo == null)
+            return
+
+        val builder = AlertDialog.Builder(this@ActMain)
+        builder.setMessage(getString(R.string.str_msg_3))
+        var editName: EditText? = EditText(m_Context)
+        editName!!.hint = getString(R.string.str_msg_4)
+        builder.setView(editName)
+        builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
+            pInfo.name = editName.text.toString()
+            m_App!!.m_FirebaseDbCtrl!!.setPlaceItem(pInfo)
+        }
+
+        builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
+
+        }
+
+        builder.setNeutralButton(getString(R.string.str_cancel)){_,_ ->
+
+        }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
     //--------------------------------------------------------------
     //
     fun showLogoutDialog()
     {
         val builder = AlertDialog.Builder(this@ActMain)
-        builder.setTitle(getString(R.string.str_msg_1))
         builder.setMessage(getString(R.string.str_msg_2))
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
             m_App!!.logoutProc(m_Context as ActMain)
@@ -189,148 +349,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     }
     //--------------------------------------------------------------
     //
-    public fun saveLocation()
-    {
-        Toast.makeText(m_Context, "save lat lng", Toast.LENGTH_SHORT).show()
-
-        var pDbRefList = this.m_FirebaseDb!!.getReference("place_list")
-
-        var pInfo:place = place()
-        pInfo.place("12387128937","222asdfasfdsaf2","safdsafasfasdf")
-
-        var newRef:DatabaseReference  = pDbRefList!!.push()
-        newRef.setValue(pInfo)
-
-
-        var pDbRefResult = FirebaseDatabase.getInstance().getReference("place_list")
-        pDbRefResult!!.addChildEventListener(childEventListener)
-
-        onLocationChanged(mLocation)
-    }
-
-
-    var m_pArr:ArrayList<place> = ArrayList()
-    val childEventListener = object : ChildEventListener {
-        override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?) {
-            // A new message has been added
-            // onChildAdded() will be called for each node at the first time
-
-            val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
-            m_pArr.add(pInfo)
-            Toast.makeText(m_Context, "onDataChange", Toast.LENGTH_SHORT).show()
-            //val message = dataSnapshot!!.getValue(Message::class.java)
-            //messageList.add(message!!)
-        }
-
-        override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?) {
-            //Log.e(TAG, "onChildChanged:" + dataSnapshot!!.key)
-
-            // A message has changed
-            //val message = dataSnapshot.getValue(Message::class.java)
-        }
-
-        override fun onChildRemoved(dataSnapshot: DataSnapshot?) {
-            //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
-
-            // A message has been removed
-            //val message = dataSnapshot.getValue(Message::class.java)
-        }
-
-        override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?) {
-            //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
-
-            // A message has changed position
-            //val message = dataSnapshot.getValue(Message::class.java)
-        }
-
-        override fun onCancelled(databaseError: DatabaseError?) {
-            //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
-        }
-    }
-
-
-    //--------------------------------------------------------------
-    //
-    val messageListener = object : ValueEventListener
-    {
-        override fun onDataChange(dataSnapshot: DataSnapshot)
-        {
-            if (dataSnapshot.exists())
-            {
-
-                Toast.makeText(m_Context, "onDataChange", Toast.LENGTH_SHORT).show()
-                // ...
-            }
-        }
-
-        override fun onCancelled(databaseError: DatabaseError)
-        {
-            // Failed to read value
-        }
-    }
-
-
-
-
-    //--------------------------------------------------------------
-    //location...
-    override fun onConnectionSuspended(p0: Int)
-    {
-        Log.i("", "Connection Suspended")
-        mGoogleApiClient.connect()
-    }
-    //--------------------------------------------------------------
-    //
-    override fun onConnectionFailed(connectionResult: ConnectionResult)
-    {
-        Log.i("", "Connection failed. Error: " + connectionResult.getErrorCode());
-    }
-    //--------------------------------------------------------------
-    //
-    override fun onLocationChanged(location: Location)
-    {
-        var msg = "Updated Location: Latitude " + location.longitude.toString() + location.longitude;
-        txt_latitude.setText(""+location.latitude);
-        txt_longitude.setText(""+location.longitude);
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-    //--------------------------------------------------------------
-    //
-    override fun onConnected(p0: Bundle?)
-    {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            return
-        }
-        startLocationUpdates()
-
-        var fusedLocationProviderClient : FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        fusedLocationProviderClient .getLastLocation().addOnSuccessListener(this, OnSuccessListener<Location> { location ->
-                    // Got last known location. In some rare situations this can be null.
-                    if (location != null)
-                    {
-                        // Logic to handle location object
-                        mLocation = location;
-                        txt_latitude.setText("" + mLocation.latitude)
-                        txt_longitude.setText("" + mLocation.longitude)
-                    }
-                })
-    }
-
-    private fun checkLocation(): Boolean
-    {
-        if(!isLocationEnabled())
-            showAlert();
-
-        return isLocationEnabled();
-    }
-
-    private fun isLocationEnabled(): Boolean
-    {
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-    }
-
     private fun showAlert()
     {
         val dialog = AlertDialog.Builder(this)
@@ -343,20 +361,79 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
                 .setNegativeButton("Cancel", DialogInterface.OnClickListener { paramDialogInterface, paramInt -> })
         dialog.show()
     }
-
-    protected fun startLocationUpdates()
+    //----------------------------------------------------------------------
+    //
+    fun setRefresh()
     {
-        // Create the location request
-        mLocationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(UPDATE_INTERVAL)
-                .setFastestInterval(FASTEST_INTERVAL)
-        // Request location updates
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        m_strStartKey = null
+        m_arrPlace = ArrayList<place>()
+        if(m_Adapter != null)
+            m_Adapter!!.clearData()
+
+        ly_SwipeRefresh.setRefreshing(false);
+
+        getPlaceList()
+    }
+
+    /************************* listener *************************/
+    //--------------------------------------------------------------
+    //
+    val childEventListener = object : ChildEventListener
+    {
+        override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
         {
-            return
+            // A new message has been added
+            // onChildAdded() will be called for each node at the first time
+            m_strStartKey = dataSnapshot!!.key
+            val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
+            m_Adapter!!.addData(pInfo)
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this)
+
+        override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+        {
+            //Log.e(TAG, "onChildChanged:" + dataSnapshot!!.key)
+
+            // A message has changed
+            //val message = dataSnapshot.getValue(Message::class.java)
+        }
+
+        override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+        {
+            //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
+
+            // A message has been removed
+            //val message = dataSnapshot.getValue(Message::class.java)
+        }
+
+        override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+        {
+            //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
+
+            // A message has changed position
+            //val message = dataSnapshot.getValue(Message::class.java)
+        }
+
+        override fun onCancelled(databaseError: DatabaseError?)
+        {
+            //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+        }
+    }
+    //--------------------------------------------------------------
+    //
+    val messageListener = object : ValueEventListener
+    {
+        override fun onDataChange(dataSnapshot: DataSnapshot)
+        {
+            if (dataSnapshot.exists())
+            {
+                // ...
+            }
+        }
+
+        override fun onCancelled(databaseError: DatabaseError)
+        {
+            // Failed to read value
+        }
     }
 
     /*********************** listener ***********************/
@@ -369,7 +446,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
             R.id.btn_SaveLocation -> saveLocation()
         }
     }
-
     //--------------------------------------------------------------
     //
     override fun onNavigationItemSelected(item: MenuItem): Boolean
@@ -421,5 +497,12 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return result
+    }
+
+    //----------------------------------------------------------------------
+    //
+    override fun onRefresh()
+    {
+        setRefresh()
     }
 }

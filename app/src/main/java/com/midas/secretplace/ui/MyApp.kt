@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
+import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.core.SharedPreferenceCtrl
 import com.midas.secretplace.ui.act.ActLogin
 import com.midas.secretplace.ui.act.ActMain
@@ -15,6 +16,7 @@ class MyApp:MultiDexApplication()
     var m_Context: Context? = null
     var m_binit:Boolean = false
     var m_SpCtrl:SharedPreferenceCtrl? = null
+    var m_FirebaseDbCtrl:FirebaseDbCtrl? = null
 
     override fun attachBaseContext(base: Context)
     {
@@ -31,6 +33,9 @@ class MyApp:MultiDexApplication()
             //sharedPreference..
             m_SpCtrl = SharedPreferenceCtrl()
             m_SpCtrl!!.init(m_Context!!)
+
+            //firebase Db Ctrl
+            m_FirebaseDbCtrl = FirebaseDbCtrl()
 
             //localDb.
 
