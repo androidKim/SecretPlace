@@ -128,6 +128,47 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
             super.onBackPressed()
         }
     }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray)
+    {
+
+        when (requestCode)
+        {
+            Constant.REQUEST_ID_MULTIPLE_PERMISSIONS ->
+            {
+                val perms = HashMap<String, Int>()
+                // Initialize the map with both permissions
+                perms[Manifest.permission.ACCESS_COARSE_LOCATION] = PackageManager.PERMISSION_GRANTED
+                perms[Manifest.permission.ACCESS_FINE_LOCATION] = PackageManager.PERMISSION_GRANTED
+                // Fill with actual results from user
+                if (grantResults.size > 0)
+                {
+                    for (i in permissions.indices)
+                        perms[permissions[i]] = grantResults[i]
+                    // Check for both permissions
+                    if (perms[Manifest.permission.ACCESS_COARSE_LOCATION] == PackageManager.PERMISSION_GRANTED
+                            && perms[Manifest.permission.ACCESS_FINE_LOCATION] == PackageManager.PERMISSION_GRANTED)
+                    {
+                        checkPermissionLocation()
+                    }
+                    else
+                    {
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                                || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION))
+                        {
+                            checkPermissionLocation()
+                        }
+                        else
+                        {
+                            saveLocation()
+                        }
+                    }
+                }
+            }
+        }
+
+    }
     /*********************** Location Function ***********************/
     //--------------------------------------------------------------
     //location...
@@ -204,31 +245,28 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     {
         val permissionCoarseLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
         val permissionFineLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+
+
+        val listPermissionsNeeded = ArrayList<String>()
+
         if (permissionCoarseLocation != PackageManager.PERMISSION_GRANTED )//
         {
-            requestCoarseLocation()
+            listPermissionsNeeded.add(Manifest.permission.ACCESS_COARSE_LOCATION)
         }
-        else if(permissionFineLocation != PackageManager.PERMISSION_GRANTED)
+
+        if(permissionFineLocation != PackageManager.PERMISSION_GRANTED)
         {
-            requestFineLocation()
+            listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION)
         }
-        else//
+
+        if (!listPermissionsNeeded.isEmpty())//
+        {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toTypedArray(), Constant.REQUEST_ID_MULTIPLE_PERMISSIONS)
+        }
+        else
         {
             saveLocation()
         }
-    }
-
-    //--------------------------------------------------------------
-    //
-    private fun requestCoarseLocation()
-    {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), Constant.PERMISSION_ACCESS_COARSE_LOCATION)
-    }
-    //--------------------------------------------------------------
-    //
-    private fun requestFineLocation()
-    {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), Constant.PERMISSION_ACCESS_FINE_LOCATION)
     }
 
     //--------------------------------------------------------------
