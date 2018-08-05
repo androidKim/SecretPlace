@@ -1,17 +1,17 @@
 package com.midas.mytimeline.ui.adapter
 
+
 import android.content.Context
+import android.content.Intent
 import android.support.v7.widget.RecyclerView
-
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.place
+import com.midas.secretplace.ui.act.ActPlaceDetail
 
 class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>) :
         RecyclerView.Adapter<PlaceRvAdapter.Holder>()
@@ -22,6 +22,13 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder
     {
         val view = LayoutInflater.from(context).inflate(R.layout.row_place, parent, false)
+
+        view!!.setOnClickListener(View.OnClickListener
+        {
+            var pIntent = Intent(context, ActPlaceDetail::class.java)
+            context.startActivity(pIntent)
+        })
+
         return Holder(view)
     }
 

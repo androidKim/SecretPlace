@@ -1,4 +1,5 @@
 <resources>
+    <string name="google_maps_key">AIzaSyDtbMkveLaoHDA18vK7GZKFK8E7IW3Wi6M</string>
     <string name="app_name">SecretPlace</string>
     <string name="option_one">Opcion Uno</string>
     <string name="option_two">Opcion Dos</string>
