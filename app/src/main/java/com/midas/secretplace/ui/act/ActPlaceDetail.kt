@@ -2,9 +2,12 @@
 package com.midas.secretplace.ui.act
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
+import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.frag.MapFragment
 
@@ -16,7 +19,7 @@ class ActPlaceDetail : AppCompatActivity()
     /*********************** Member ***********************/
     private var m_App: MyApp? = null
     private var m_Context: Context? = null
-
+    private var m_PlaceInfo:place? = null
     /*********************** Controller ***********************/
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
@@ -31,10 +34,6 @@ class ActPlaceDetail : AppCompatActivity()
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context as ActPlaceDetail)
-
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as MapFragment
-        mapFragment.getMapAsync(mapFragment)
-        System.err.println("OnCreate end")
 
         initValue()
         recvIntentData()
@@ -52,7 +51,13 @@ class ActPlaceDetail : AppCompatActivity()
     //
     fun recvIntentData()
     {
+        var pIntent: Intent = intent
 
+        if(pIntent == null)
+            return
+
+        if(pIntent.hasExtra(Constant.INTENT_DATA_PLACE_OBJECT))
+            m_PlaceInfo =  pIntent.extras.get(Constant.INTENT_DATA_PLACE_OBJECT) as place
     }
     //--------------------------------------------------------------
     //
@@ -64,7 +69,12 @@ class ActPlaceDetail : AppCompatActivity()
     //
     fun settingView()
     {
-
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as MapFragment
+        mapFragment.getMapAsync(mapFragment)
+        val mArgs = Bundle()
+        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo)
+        mapFragment.arguments = mArgs
+        System.err.println("OnCreate end")
     }
     /************************* listener *************************/
 
