@@ -66,7 +66,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     lateinit var locationManager: LocationManager
     /*********************** Controller ***********************/
     private var m_btn_SaveLocation: Button?=null
-
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
     //
@@ -367,6 +366,8 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     //
     fun getPlaceList()
     {
+        m_App!!.showLoadingDialog(ly_LoadingDialog!!)
+
         if(m_strSeq == null)
             m_strSeq = ""
 

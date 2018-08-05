@@ -21,11 +21,7 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
         var args = arguments
         var pInfo:place = args!!.getSerializable(Constant.INTENT_DATA_PLACE_OBJECT) as place
 
-
-
         mMap = map as GoogleMap
-
-
 
         var nLat:Double = pInfo.lat!!.toDouble()
         var nLng:Double = pInfo.lng!!.toDouble()
