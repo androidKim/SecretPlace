@@ -20,12 +20,15 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -65,8 +68,11 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     private val FASTEST_INTERVAL: Long = 2000 /* 2 sec */
 
     lateinit var locationManager: LocationManager
+    //
+    private var m_bRunning:Boolean = false
     /*********************** Controller ***********************/
     private var m_btn_SaveLocation: Button?=null
+    private var m_iv_Profile:ImageView? = null
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
     //
@@ -322,6 +328,27 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         val pLayoutManager = GridLayoutManager(this, nSpanCnt)
         recyclerView.layoutManager = pLayoutManager
         recyclerView.setHasFixedSize(true)
+
+        recyclerView.layoutManager = pLayoutManager
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener()
+        {
+            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
+            {
+                val visibleItemCount = pLayoutManager.childCount
+                val totalItemCount = pLayoutManager.itemCount
+                val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
+
+                if(!m_bRunning && (visibleItemCount + firstVisible) >= totalItemCount)
+                {
+                    m_bRunning = true
+                    // Call your API to load more items
+                }
+            }
+        })
     }
     //--------------------------------------------------------------
     //
@@ -336,6 +363,10 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         toggle.syncState()
 
         navigation_view.setNavigationItemSelectedListener(this)
+
+        //header..
+        var v_Header:View = navigation_view!!.getHeaderView(0)
+        m_iv_Profile = v_Header.findViewById(R.id.iv_Profile)
     }
     //--------------------------------------------------------------
     //
@@ -357,6 +388,10 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
             override fun onDataChange(dataSnapshot: DataSnapshot?)
             {
                 val pInfo: user = dataSnapshot!!.getValue(user::class.java)!!
+                if(pInfo != null)
+                {
+                    settingUserView(pInfo)
+                }
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -365,7 +400,18 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
             }
         })
     }
+    //--------------------------------------------------------------
+    //
+    fun settingUserView(pInfo:user)
+    {
+        if(pInfo == null)
+            return
 
+        if(pInfo.img_url != null)
+        {
+            Glide.with(this).load(pInfo.img_url).into(m_iv_Profile)
+        }
+    }
 
     //--------------------------------------------------------------
     //
