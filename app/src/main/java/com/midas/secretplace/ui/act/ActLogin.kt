@@ -16,7 +16,7 @@ import com.google.android.gms.common.api.Status
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
-
+import kotlinx.android.synthetic.main.act_login.*
 
 
 class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
@@ -143,6 +143,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
     {
         if (result.isSuccess)
         {
+            m_App!!.showLoadingDialog(ly_LoadingDialog)
             setRefreshUi(true)
 
             val acct = result.signInAccount
@@ -152,12 +153,11 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
             if(strImgUrl == null)
                 strImgUrl = ""
 
-            var pInfo:user = user(user.JOIN_TYPE_GOOGLE, strUserKey!!, strUserName!!, strImgUrl)
+            var pInfo: user = user(user.JOIN_TYPE_GOOGLE, strUserKey!!, strUserName!!, strImgUrl)
             m_App!!.m_FirebaseDbCtrl!!.setUser(pInfo)
 
             m_App!!.m_SpCtrl!!.setSpUserKey(strUserKey!!)
             m_App!!.goMain(m_Context!!)
         }
     }
-
 }

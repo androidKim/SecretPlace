@@ -11,7 +11,7 @@ class ReqBase
 
     companion object
     {
-        public val ITEM_COUNT:Int = 20
+        public val ITEM_COUNT:Int = 40
     }
 
 

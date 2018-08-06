@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -21,7 +21,7 @@
 
 
     <android.support.v4.widget.SwipeRefreshLayout
-        android:layout_above="@+id/ly_Bottom"
+        android:layout_below="@+id/btn_SaveLocation"
         android:id="@+id/ly_SwipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -29,8 +29,13 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-        </android.support.v7.widget.RecyclerView>
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
     </android.support.v4.widget.SwipeRefreshLayout>
-</LinearLayout>
+
+    <LinearLayout
+        android:layout_centerInParent="true"
+        android:id="@+id/ly_LoadingDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"></LinearLayout>
+</RelativeLayout>

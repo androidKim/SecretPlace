@@ -53,7 +53,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
 
     private var m_arrPlace:ArrayList<place>? = null
     var m_Adapter:PlaceRvAdapter? = null
-    var m_strStartKey:String? = null
+    var m_strSeq:String? = null
     //location..
     private lateinit var mGoogleApiClient: GoogleApiClient
     private var mLocationManager: LocationManager? = null
@@ -66,7 +66,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     lateinit var locationManager: LocationManager
     /*********************** Controller ***********************/
     private var m_btn_SaveLocation: Button?=null
-
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
     //
@@ -161,7 +160,25 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
                         }
                         else
                         {
-                            saveLocation()
+                            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                                return
+
+                            if(mLocation.latitude <= 0 || mLocation.longitude <= 0)
+                            {
+                                var fusedLocationProviderClient : FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+                                fusedLocationProviderClient .getLastLocation().addOnSuccessListener(this, OnSuccessListener<Location> { location ->
+                                    // Got last known location. In some rare situations this can be null.
+                                    if (location != null)
+                                    {
+                                        // Logic to handle location object
+                                        mLocation = location
+                                    }
+                                })
+                            }
+                            else
+                            {
+                                saveLocation()
+                            }
                         }
                     }
                 }
@@ -188,6 +205,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     override fun onLocationChanged(location: Location)
     {
         var msg = "Updated Location: Latitude " + location.longitude.toString() + location.longitude;
+        mLocation = location
     }
     //--------------------------------------------------------------
     //
@@ -215,6 +233,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     fun initValue()
     {
         m_arrPlace = ArrayList<place>()
+        mLocation = Location("dummyProvider");
     }
     //--------------------------------------------------------------
     //
@@ -265,7 +284,22 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         }
         else
         {
-            saveLocation()
+            if(mLocation.latitude <= 0 || mLocation.longitude <= 0)
+            {
+                var fusedLocationProviderClient : FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+                fusedLocationProviderClient .getLastLocation().addOnSuccessListener(this, OnSuccessListener<Location> { location ->
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null)
+                    {
+                        // Logic to handle location object
+                        mLocation = location
+                    }
+                })
+            }
+            else
+            {
+                saveLocation()
+            }
         }
     }
 
@@ -330,13 +364,14 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     //
     fun getPlaceList()
     {
-        if(m_strStartKey == null)
-            m_strStartKey = ""
+        m_App!!.showLoadingDialog(ly_LoadingDialog!!)
 
-        var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(m_strStartKey!!)
-        pQuery!!.addChildEventListener(childEventListener)
+        if(m_strSeq == null)
+            m_strSeq = ""
+
+        var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(m_strSeq!!)
+        pQuery!!.addChildEventListener(getPlaceListener)
     }
-
     //--------------------------------------------------------------
     //
     private fun checkLocation(): Boolean
@@ -384,7 +419,8 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         builder.setView(editName)
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
             pInfo.name = editName.text.toString()
-            m_App!!.m_FirebaseDbCtrl!!.setPlaceItem(pInfo)
+            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceItem(pInfo)
+            pDbRef.addValueEventListener(addPlaceListener)
         }
 
         builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
@@ -437,7 +473,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     //
     fun setRefresh()
     {
-        m_strStartKey = null
+        m_strSeq = null
         m_arrPlace = ArrayList<place>()
         if(m_Adapter != null)
             m_Adapter!!.clearData()
@@ -450,13 +486,13 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     /************************* listener *************************/
     //--------------------------------------------------------------
     //
-    val childEventListener = object : ChildEventListener
+    val getPlaceListener = object : ChildEventListener
     {
         override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
         {
             // A new message has been added
             // onChildAdded() will be called for each node at the first time
-            m_strStartKey = dataSnapshot!!.key
+            m_strSeq = dataSnapshot!!.key
             val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
             m_Adapter!!.addData(pInfo)
         }
@@ -492,13 +528,15 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     }
     //--------------------------------------------------------------
     //
-    val messageListener = object : ValueEventListener
+    val addPlaceListener = object : ValueEventListener
     {
         override fun onDataChange(dataSnapshot: DataSnapshot)
         {
             if (dataSnapshot.exists())
             {
-                // ...
+                m_strSeq = dataSnapshot!!.key
+                val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
+                m_Adapter!!.addData(pInfo)
             }
         }
 

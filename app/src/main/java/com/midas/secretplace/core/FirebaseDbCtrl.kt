@@ -1,5 +1,6 @@
 package com.midas.secretplace.core
 
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.Query
 import com.midas.secretplace.structure.core.ReqBase
@@ -64,10 +65,11 @@ class FirebaseDbCtrl
 
     //---------------------------------------------------------------
     //
-    fun setPlaceItem(pInfo:place)
+    fun setPlaceItem(pInfo:place):DatabaseReference
     {
         var pDbRef = m_FirebaseDb!!.getReference(TB_PLACE)!!.push()
         pDbRef.setValue(pInfo)
+        return pDbRef
     }
 
     /************************* DB Getter *************************/
