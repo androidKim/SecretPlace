@@ -308,8 +308,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     {
         getPlaceList()
     }
-
-
     //--------------------------------------------------------------
     //
 
