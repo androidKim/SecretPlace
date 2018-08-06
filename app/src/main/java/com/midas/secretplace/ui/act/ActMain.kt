@@ -351,7 +351,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         var joinType:String? = m_App!!.m_SpCtrl!!.getJoinType()
         var key:String? = m_App!!.m_SpCtrl!!.getSpUserKey()
         var seq:String? = String.format("%s%s", joinType, key)
-        
+
         var pDbRef:DatabaseReference? = m_App!!.m_FirebaseDbCtrl!!.getUserDbRef().child(seq)//where
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onDataChange(dataSnapshot: DataSnapshot?)
