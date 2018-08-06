@@ -51,18 +51,19 @@ class FirebaseDbCtrl
         //insert & update..
         var pDbRef = m_FirebaseDb!!.getReference(TB_USER)!!.child(pInfo.join_type+pInfo.key).setValue(pInfo)
 
-
         //ref.child("myDb").child("awais@gmailcom").child("leftSpace").setValue("YourDateHere");
         //pDbRef.setValue(pInfo)
-
-
-
-
 
         //var pDbRef = m_FirebaseDb!!.getReference(TB_USER)!!.push()
         //pDbRef.updateChildren(pMap)
     }
-
+    //---------------------------------------------------------------
+    //user key
+    fun getUserDbRef():DatabaseReference
+    {
+        var pDbRef = m_FirebaseDb!!.getReference(TB_USER)
+        return pDbRef
+    }
     //---------------------------------------------------------------
     //
     fun setPlaceItem(pInfo:place):DatabaseReference

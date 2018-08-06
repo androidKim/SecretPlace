@@ -109,6 +109,6 @@ class MyApp:MultiDexApplication()
     //
     fun hideLoadingDialog(pView:LinearLayout)
     {
-         pView.removeAllViews()
+        pView.removeAllViews()
     }
 }

@@ -37,6 +37,7 @@ import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.place
+import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import kotlinx.android.synthetic.main.act_main.*
 import kotlinx.android.synthetic.main.ly_main.*
@@ -340,10 +341,30 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     //
     fun settingView()
     {
+        getUserData()
         getPlaceList()
     }
     //--------------------------------------------------------------
     //
+    fun getUserData()
+    {
+        var joinType:String? = m_App!!.m_SpCtrl!!.getJoinType()
+        var key:String? = m_App!!.m_SpCtrl!!.getSpUserKey()
+        var seq:String? = String.format("%s%s", joinType, key)
+        
+        var pDbRef:DatabaseReference? = m_App!!.m_FirebaseDbCtrl!!.getUserDbRef().child(seq)//where
+        pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                val pInfo: user = dataSnapshot!!.getValue(user::class.java)!!
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+    }
 
 
     //--------------------------------------------------------------
@@ -364,13 +385,14 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     //
     fun getPlaceList()
     {
-        m_App!!.showLoadingDialog(ly_LoadingDialog!!)
-
         if(m_strSeq == null)
             m_strSeq = ""
 
+        m_App!!.showLoadingDialog(ly_LoadingDialog)
+
         var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(m_strSeq!!)
-        pQuery!!.addChildEventListener(getPlaceListener)
+        pQuery!!.addListenerForSingleValueEvent(listenerForSingleValueEvent)
+        pQuery!!.addChildEventListener(childEventListener)
     }
     //--------------------------------------------------------------
     //
@@ -483,10 +505,29 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         getPlaceList()
     }
 
+    var count:Int = 0
     /************************* listener *************************/
     //--------------------------------------------------------------
     //
-    val getPlaceListener = object : ChildEventListener
+    val listenerForSingleValueEvent = object:ValueEventListener
+    {
+        override fun onDataChange(p0: DataSnapshot?)
+        {
+            //stop progress bar here
+            m_App!!.hideLoadingDialog(ly_LoadingDialog)
+        }
+
+        override fun onCancelled(p0: DatabaseError?)
+        {
+
+        }
+
+    }
+
+
+    //--------------------------------------------------------------
+    //
+    val childEventListener = object : ChildEventListener
     {
         override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
         {
@@ -495,11 +536,13 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
             m_strSeq = dataSnapshot!!.key
             val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
             m_Adapter!!.addData(pInfo)
+
+
         }
 
         override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
         {
-            //Log.e(TAG, "onChildChanged:" + dataSnapshot!!.key)
+            //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
 
             // A message has changed
             //val message = dataSnapshot.getValue(Message::class.java)

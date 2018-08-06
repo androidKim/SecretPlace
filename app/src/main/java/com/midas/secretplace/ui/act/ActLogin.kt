@@ -157,6 +157,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
             m_App!!.m_FirebaseDbCtrl!!.setUser(pInfo)
 
             m_App!!.m_SpCtrl!!.setSpUserKey(strUserKey!!)
+            m_App!!.m_SpCtrl!!.setJoinType(user.JOIN_TYPE_GOOGLE)
             m_App!!.goMain(m_Context!!)
         }
     }

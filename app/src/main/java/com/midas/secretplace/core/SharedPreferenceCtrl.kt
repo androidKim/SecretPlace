@@ -6,8 +6,8 @@ import android.content.SharedPreferences
 class SharedPreferenceCtrl
 {
     /************************* Defeine *************************/
-    private val SP_USER_KEY = "SP_USER_KEY";
-    private val SP_USER_JOIN_TYPE = "SP_USER_JOIN_TYPE";
+    private val SP_USER_KEY = "SP_USER_KEY"
+    private val SP_USER_JOIN_TYPE = "SP_USER_JOIN_TYPE"
 
     private lateinit var preference: SharedPreferences
 
@@ -50,18 +50,32 @@ class SharedPreferenceCtrl
     /************************* User Function *************************/
     //---------------------------------------------------------
     //
-    public fun setSpUserKey(value:String)
+    fun setSpUserKey(value:String)
     {
         if(value == null)
             return
 
         setStrSaveData(SP_USER_KEY, value)
     }
-    public fun getSpUserKey():String?
+    fun getSpUserKey():String?
     {
         var strResult:String?=null
         strResult = getStrLoadData(SP_USER_KEY)
         return strResult
     }
+    //---------------------------------------------------------
+    //
+    fun setJoinType(value:String)
+    {
+        if(value == null)
+            return
 
+        setStrSaveData(SP_USER_JOIN_TYPE, value)
+    }
+    fun getJoinType():String?
+    {
+        var strResult:String?=null
+        strResult = getStrLoadData(SP_USER_JOIN_TYPE)
+        return strResult
+    }
 }
