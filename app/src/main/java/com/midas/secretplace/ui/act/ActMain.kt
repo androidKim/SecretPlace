@@ -70,6 +70,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     lateinit var locationManager: LocationManager
     //
     private var m_bRunning:Boolean = false
+    private var m_bPagingFinish:Boolean = false
     /*********************** Controller ***********************/
     private var m_btn_SaveLocation: Button?=null
     private var m_iv_Profile:ImageView? = null
@@ -332,10 +333,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         recyclerView.layoutManager = pLayoutManager
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener()
         {
-            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-            }
-
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
             {
                 val visibleItemCount = pLayoutManager.childCount
@@ -344,8 +341,9 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
 
                 if(!m_bRunning && (visibleItemCount + firstVisible) >= totalItemCount)
                 {
-                    m_bRunning = true
                     // Call your API to load more items
+                    if(!m_bPagingFinish)
+                        getPlaceList(m_strSeq!!)
                 }
             }
         })
@@ -373,7 +371,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     fun settingView()
     {
         getUserData()
-        getPlaceList()
+        getPlaceList("")
     }
     //--------------------------------------------------------------
     //
@@ -429,16 +427,75 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     }
     //--------------------------------------------------------------
     //
-    fun getPlaceList()
+    fun getPlaceList(strSeq:String)
     {
-        if(m_strSeq == null)
-            m_strSeq = ""
-
+        m_bRunning = true
         m_App!!.showLoadingDialog(ly_LoadingDialog)
 
-        var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(m_strSeq!!)
-        pQuery!!.addListenerForSingleValueEvent(listenerForSingleValueEvent)
-        pQuery!!.addChildEventListener(childEventListener)
+        var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(strSeq!!)
+        //pQuery!!.addListenerForSingleValueEvent(listenerForSingleValueEvent)
+        //pQuery!!.addChildEventListener(childEventListener)
+        pQuery.addChildEventListener(object : ChildEventListener{
+            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                // A new message has been added
+                // onChildAdded() will be called for each node at the first time
+                if(!m_strSeq.equals(dataSnapshot!!.key))
+                {
+                    m_strSeq = dataSnapshot!!.key
+                    val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
+                    m_Adapter!!.addData(pInfo)
+                }
+                else
+                {
+                    //no more data
+                    m_bPagingFinish = true
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
+
+                // A message has changed
+                //val message = dataSnapshot.getValue(Message::class.java)
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            {
+                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
+
+                // A message has been removed
+                //val message = dataSnapshot.getValue(Message::class.java)
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
+
+                // A message has changed position
+                //val message = dataSnapshot.getValue(Message::class.java)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError?)
+            {
+                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+            }
+        })
+
+        pQuery.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onDataChange(p0: DataSnapshot?)
+            {
+                m_bRunning = false
+                m_App!!.hideLoadingDialog(ly_LoadingDialog)
+
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
     }
     //--------------------------------------------------------------
     //
@@ -488,7 +545,22 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
             pInfo.name = editName.text.toString()
             var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceItem(pInfo)
-            pDbRef.addValueEventListener(addPlaceListener)
+            //pDbRef.addValueEventListener(addPlaceListener)
+            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(dataSnapshot: DataSnapshot?)
+                {
+                    if (dataSnapshot!!.exists())
+                    {
+                        m_strSeq = dataSnapshot!!.key
+                        val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
+                    }
+                }
+
+                override fun onCancelled(p0: DatabaseError?)
+                {
+
+                }
+            })
         }
 
         builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
@@ -548,91 +620,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
 
         ly_SwipeRefresh.setRefreshing(false);
 
-        getPlaceList()
-    }
-
-    var count:Int = 0
-    /************************* listener *************************/
-    //--------------------------------------------------------------
-    //
-    val listenerForSingleValueEvent = object:ValueEventListener
-    {
-        override fun onDataChange(p0: DataSnapshot?)
-        {
-            //stop progress bar here
-            m_App!!.hideLoadingDialog(ly_LoadingDialog)
-        }
-
-        override fun onCancelled(p0: DatabaseError?)
-        {
-
-        }
-
-    }
-
-
-    //--------------------------------------------------------------
-    //
-    val childEventListener = object : ChildEventListener
-    {
-        override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
-        {
-            // A new message has been added
-            // onChildAdded() will be called for each node at the first time
-            m_strSeq = dataSnapshot!!.key
-            val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
-            m_Adapter!!.addData(pInfo)
-
-
-        }
-
-        override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
-        {
-            //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
-
-            // A message has changed
-            //val message = dataSnapshot.getValue(Message::class.java)
-        }
-
-        override fun onChildRemoved(dataSnapshot: DataSnapshot?)
-        {
-            //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
-
-            // A message has been removed
-            //val message = dataSnapshot.getValue(Message::class.java)
-        }
-
-        override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
-        {
-            //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
-
-            // A message has changed position
-            //val message = dataSnapshot.getValue(Message::class.java)
-        }
-
-        override fun onCancelled(databaseError: DatabaseError?)
-        {
-            //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
-        }
-    }
-    //--------------------------------------------------------------
-    //
-    val addPlaceListener = object : ValueEventListener
-    {
-        override fun onDataChange(dataSnapshot: DataSnapshot)
-        {
-            if (dataSnapshot.exists())
-            {
-                m_strSeq = dataSnapshot!!.key
-                val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
-                m_Adapter!!.addData(pInfo)
-            }
-        }
-
-        override fun onCancelled(databaseError: DatabaseError)
-        {
-            // Failed to read value
-        }
+        getPlaceList("")
     }
 
     /*********************** listener ***********************/
