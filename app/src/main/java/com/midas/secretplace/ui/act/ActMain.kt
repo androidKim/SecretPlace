@@ -2,11 +2,13 @@
 package com.midas.secretplace.ui.act
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
@@ -21,13 +23,12 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.InputFilter
+import android.text.InputType
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import com.bumptech.glide.Glide
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -39,6 +40,7 @@ import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
+import com.midas.secretplace.structure.core.distance
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
@@ -50,7 +52,8 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
 {
 
     /*********************** Define ***********************/
-
+    val TYPE_SAVE_PLACE:Int = 1//
+    val TYPE_SAVE_DISTANCE:Int = 2
     /*********************** Member ***********************/
     private var m_App: MyApp? = null
     private var m_Context: Context? = null
@@ -69,6 +72,8 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
 
     lateinit var locationManager: LocationManager
     //
+    private var m_DistanceInfo:distance? = null
+    private var m_nSaveType:Int = 0
     private var m_bRunning:Boolean = false
     private var m_bPagingFinish:Boolean = false
     /*********************** Controller ***********************/
@@ -213,6 +218,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     override fun onLocationChanged(location: Location)
     {
         var msg = "Updated Location: Latitude " + location.longitude.toString() + location.longitude;
+        Toast.makeText(m_Context, "Update", Toast.LENGTH_SHORT).show()
         mLocation = location
     }
     //--------------------------------------------------------------
@@ -241,7 +247,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     fun initValue()
     {
         m_arrPlace = ArrayList<place>()
-        mLocation = Location("dummyProvider");
+        mLocation = Location("dummyProvider")
     }
     //--------------------------------------------------------------
     //
@@ -259,7 +265,14 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         m_btn_SaveLocation = findViewById(R.id.btn_SaveLocation)
 
         //listener..
-        m_btn_SaveLocation?.setOnClickListener(onClickListener)
+        m_btn_SaveLocation?.setOnClickListener(View.OnClickListener {
+            m_nSaveType = TYPE_SAVE_PLACE
+            checkPermissionLocation()
+        })
+        btn_SaveDistance.setOnClickListener(View.OnClickListener {
+            m_nSaveType = TYPE_SAVE_DISTANCE
+            checkPermissionLocation()
+        })
 
         settingDrawer()
         settingView()
@@ -272,7 +285,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     {
         val permissionCoarseLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
         val permissionFineLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-
 
         val listPermissionsNeeded = ArrayList<String>()
 
@@ -306,7 +318,10 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
             }
             else
             {
-                saveLocation()
+                if(m_nSaveType == TYPE_SAVE_PLACE)
+                    saveLocation()
+                else if(m_nSaveType == TYPE_SAVE_DISTANCE)
+                    saveDistance()
             }
         }
     }
@@ -377,11 +392,8 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     //
     fun getUserData()
     {
-        var joinType:String? = m_App!!.m_SpCtrl!!.getJoinType()
-        var key:String? = m_App!!.m_SpCtrl!!.getSpUserKey()
-        var seq:String? = String.format("%s%s", joinType, key)
-
-        var pDbRef:DatabaseReference? = m_App!!.m_FirebaseDbCtrl!!.getUserDbRef().child(seq)//where
+        var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()
+        var pDbRef:DatabaseReference? = m_App!!.m_FirebaseDbCtrl!!.getUserDbRef().child(userKey)//where
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onDataChange(dataSnapshot: DataSnapshot?)
             {
@@ -407,10 +419,10 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
 
         if(pInfo.img_url != null)
         {
-            Glide.with(this).load(pInfo.img_url).into(m_iv_Profile)
+            if(pInfo.img_url!!.length > 0)
+                Glide.with(this).load(pInfo.img_url).into(m_iv_Profile)
         }
     }
-
     //--------------------------------------------------------------
     //
     fun saveLocation()
@@ -421,18 +433,29 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
             var lat:Double = mLocation.latitude
             var lng:Double = mLocation.longitude
 
-            var pInfo:place = place("", String.format("%s",lat), String.format("%s",lng))
+            var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919
+
+            var pInfo:place = place(userKey!!, "", String.format("%s",lat), String.format("%s",lng))
             showPlaceInputDialog(pInfo)
         }
     }
     //--------------------------------------------------------------
     //
-    fun getPlaceList(strSeq:String)
+    fun saveDistance()
+    {
+        if(checkLocation())
+        {
+            showDistanceInputDialog()
+        }
+    }
+    //--------------------------------------------------------------
+    //
+    fun getPlaceList(seq:String)
     {
         m_bRunning = true
         m_App!!.showLoadingDialog(ly_LoadingDialog)
 
-        var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(strSeq!!)
+        var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(seq!!)
         //pQuery!!.addListenerForSingleValueEvent(listenerForSingleValueEvent)
         //pQuery!!.addChildEventListener(childEventListener)
         pQuery.addChildEventListener(object : ChildEventListener{
@@ -442,9 +465,12 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
                 // onChildAdded() will be called for each node at the first time
                 if(!m_strSeq.equals(dataSnapshot!!.key))
                 {
-                    m_strSeq = dataSnapshot!!.key
                     val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
-                    m_Adapter!!.addData(pInfo)
+                    if(pInfo.user_fk.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
+                    {
+                        m_strSeq = dataSnapshot!!.key
+                        m_Adapter!!.addData(pInfo)
+                    }
                 }
                 else
                 {
@@ -488,7 +514,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
             {
                 m_bRunning = false
                 m_App!!.hideLoadingDialog(ly_LoadingDialog)
-
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -544,7 +569,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         builder.setView(editName)
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
             pInfo.name = editName.text.toString()
-            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceItem(pInfo)
+            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(pInfo)
             //pDbRef.addValueEventListener(addPlaceListener)
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -574,6 +599,79 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         val dialog: AlertDialog = builder.create()
         dialog.show()
     }
+    @SuppressLint("MissingPermission")
+//--------------------------------------------------------------
+    //
+    fun showDistanceInputDialog()
+    {
+        val builder = AlertDialog.Builder(this@ActMain)
+        builder.setMessage(getString(R.string.str_msg_5))
+        //custom view..
+        var pLayout:LinearLayout? = LinearLayout(m_Context)
+        pLayout!!.orientation = LinearLayout.VERTICAL
+
+        var editTime: EditText? = EditText(m_Context)
+        editTime!!.inputType = InputType.TYPE_CLASS_NUMBER
+        editTime!!.hint = getString(R.string.str_msg_6)
+        editTime!!.limitLength(2)
+
+        pLayout.addView(editTime)
+
+        var editName: EditText? = EditText(m_Context)
+        editName!!.hint = getString(R.string.str_msg_4)
+        pLayout.addView(editName)
+
+        builder.setView(pLayout)
+
+        builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
+            m_DistanceInfo = distance()//init
+            m_DistanceInfo!!.name = editName.text.toString()
+            /*
+            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceItem(pInfo)
+            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(dataSnapshot: DataSnapshot?)
+                {
+                    if (dataSnapshot!!.exists())
+                    {
+                        m_strSeq = dataSnapshot!!.key
+                        val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
+                    }
+                }
+
+                override fun onCancelled(p0: DatabaseError?)
+                {
+
+                }
+             })
+             */
+            var minute:Int = Integer.parseInt(editTime.text.toString())
+
+            mLocationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 0f, locationListener)
+
+        }
+
+        builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
+
+        }
+
+        builder.setNeutralButton(getString(R.string.str_cancel)){_,_ ->
+
+        }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+    }
+    //define the listener
+    private val locationListener: LocationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            var msg:String = "" + location.longitude + ":" + location.latitude
+            Toast.makeText(m_Context, "locationListener Update", Toast.LENGTH_SHORT).show()
+        }
+        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onProviderDisabled(provider: String) {}
+    }
+
     //--------------------------------------------------------------
     //
     fun showLogoutDialog()
@@ -624,15 +722,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     /*********************** listener ***********************/
-    //-------------------------------------------------------------
-    //
-    val onClickListener = View.OnClickListener { view ->
-
-        when (view.getId())
-        {
-            R.id.btn_SaveLocation -> checkPermissionLocation()
-        }
-    }
     //--------------------------------------------------------------
     //
     override fun onNavigationItemSelected(item: MenuItem): Boolean
@@ -691,5 +780,13 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     override fun onRefresh()
     {
         setRefresh()
+    }
+
+    /*********************** util ***********************/
+    //-----------------------------------------------------------------
+    //editText max Length..
+    fun EditText.limitLength(maxLength: Int)
+    {
+        filters = arrayOf(InputFilter.LengthFilter(maxLength))
     }
 }

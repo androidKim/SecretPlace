@@ -7,7 +7,7 @@ class SharedPreferenceCtrl
 {
     /************************* Defeine *************************/
     private val SP_USER_KEY = "SP_USER_KEY"
-    private val SP_USER_JOIN_TYPE = "SP_USER_JOIN_TYPE"
+    private val SP_USER_SNS_TYPE = "SP_USER_SNS_TYPE"
 
     private lateinit var preference: SharedPreferences
 
@@ -65,17 +65,17 @@ class SharedPreferenceCtrl
     }
     //---------------------------------------------------------
     //
-    fun setJoinType(value:String)
+    fun setSnsType(value:String)
     {
         if(value == null)
             return
 
-        setStrSaveData(SP_USER_JOIN_TYPE, value)
+        setStrSaveData(SP_USER_SNS_TYPE, value)
     }
-    fun getJoinType():String?
+    fun getSnsType():String?
     {
         var strResult:String?=null
-        strResult = getStrLoadData(SP_USER_JOIN_TYPE)
+        strResult = getStrLoadData(SP_USER_SNS_TYPE)
         return strResult
     }
 }

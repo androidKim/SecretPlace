@@ -19,6 +19,8 @@ import com.midas.secretplace.ui.MyApp
 import kotlinx.android.synthetic.main.act_login.*
 
 
+
+
 class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
 {
     override fun onConnectionFailed(connectionResult: ConnectionResult)
@@ -128,13 +130,13 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
     {
         if (isLogin)
         {
-            m_btn_GoogleLogin?.visibility = View.GONE
+            m_btn_GoogleLogin?.visibility = View.VISIBLE
             m_btn_GoogleLogout?.visibility = View.VISIBLE
         }
         else
         {
             m_btn_GoogleLogin?.visibility = View.VISIBLE
-            m_btn_GoogleLogout?.visibility = View.GONE
+            m_btn_GoogleLogout?.visibility = View.VISIBLE
         }
     }
     //-----------------------------------------------------------
@@ -147,17 +149,18 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
             setRefreshUi(true)
 
             val acct = result.signInAccount
-            var strUserKey:String? = acct!!.id
+            var snsKey:String? = acct!!.id
             var strUserName:String? = acct!!.displayName
             var strImgUrl: String? = acct!!.photoUrl.toString()
             if(strImgUrl == null)
                 strImgUrl = ""
 
-            var pInfo: user = user(user.JOIN_TYPE_GOOGLE, strUserKey!!, strUserName!!, strImgUrl)
+            var userKey:String? = String.format("%s%s", user.SNS_TYPE_GOOGLE, snsKey)
+            var pInfo: user = user(user.SNS_TYPE_GOOGLE, snsKey!!, userKey!!, strUserName!!, strImgUrl)
             m_App!!.m_FirebaseDbCtrl!!.setUser(pInfo)
 
-            m_App!!.m_SpCtrl!!.setSpUserKey(strUserKey!!)
-            m_App!!.m_SpCtrl!!.setJoinType(user.JOIN_TYPE_GOOGLE)
+            m_App!!.m_SpCtrl!!.setSpUserKey(userKey!!)
+            m_App!!.m_SpCtrl!!.setSnsType(user.SNS_TYPE_GOOGLE)
             m_App!!.goMain(m_Context!!)
         }
     }

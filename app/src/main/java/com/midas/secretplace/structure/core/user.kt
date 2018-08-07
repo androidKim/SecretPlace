@@ -7,16 +7,17 @@ class user
 {
     companion object
     {
-        val JOIN_TYPE_GOOGLE:String = "G"
-        val JOIN_TYPE_KAKAO:String = "K"
-        val JOIN_TYPE_FACEBOOK:String = "F"
-        val JOIN_TYPE_TWITTER:String = "T"
-        val JOIN_TYPE_NAVER:String = "N"
-        val JOIN_TYPE_INSTARGRAM:String = "I"
+        val SNS_TYPE_GOOGLE:String = "G"
+        val SNS_TYPE_KAKAO:String = "K"
+        val SNS_TYPE_FACEBOOK:String = "F"
+        val SNS_TYPE_TWITTER:String = "T"
+        val SNS_TYPE_NAVER:String = "N"
+        val SNS_TYPE_INSTARGRAM:String = "I"
     }
 
-    var join_type:String? = null
-    var key:String? = null
+    var sns_type:String? = null
+    var sns_key:String? = null
+    var user_key:String? = null
     var name:String? = null
     var img_url:String? = null
 
@@ -24,10 +25,11 @@ class user
     {
 
     }
-    constructor(join_type:String, key:String, name:String, img_url:String)
+    constructor(sns_type:String, key:String, user_key:String ,name:String, img_url:String)
     {
-        this.join_type = join_type
-        this.key = key
+        this.sns_type = sns_type
+        this.sns_key = key
+        this.user_key = user_key
         this.name = name
         this.img_url = img_url
     }
@@ -36,8 +38,9 @@ class user
     fun toMap(): Map<String, Any>
     {
         val result:HashMap<String, Any> = HashMap()
-        result.put("join_type", join_type!!)
-        result.put("key", key!!)
+        result.put("sns_type", sns_type!!)
+        result.put("sns_key", sns_key!!)
+        result.put("user_key", user_key!!)
         result.put("name", name!!)
         result.put("img_url", img_url!!)
         return result
