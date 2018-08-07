@@ -8,7 +8,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
@@ -32,9 +31,7 @@ import android.widget.*
 import com.bumptech.glide.Glide
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
@@ -67,8 +64,13 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     lateinit var mLocation: Location
     private var mLocationRequest: LocationRequest? = null
     private val listener: com.google.android.gms.location.LocationListener? = null
-    private val UPDATE_INTERVAL = (2 * 1000).toLong()  /* 10 secs */
-    private val FASTEST_INTERVAL: Long = 2000 /* 2 sec */
+    private val UPDATE_INTERVAL = ((5000).toLong())
+    private val FASTEST_INTERVAL: Long = 5000
+    /*
+    .setInterval(15000) // 15 seconds
+    .setFastestInterval(5000) // 5000ms
+    기기는 15초마다 혹은 그보다 더 빠르거나 느리게 위치를 수집하지만 5초보다 빠르게 수집하진 않을것입니다
+     */
 
     lateinit var locationManager: LocationManager
     //
@@ -552,8 +554,27 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         {
             return
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this)
+        //LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this)
+
+        //LocationRequest var1, LocationCallback var2, @Nullable Looper var3
+        LocationServices.getFusedLocationProviderClient(m_Context!!).requestLocationUpdates(mLocationRequest, locationCallback, null)
     }
+
+    //--------------------------------------------------------------------
+    //
+    var locationCallback = object : LocationCallback()
+    {
+    override fun onLocationResult(locationResult: LocationResult?)
+    {
+        locationResult ?: return
+        for (location in locationResult.locations)
+        {
+            Log.i("longitude", location.longitude.toString())
+            Log.i("latitude", location.latitude.toString())
+        }
+    }
+}
+
 
     //--------------------------------------------------------------
     //
@@ -644,10 +665,14 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
                 }
              })
              */
-            var minute:Int = Integer.parseInt(editTime.text.toString())
+            var minute:String = editTime.text.toString()
+            var minTime:Long = minute.toLong() * 1000 * 60
+            //mLocationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTime, 0f, locationListener)
 
-            mLocationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 0f, locationListener)
-
+            mLocationRequest!!.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+            mLocationRequest!!.setInterval(minTime)
+            mLocationRequest!!.setFastestInterval(minTime) // Ever
+            LocationServices.getFusedLocationProviderClient(m_Context!!).requestLocationUpdates(mLocationRequest, locationCallback, null)
         }
 
         builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
@@ -661,17 +686,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         val dialog: AlertDialog = builder.create()
         dialog.show()
     }
-    //define the listener
-    private val locationListener: LocationListener = object : LocationListener {
-        override fun onLocationChanged(location: Location) {
-            var msg:String = "" + location.longitude + ":" + location.latitude
-            Toast.makeText(m_Context, "locationListener Update", Toast.LENGTH_SHORT).show()
-        }
-        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
-        override fun onProviderEnabled(provider: String) {}
-        override fun onProviderDisabled(provider: String) {}
-    }
-
     //--------------------------------------------------------------
     //
     fun showLogoutDialog()
