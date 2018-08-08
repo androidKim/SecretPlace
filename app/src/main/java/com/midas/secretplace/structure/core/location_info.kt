@@ -1,8 +1,6 @@
 package com.midas.secretplace.structure.core
 
-import java.io.Serializable
-
-class location:Serializable
+class location_info
 {
     var lat:String? = null
     var lng:String? = null
