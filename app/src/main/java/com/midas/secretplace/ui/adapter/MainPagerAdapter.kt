@@ -12,7 +12,9 @@ class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPager
     private val TAB_NAME_0 = "위치"
     private val TAB_NAME_1 = "경로"
     private val COUNT = 2
-
+    /************************** System Fucntion **************************/
+    //--------------------------------------------------------
+    //
     override fun getItem(position: Int): Fragment?
     {
         var fragment: Fragment? = null
@@ -24,12 +26,15 @@ class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPager
 
         return fragment
     }
-
+    //--------------------------------------------------------
+    //
     override fun getCount(): Int
     {
         return COUNT
     }
 
+    //--------------------------------------------------------
+    //
     override fun getPageTitle(position: Int): CharSequence?
     {
         if(position == 0)
@@ -44,11 +49,5 @@ class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPager
         {
             return ""
         }
-    }
-
-
-    fun setPlaceIfCallback()
-    {
-
     }
 }

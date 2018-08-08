@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.text.InputFilter
 import android.text.InputType
 import android.view.LayoutInflater
@@ -15,11 +17,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
-
+import com.google.firebase.database.*
+import com.midas.mytimeline.ui.adapter.DistanceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.distance
 import com.midas.secretplace.ui.MyApp
@@ -36,7 +35,13 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     var m_Activity: Activity? = null
     var m_App:MyApp? = null
     var m_IfCallback:ifCallback? = null
+    var m_Adapter:DistanceRvAdapter? = null
+    var m_arrDistance:ArrayList<distance>? = null
+    var m_strSeq:String? = null
+    var m_bRunning:Boolean = false
+    var m_bPagingFinish:Boolean = false
     /************************** Controller **************************/
+    var m_RecyclerView: RecyclerView? = null
     var m_btn_SaveDistance:Button? = null
     var m_btn_StopDistance:Button? = null
     /************************** System Function **************************/
@@ -58,8 +63,9 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     //
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
-        m_btn_SaveDistance = view.findViewById<Button>(R.id.btn_SaveDistance)
-        m_btn_StopDistance = view.findViewById<Button>(R.id.btn_StopDistance)
+        m_RecyclerView = view.findViewById(R.id.recyclerView)
+        m_btn_SaveDistance = view.findViewById(R.id.btn_SaveDistance)
+        m_btn_StopDistance = view.findViewById(R.id.btn_StopDistance)
         initValue()
         setInitLayout()
     }
@@ -84,7 +90,7 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     //
     fun initValue()
     {
-
+        m_arrDistance = ArrayList<distance>()
     }
     //------------------------------------------------------------------------
     //
@@ -124,7 +130,115 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     //
     fun settingView()
     {
+        m_Adapter = DistanceRvAdapter(m_Context!!, m_arrDistance!!)
+        m_RecyclerView!!.adapter = m_Adapter
 
+        var nSpanCnt = 3
+        /*
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode..
+        {
+            nSpanCnt = 4
+        }
+        */
+
+        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
+        m_RecyclerView!!.layoutManager = pLayoutManager
+        m_RecyclerView!!.setHasFixedSize(true)
+
+        m_RecyclerView!!.layoutManager = pLayoutManager
+        m_RecyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
+        {
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
+            {
+                val visibleItemCount = pLayoutManager.childCount
+                val totalItemCount = pLayoutManager.itemCount
+                val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
+
+                if(!m_bRunning && (visibleItemCount + firstVisible) >= totalItemCount)
+                {
+                    // Call your API to load more items
+                    if(!m_bPagingFinish)
+                        getDistanceListProc(m_strSeq!!)
+                }
+            }
+        })
+
+        getDistanceListProc("")
+    }
+
+    //--------------------------------------------------------------
+    //
+    fun getDistanceListProc(seq:String)
+    {
+        m_bRunning = true
+        m_App!!.showLoadingDialog(ly_LoadingDialog)
+
+        var pQuery: Query = m_App!!.m_FirebaseDbCtrl!!.getDistanceList(seq!!)
+        //pQuery!!.addListenerForSingleValueEvent(listenerForSingleValueEvent)
+        //pQuery!!.addChildEventListener(childEventListener)
+        pQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                // A new message has been added
+                // onChildAdded() will be called for each node at the first time
+                if(!m_strSeq.equals(dataSnapshot!!.key))
+                {
+                    val pInfo: distance = dataSnapshot!!.getValue(distance::class.java)!!
+                    if(pInfo.user_fk.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
+                    {
+                        m_strSeq = dataSnapshot!!.key
+                        m_Adapter!!.addData(pInfo)
+                    }
+                }
+                else
+                {
+                    //no more data
+                    m_bPagingFinish = true
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
+
+                // A message has changed
+                //val message = dataSnapshot.getValue(Message::class.java)
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            {
+                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
+
+                // A message has been removed
+                //val message = dataSnapshot.getValue(Message::class.java)
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
+
+                // A message has changed position
+                //val message = dataSnapshot.getValue(Message::class.java)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError?)
+            {
+                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+            }
+        })
+
+        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot?)
+            {
+                m_bRunning = false
+                m_App!!.hideLoadingDialog(ly_LoadingDialog)
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
     }
 
     //--------------------------------------------------------------
@@ -140,8 +254,8 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
 
         var editTime: EditText? = EditText(m_Context)
         editTime!!.inputType = InputType.TYPE_CLASS_NUMBER
-        editTime!!.hint = getString(R.string.str_msg_6)
-        editTime!!.limitLength(2)
+        editTime.hint = getString(R.string.str_msg_6)
+        editTime.limitLength(2)
 
         pLayout.addView(editTime)
 
@@ -153,9 +267,9 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
 
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
             var pInfo:distance = distance()//init
-            pInfo!!.name = editName.text.toString()
-            pInfo!!.user_fk = m_App!!.m_SpCtrl!!.getSpUserKey()
-            pInfo!!.location_list = ArrayList()
+            pInfo.name = editName.text.toString()
+            pInfo.user_fk = m_App!!.m_SpCtrl!!.getSpUserKey()
+            pInfo.location_list = ArrayList()
 
             if(m_IfCallback != null)
                 m_IfCallback!!.setDistanceInfo(pInfo)
@@ -195,14 +309,14 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
 
             if(pInfo != null)
             {
-                var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setDistanceInfo(pInfo!!)
+                var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setDistanceInfo(pInfo)
                 pDbRef.addListenerForSingleValueEvent(object : ValueEventListener
                 {
                     override fun onDataChange(dataSnapshot: DataSnapshot?)
                     {
                         if (dataSnapshot!!.exists())
                         {
-                            val pInfo: distance = dataSnapshot!!.getValue(distance::class.java)!!
+                            val pInfo: distance = dataSnapshot.getValue(distance::class.java)!!
                             m_IfCallback!!.disableDistanceSave()
                         }
 
@@ -219,12 +333,25 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     }
 
 
+    //----------------------------------------------------------------------
+    //
+    fun setRefresh()
+    {
+        m_strSeq = null
+        m_arrDistance = ArrayList<distance>()
+        if(m_Adapter != null)
+            m_Adapter!!.clearData()
+
+        ly_SwipeRefresh.setRefreshing(false)
+
+        getDistanceListProc("")
+    }
     /************************** callback **************************/
     //----------------------------------------------------------------------
     //swiper listener callback
     override fun onRefresh()
     {
-
+        setRefresh()
     }
 
     /************************** interface **************************/

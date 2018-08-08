@@ -62,8 +62,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
     //
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
-        m_RecyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        m_btn_SaveLocation = view.findViewById<Button>(R.id.btn_SaveLocation)
+        m_RecyclerView = view.findViewById(R.id.recyclerView)
+        m_btn_SaveLocation = view.findViewById(R.id.btn_SaveLocation)
 
         initValue()
         setInitLayout()
@@ -88,6 +88,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
     //
     fun initValue()
     {
+        m_strSeq = ""
         m_arrPlace = ArrayList<place>()
     }
     //------------------------------------------------------------------------
@@ -153,6 +154,10 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
                 }
             }
         })
+
+
+
+        getPlaceListProc("")
     }
     //--------------------------------------------------------------
     //
@@ -267,8 +272,11 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
                 {
                     if (dataSnapshot!!.exists())
                     {
-                        m_strSeq = dataSnapshot!!.key
-                        val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
+                        if(!m_strSeq.equals(dataSnapshot!!.key))
+                        {
+                            m_strSeq = dataSnapshot!!.key
+                            val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
+                        }
                     }
                 }
 

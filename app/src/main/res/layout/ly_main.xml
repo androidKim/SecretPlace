@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:background="@color/colorPrimary"
+            android:background="@color/color_white"
             android:padding="13dp"/>
 
     </android.support.v4.view.ViewPager>

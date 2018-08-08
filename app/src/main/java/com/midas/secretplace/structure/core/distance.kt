@@ -1,6 +1,8 @@
 package com.midas.secretplace.structure.core
 
-class distance
+import java.io.Serializable
+
+class distance:Serializable
 {
     var user_fk:String? = null
     var name:String? = null

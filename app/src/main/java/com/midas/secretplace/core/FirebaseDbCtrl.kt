@@ -97,4 +97,16 @@ class FirebaseDbCtrl
         return pQuery
     }
 
+    //---------------------------------------------------------------
+    //
+    fun getDistanceList(seq:String) : Query
+    {
+        var pQuery:Query? = null
+        if(!seq.equals(""))
+            pQuery = m_FirebaseDb!!.getReference(TB_DISTANCE).orderByKey().startAt(seq).limitToFirst(ReqBase.ITEM_COUNT)
+        else
+            pQuery = m_FirebaseDb!!.getReference(TB_DISTANCE).orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
+
+        return pQuery
+    }
 }
