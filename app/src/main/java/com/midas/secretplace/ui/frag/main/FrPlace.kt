@@ -266,7 +266,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
             pInfo.name = editName.text.toString()
             var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(pInfo)
-            //pDbRef.addValueEventListener(addPlaceListener)
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(dataSnapshot: DataSnapshot?)
                 {

@@ -5,24 +5,27 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.distance
+import com.midas.secretplace.structure.core.location_info
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.frag.MapFragment
 import kotlinx.android.synthetic.main.act_distance_detail.*
 
 
-class ActDistanceDetail : AppCompatActivity()
+class ActDistanceDetail : ActBase()
 {
     /*********************** Define ***********************/
 
     /*********************** Member ***********************/
     private var m_App: MyApp? = null
     private var m_Context: Context? = null
-    private var m_DistanceInfo:distance? = null
     /*********************** Controller ***********************/
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
@@ -76,30 +79,7 @@ class ActDistanceDetail : AppCompatActivity()
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as MapFragment
         mapFragment.getMapAsync(mapFragment)
         val mArgs = Bundle()
-<<<<<<< HEAD
-        //testcode
-        /*
-        var tempInfo1:location_info = location_info()
-        tempInfo1.lat = "37.498278"
-        tempInfo1.lng = "127.046151"
-        var tempInfo2:location_info = location_info()
-        tempInfo2.lat = "37.489096"
-        tempInfo2.lng = "127.055813"
-        var tempInfo3:location_info = location_info()
-        tempInfo3.lat = "37.498992"
-        tempInfo3.lng = "127.116259"
-        var tempInfo4:location_info = location_info()
-        tempInfo4.lat = "37.454722"
-        tempInfo4.lng = "127.070987"
 
-        m_DistanceInfo!!.location_list!!.add(tempInfo1)
-        m_DistanceInfo!!.location_list!!.add(tempInfo2)
-        m_DistanceInfo!!.location_list!!.add(tempInfo3)
-        m_DistanceInfo!!.location_list!!.add(tempInfo4)
-           */
-=======
-
->>>>>>> 4145d4f75eee6bb8ff377a855efd5ff9f7cbef67
         mArgs.putSerializable(Constant.INTENT_DATA_DISTANCE_OBJECT, m_DistanceInfo)
         mapFragment.arguments = mArgs
         System.err.println("OnCreate end")
@@ -111,23 +91,33 @@ class ActDistanceDetail : AppCompatActivity()
         val builder = AlertDialog.Builder(m_Context!!)
         builder.setMessage(getString(R.string.str_msg_6))
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
-            /*
-            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.updateDistanceLocation(pInfo)
-            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot?)
-                {
-                    if (dataSnapshot!!.exists())
+            if(m_DistanceInfo != null)
+            {
+
+                var locationInfo = getLocation()
+
+                //first LatLng
+                var pLocationInfo: location_info = location_info(String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude))
+                m_DistanceInfo!!.location_list!!.add(pLocationInfo)
+
+                var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.updateDistanceLocation()
+                pDbRef.child(m_DistanceInfo!!.seq).setValue(m_DistanceInfo!!)
+                pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot?)
                     {
-                        //refresh Map Marker..
+                        if (dataSnapshot!!.exists())
+                        {
+                            //refresh Map Marker..
+                            val pInfo: distance = dataSnapshot.getValue(distance::class.java)!!
+                        }
                     }
-                }
 
-                override fun onCancelled(p0: DatabaseError?)
-                {
+                    override fun onCancelled(p0: DatabaseError?)
+                    {
 
-                }
-            })
-            */
+                    }
+                })
+            }
         }
 
         builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
@@ -147,8 +137,8 @@ class ActDistanceDetail : AppCompatActivity()
     {
 
     }
-
-    /************************* listener *************************/
-
     /*********************** listener ***********************/
+
+
+    /*********************** interface ***********************/
 }

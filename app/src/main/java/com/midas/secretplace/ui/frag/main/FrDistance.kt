@@ -239,48 +239,58 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     @SuppressLint("MissingPermission")
     fun showDistanceInputDialog()
     {
-        val builder = AlertDialog.Builder(m_Context!!)
-        builder.setMessage(getString(R.string.str_msg_5))
-        //custom view..
-        var pLayout: LinearLayout? = LinearLayout(m_Context)
-        pLayout!!.orientation = LinearLayout.VERTICAL
 
-        var editName: EditText? = EditText(m_Context)
-        editName!!.hint = getString(R.string.str_msg_4)
-        pLayout.addView(editName)
+        if(m_IfCallback != null)
+        {
+            var bCheckLocation:Boolean = m_IfCallback!!.checkLocationInfo()
 
-        builder.setView(pLayout)
+            if(bCheckLocation)
+            {
+                var locationInfo = m_IfCallback!!.getLocation()
+                var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919
 
-        builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
-            var pInfo:distance = distance()//init
-            pInfo.name = editName.text.toString()
-            pInfo.user_fk = m_App!!.m_SpCtrl!!.getSpUserKey()
-            pInfo.location_list = ArrayList()
+                //first LatLng
+                var pLocationInfo:location_info = location_info(String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude))
 
-            if(m_IfCallback != null)
-                m_IfCallback!!.setDistanceInfo(pInfo)
+                //show Dialog
+                val builder = AlertDialog.Builder(m_Context!!)
+                builder.setMessage(getString(R.string.str_msg_5))
+                //custom view..
+                var pLayout: LinearLayout? = LinearLayout(m_Context)
+                pLayout!!.orientation = LinearLayout.VERTICAL
 
-            /*
-            var minute:String = editTime.text.toString()//사용자가 입력한 분
-            var minTime:Long = minute.toLong() * 1000 * 60
+                var editName: EditText? = EditText(m_Context)
+                editName!!.hint = getString(R.string.str_msg_4)
+                pLayout.addView(editName)
 
-            if(m_IfCallback != null)
-                m_IfCallback!!.setLocationManagerInterval(minTime)
-            */
+                builder.setView(pLayout)
 
-            saveDistanceProc()
+                builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
+                    var pInfo:distance = distance()//init
+                    pInfo.name = editName.text.toString()
+                    pInfo.user_fk = m_App!!.m_SpCtrl!!.getSpUserKey()
+                    pInfo.location_list = ArrayList()
+                    pInfo.location_list!!.add(pLocationInfo)
+
+                    if(m_IfCallback != null)
+                        m_IfCallback!!.setDistanceInfo(pInfo)
+
+                    saveDistanceProc()
+                }
+
+                builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
+
+                }
+
+                builder.setNeutralButton(getString(R.string.str_cancel)){_,_ ->
+
+                }
+
+                val dialog: AlertDialog = builder.create()
+                dialog.show()
+            }
         }
 
-        builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
-
-        }
-
-        builder.setNeutralButton(getString(R.string.str_cancel)){_,_ ->
-
-        }
-
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
     }
 
     //--------------------------------------------------------------

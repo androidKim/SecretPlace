@@ -7,6 +7,8 @@ class Constant
         //Intent
         val INTENT_DATA_PLACE_OBJECT:String = "INTENT_DATA_PLACE_OBJECT"
         val INTENT_DATA_DISTANCE_OBJECT:String = "INTENT_DATA_DISTANCE_OBJECT"
+        val INTENT_DATA_INTERFACE:String = "INTENT_DATA_INTERFACE"
+
 
         //Permission
         val REQUEST_ID_MULTIPLE_PERMISSIONS:Int = 1000
