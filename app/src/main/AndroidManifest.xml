@@ -48,6 +48,16 @@
             android:name=".ui.act.ActDistanceDetail"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"></activity>
+
+
+        <service
+            android:exported="false"
+            android:name=".service.MyJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" >
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>

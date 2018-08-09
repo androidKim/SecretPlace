@@ -3,6 +3,7 @@ package com.midas.secretplace.ui.frag.main
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
@@ -10,7 +11,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.InputFilter
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +21,7 @@ import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.DistanceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.distance
+import com.midas.secretplace.structure.core.location_info
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
 import kotlinx.android.synthetic.main.frag_distance.*
@@ -38,12 +39,12 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     var m_Adapter:DistanceRvAdapter? = null
     var m_arrDistance:ArrayList<distance>? = null
     var m_strSeq:String? = null
+    var m_strRunningSeq:String? = null
     var m_bRunning:Boolean = false
     var m_bPagingFinish:Boolean = false
     /************************** Controller **************************/
     var m_RecyclerView: RecyclerView? = null
     var m_btn_SaveDistance:Button? = null
-    var m_btn_StopDistance:Button? = null
     /************************** System Function **************************/
     //----------------------------------------------------------------------
     //
@@ -65,7 +66,6 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     {
         m_RecyclerView = view.findViewById(R.id.recyclerView)
         m_btn_SaveDistance = view.findViewById(R.id.btn_SaveDistance)
-        m_btn_StopDistance = view.findViewById(R.id.btn_StopDistance)
         initValue()
         setInitLayout()
     }
@@ -115,16 +115,8 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
             }
         })
 
-        m_btn_StopDistance!!.setOnClickListener(View.OnClickListener
-        {
-            m_btn_StopDistance!!.visibility = View.GONE
-            saveDistanceProc()
-        })
-
-
 
         settingView()
-
     }
     //------------------------------------------------------------------------
     //
@@ -187,6 +179,7 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
                     if(pInfo.user_fk.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
                     {
                         m_strSeq = dataSnapshot!!.key
+                        pInfo.seq = dataSnapshot!!.key
                         m_Adapter!!.addData(pInfo)
                     }
                 }
@@ -252,13 +245,6 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
         var pLayout: LinearLayout? = LinearLayout(m_Context)
         pLayout!!.orientation = LinearLayout.VERTICAL
 
-        var editTime: EditText? = EditText(m_Context)
-        editTime!!.inputType = InputType.TYPE_CLASS_NUMBER
-        editTime.hint = getString(R.string.str_msg_6)
-        editTime.limitLength(2)
-
-        pLayout.addView(editTime)
-
         var editName: EditText? = EditText(m_Context)
         editName!!.hint = getString(R.string.str_msg_4)
         pLayout.addView(editName)
@@ -274,14 +260,15 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
             if(m_IfCallback != null)
                 m_IfCallback!!.setDistanceInfo(pInfo)
 
+            /*
             var minute:String = editTime.text.toString()//사용자가 입력한 분
             var minTime:Long = minute.toLong() * 1000 * 60
 
             if(m_IfCallback != null)
                 m_IfCallback!!.setLocationManagerInterval(minTime)
+            */
 
-
-            m_btn_StopDistance!!.visibility = View.VISIBLE
+            saveDistanceProc()
         }
 
         builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
@@ -295,7 +282,6 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
         val dialog: AlertDialog = builder.create()
         dialog.show()
     }
-
 
     //--------------------------------------------------------------
     //
@@ -317,7 +303,6 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
                         if (dataSnapshot!!.exists())
                         {
                             val pInfo: distance = dataSnapshot.getValue(distance::class.java)!!
-                            m_IfCallback!!.disableDistanceSave()
                         }
 
                         pInfo = null
@@ -331,8 +316,20 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
             }
         }
     }
+    //--------------------------------------------------------------
+    //
+    fun addLocationPointProc()
+    {
+        if(m_IfCallback != null)
+        {
+            //-LJSUyiSTYMkz6dLFo8N location_list 에 업데이트
 
+            var locationInfo = m_IfCallback!!.getLocation()
+            var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919
 
+            var pInfo:location_info = location_info(locationInfo.latitude.toString(), locationInfo.longitude.toString())
+        }
+    }
     //----------------------------------------------------------------------
     //
     fun setRefresh()
@@ -361,10 +358,10 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     {
         fun checkPermission():Boolean
         fun checkLocationInfo():Boolean
-        fun setLocationManagerInterval(nInterval:Long)
         fun setDistanceInfo(pInfo:distance)
         fun getSavedDistanceInfo():distance
         fun disableDistanceSave()
+        fun getLocation(): Location
     }
     /************************** util **************************/
     //-----------------------------------------------------------------

@@ -18,17 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="거리 저장하기"
+            android:text="@string/str_msg_5"
             android:textColor="#000000" />
-
-        <Button
-            android:id="@+id/btn_StopDistance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="거리 저장 중지"
-            android:textColor="#000000"
-            android:visibility="gone" />
     </LinearLayout>
 
 

@@ -1,22 +1,17 @@
 <resources>
     <string name="google_maps_key">AIzaSyDtbMkveLaoHDA18vK7GZKFK8E7IW3Wi6M</string>
     <string name="app_name">SecretPlace</string>
-    <string name="option_one">Opcion Uno</string>
-    <string name="option_two">Opcion Dos</string>
-    <string name="option_three">Opcion Tres</string>
-    <string name="other_option_one">Otra Opcion Uno</string>
-    <string name="other_option_two">Otra Opcion Dos</string>
-    <string name="other_option_three">Otra Opcion Tres</string>
     <string name="navigation_drawer_open">Navigation Drawer Is Open</string>
     <string name="navigation_drawer_close">Navigation Drawer Is Close</string>
 
     <string name="str_ok">Ok</string>
     <string name="str_no">No</string>
     <string name="str_cancel">Cancel</string>
-    <string name="str_msg_1">로그아웃</string>
-    <string name="str_msg_2">로그아웃 하시겠습니까?</string>
-    <string name="str_msg_3">위치를 저장하시겠습니까?</string>
-    <string name="str_msg_4">장소 이름</string>
-    <string name="str_msg_5">거리정보 저장</string>
-    <string name="str_msg_6">시간 간격(단위 분)</string>
+    <string name="str_msg_1">logout</string>
+    <string name="str_msg_2">logout?</string>
+    <string name="str_msg_3">save location?</string>
+    <string name="str_msg_4">Title</string>
+    <string name="str_msg_5">Save</string>
+    <string name="str_msg_6">add current location</string>
+    <string name="str_msg_7"></string>
 </resources>
