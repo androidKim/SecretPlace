@@ -8,7 +8,7 @@
         android:id="@+id/btn_SaveLocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="장소 저장하기"
+        android:text="@string/str_msg_5"
         android:textColor="#000000" />
 
     <android.support.v4.widget.SwipeRefreshLayout

@@ -2,7 +2,6 @@
 package com.midas.secretplace.ui.act
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -26,6 +25,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import com.bumptech.glide.Glide
+import com.firebase.jobdispatcher.Constraint
+import com.firebase.jobdispatcher.FirebaseJobDispatcher
+import com.firebase.jobdispatcher.GooglePlayDriver
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
@@ -36,8 +38,8 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
+import com.midas.secretplace.service.MyJobService
 import com.midas.secretplace.structure.core.distance
-import com.midas.secretplace.structure.core.location_info
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.MainPagerAdapter
@@ -262,7 +264,18 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         settingDrawerView()
         settingView()
     }
-
+    //--------------------------------------------------------------
+    //
+    fun setJobDispatcher()
+    {
+        val dispatcher = FirebaseJobDispatcher(GooglePlayDriver(applicationContext))
+        val job = dispatcher.newJobBuilder()
+                .setService(MyJobService::class.java)
+                .setTag("my_tag")
+                .setConstraints(Constraint.ON_UNMETERED_NETWORK)
+                .build()
+        dispatcher.mustSchedule(job)
+    }
     //--------------------------------------------------------------
     //
     private fun checkPermissionLocation():Boolean
@@ -307,8 +320,6 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
                 bResult = true
             }
         }
-
-
         return bResult
     }
     //--------------------------------------------------------------
@@ -326,8 +337,8 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         navigation_view.setNavigationItemSelectedListener(this)
 
         //header..
-        var v_Header:View = navigation_view!!.getHeaderView(0)
-        m_iv_Profile = v_Header.findViewById(R.id.iv_Profile)
+        var v_Header:View? = navigation_view!!.getHeaderView(0)
+        m_iv_Profile = v_Header!!.findViewById(R.id.iv_Profile)
     }
     //--------------------------------------------------------------
     //
@@ -455,39 +466,9 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
                 showLogoutDialog()
             }
 
-            R.id.menu_option_one ->
-            {
-                Toast.makeText(this@ActMain,"Opcion Uno Seleccionada",Toast.LENGTH_LONG).show()
-                result = true
-            }
-
-            R.id.menu_option_two ->
-            {
-                Toast.makeText(this@ActMain,"Opcion Dos Seleccionada", Toast.LENGTH_LONG).show()
-                result = true
-            }
-
-            R.id.menu_option_three ->
-            {
-                Toast.makeText(this@ActMain,"Opcion Tres Seleccionada",Toast.LENGTH_LONG).show()
-                result = true
-            }
-
             R.id.other_menu_option_one ->
             {
                 Toast.makeText(this@ActMain,"Otra Opcion Uno Seleccionada",Toast.LENGTH_LONG).show()
-                result = true
-            }
-
-            R.id.other_menu_option_two ->
-            {
-                Toast.makeText(this@ActMain,"Otra Opcion Dos Seleccionada",Toast.LENGTH_LONG).show()
-                result = true
-            }
-
-            R.id.other_menu_option_three ->
-            {
-                Toast.makeText(this@ActMain,"Otra Opcion Tres Seleccionada",Toast.LENGTH_LONG).show()
                 result = true
             }
         }
@@ -496,7 +477,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     //--------------------------------------------------------------------
-    //distance save listener
+    //
     var locationCallback = object : LocationCallback()
     {
         override fun onLocationResult(locationResult: LocationResult?)
@@ -504,11 +485,13 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
             locationResult ?: return
             for (location in locationResult.locations)
             {
+                /*
                 if(m_DistanceInfo != null)
                 {
                     var pInfo:location_info = location_info(location.latitude.toString(), location.longitude.toString())
                     m_DistanceInfo!!.location_list!!.add(pInfo)
                 }
+                */
             }
         }
     }
@@ -542,7 +525,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
     }
     //--------------------------------------------------------------
     //frDistance
-    @SuppressLint("MissingPermission")
+    /*
     override fun setLocationManagerInterval(nInterval: Long)
     {
         mLocationRequest!!.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -550,6 +533,7 @@ class ActMain : AppCompatActivity(), NavigationView.OnNavigationItemSelectedList
         mLocationRequest!!.setFastestInterval(nInterval)
         LocationServices.getFusedLocationProviderClient(m_Context!!).requestLocationUpdates(mLocationRequest, locationCallback, null)
     }
+    */
     //--------------------------------------------------------------
     //frDistance
     override fun setDistanceInfo(pInfo: distance)

@@ -9,8 +9,9 @@ import com.midas.secretplace.ui.frag.main.FrPlace
 class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPagerAdapter(fm)
 {
     /************************** Define **************************/
-    private val TAB_NAME_0 = "위치"
-    private val TAB_NAME_1 = "경로"
+    private val TAB_NAME_0 = "1개 위치"
+    private val TAB_NAME_1 = "n개 위치"
+    private val TAB_NAME_2 = "직접 지정"
     private val COUNT = 2
     /************************** System Fucntion **************************/
     //--------------------------------------------------------
@@ -32,7 +33,6 @@ class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPager
     {
         return COUNT
     }
-
     //--------------------------------------------------------
     //
     override fun getPageTitle(position: Int): CharSequence?
@@ -45,6 +45,10 @@ class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPager
         {
             return TAB_NAME_1
         }
+        //else if(position == 2)
+        //{
+            //return TAB_NAME_2
+        //}
         else
         {
             return ""

@@ -3,14 +3,24 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context=".ui.act.ActPlaceDetail">
+    android:orientation="vertical"
+    android:layout_height="match_parent" tools:context=".ui.act.ActDistanceDetail">
+
+    <Button
+        android:id="@+id/btn_AddLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/str_msg_6"
+        android:textColor="@color/color_black"
+        android:textSize="15dp" />
+
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/map"
-        tools:context=".MainActivity"
+        tools:context=".ui.act.ActDistanceDetail"
         android:name="com.midas.secretplace.ui.frag.MapFragment"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="8dp"

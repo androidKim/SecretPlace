@@ -53,24 +53,29 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
         {
             var arrLatLng:ArrayList<LatLng> = ArrayList()
             var pLatLngInfo:LatLng? = null
-            for (i in 0 until pDistanceInfo.location_list!!.size)
+            if(pDistanceInfo.location_list != null)
             {
-                var pInfo:location_info = pDistanceInfo.location_list!!.get(i)
-                var nLat:Double = pInfo.lat!!.toDouble()
-                var nLng:Double = pInfo.lng!!.toDouble()
-                pLatLngInfo = LatLng(nLat, nLng)
-                arrLatLng!!.add(pLatLngInfo)
-                mMap.addMarker(MarkerOptions().position(pLatLngInfo).title(pDistanceInfo.name))
+                for (i in 0 until pDistanceInfo.location_list!!.size)
+                {
+                    var pInfo: location_info = pDistanceInfo.location_list!!.get(i)
+                    var nLat:Double = pInfo.lat!!.toDouble()
+                    var nLng:Double = pInfo.lng!!.toDouble()
+                    pLatLngInfo = LatLng(nLat, nLng)
+                    arrLatLng!!.add(pLatLngInfo)
+                    mMap.addMarker(MarkerOptions().position(pLatLngInfo).title(pDistanceInfo.name))
+                }
             }
 
-            //last item
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pLatLngInfo, m_nZoomLevel))
+            //poly line..
+            if(pLatLngInfo != null && arrLatLng.size > 0)
+            {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pLatLngInfo, m_nZoomLevel))
 
-
-            val line = map.addPolyline(PolylineOptions()
-                    .addAll(arrLatLng!!)
-                    .width(5f)
-                    .color(Color.RED))
+                val line = map.addPolyline(PolylineOptions()
+                        .addAll(arrLatLng!!)
+                        .width(5f)
+                        .color(Color.RED))
+            }
         }
         else
         {

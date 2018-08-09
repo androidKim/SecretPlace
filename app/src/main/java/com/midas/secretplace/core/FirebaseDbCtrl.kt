@@ -3,12 +3,7 @@ package com.midas.secretplace.core
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.Query
-import com.midas.secretplace.structure.core.ReqBase
-import com.midas.secretplace.structure.core.distance
-import com.midas.secretplace.structure.core.place
-import com.midas.secretplace.structure.core.user
-import java.util.*
-
+import com.midas.secretplace.structure.core.*
 
 
 class FirebaseDbCtrl
@@ -51,7 +46,7 @@ class FirebaseDbCtrl
         //pInfo.name="업데이트되나"
 
         //insert & update..
-        var pDbRef = m_FirebaseDb!!.getReference(TB_USER)!!.child(pInfo.sns_type+pInfo.sns_key).setValue(pInfo)
+        m_FirebaseDb!!.getReference(TB_USER)!!.child(pInfo.sns_type+pInfo.sns_key).setValue(pInfo)
 
         //ref.child("myDb").child("awais@gmailcom").child("leftSpace").setValue("YourDateHere");
         //pDbRef.setValue(pInfo)
@@ -82,6 +77,13 @@ class FirebaseDbCtrl
         pDbRef.setValue(pInfo)
         return pDbRef
     }
+    //---------------------------------------------------------------
+    //
+    fun updateDistanceLocation(key:String, pArr:ArrayList<location_info>)
+    {
+
+    }
+
     /************************* DB Getter *************************/
     //---------------------------------------------------------------
     //
