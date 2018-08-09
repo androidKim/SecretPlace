@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.distance
-import com.midas.secretplace.structure.core.location_info
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.frag.MapFragment
 
@@ -74,6 +73,7 @@ class ActDistanceDetail : AppCompatActivity()
         mapFragment.getMapAsync(mapFragment)
         val mArgs = Bundle()
         //testcode
+        /*
         var tempInfo1:location_info = location_info()
         tempInfo1.lat = "37.498278"
         tempInfo1.lng = "127.046151"
@@ -91,7 +91,7 @@ class ActDistanceDetail : AppCompatActivity()
         m_DistanceInfo!!.location_list!!.add(tempInfo2)
         m_DistanceInfo!!.location_list!!.add(tempInfo3)
         m_DistanceInfo!!.location_list!!.add(tempInfo4)
-
+           */
         mArgs.putSerializable(Constant.INTENT_DATA_DISTANCE_OBJECT, m_DistanceInfo)
         mapFragment.arguments = mArgs
         System.err.println("OnCreate end")
