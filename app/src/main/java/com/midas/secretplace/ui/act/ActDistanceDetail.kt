@@ -98,7 +98,15 @@ class ActDistanceDetail : ActBase()
 
                 //first LatLng
                 var pLocationInfo: location_info = location_info(String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude))
-                m_DistanceInfo!!.location_list!!.add(pLocationInfo)
+                if(m_DistanceInfo!!.location_list == null)
+                {
+                    m_DistanceInfo!!.location_list = ArrayList<location_info>()
+                    m_DistanceInfo!!.location_list!!.add(pLocationInfo)
+                }
+                else
+                {
+                    m_DistanceInfo!!.location_list!!.add(pLocationInfo)
+                }
 
                 var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.updateDistanceLocation()
                 pDbRef.child(m_DistanceInfo!!.seq).setValue(m_DistanceInfo!!)
