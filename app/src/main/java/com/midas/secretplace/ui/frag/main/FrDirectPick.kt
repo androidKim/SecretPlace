@@ -18,15 +18,16 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import com.google.firebase.database.*
-import com.midas.mytimeline.ui.adapter.DistanceRvAdapter
+import com.midas.mytimeline.ui.adapter.DirectRvAdapter
 import com.midas.secretplace.R
-import com.midas.secretplace.structure.core.distance
+import com.midas.secretplace.structure.core.direct
 import com.midas.secretplace.structure.core.location_info
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
-import kotlinx.android.synthetic.main.frag_distance.*
+import kotlinx.android.synthetic.main.frag_direct_pick.*
 
-class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
+
+class FrDirectPick : Fragment(), SwipeRefreshLayout.OnRefreshListener
 {
 
     /************************** Define **************************/
@@ -36,21 +37,21 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     var m_Activity: Activity? = null
     var m_App:MyApp? = null
     var m_IfCallback:ifCallback? = null
-    var m_Adapter:DistanceRvAdapter? = null
-    var m_arrDistance:ArrayList<distance>? = null
+    var m_Adapter: DirectRvAdapter? = null
+    var m_arrDirect:ArrayList<direct>? = null
     var m_strSeq:String? = null
     var m_strRunningSeq:String? = null
     var m_bRunning:Boolean = false
     var m_bPagingFinish:Boolean = false
     /************************** Controller **************************/
     var m_RecyclerView: RecyclerView? = null
-    var m_btn_SaveDistance:Button? = null
+    var m_btn_SaveDirect:Button? = null
     /************************** System Function **************************/
     //----------------------------------------------------------------------
     //
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
-        val view = inflater.inflate(R.layout.frag_distance, container, false)
+        val view = inflater.inflate(R.layout.frag_direct_pick, container, false)
 
         m_Context = context
         m_Activity = activity
@@ -65,7 +66,7 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         m_RecyclerView = view.findViewById(R.id.recyclerView)
-        m_btn_SaveDistance = view.findViewById(R.id.btn_SaveDistance)
+        m_btn_SaveDirect = view.findViewById(R.id.btn_SaveDirect)
         initValue()
         setInitLayout()
     }
@@ -90,7 +91,7 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     //
     fun initValue()
     {
-        m_arrDistance = ArrayList<distance>()
+        m_arrDirect = ArrayList<direct>()
     }
     //------------------------------------------------------------------------
     //
@@ -99,14 +100,14 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
         //event..
         ly_SwipeRefresh.setOnRefreshListener(this)
 
-        m_btn_SaveDistance!!.setOnClickListener(View.OnClickListener {
+        m_btn_SaveDirect!!.setOnClickListener(View.OnClickListener {
             if(m_IfCallback != null)
             {
                 var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
 
                 if(bPermissionVal)
                 {
-                    showDistanceInputDialog()
+                    showDirectInputDialog()
                 }
                 else
                 {
@@ -122,7 +123,7 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     //
     fun settingView()
     {
-        m_Adapter = DistanceRvAdapter(m_Context!!, m_arrDistance!!)
+        m_Adapter = DirectRvAdapter(m_Context!!, m_arrDirect!!)
         m_RecyclerView!!.adapter = m_Adapter
 
         var nSpanCnt = 3
@@ -150,22 +151,22 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
                 {
                     // Call your API to load more items
                     if(!m_bPagingFinish)
-                        getDistanceListProc(m_strSeq!!)
+                        getDirectListProc(m_strSeq!!)
                 }
             }
         })
 
-        getDistanceListProc("")
+        getDirectListProc("")
     }
 
     //--------------------------------------------------------------
     //
-    fun getDistanceListProc(seq:String)
+    fun getDirectListProc(seq:String)
     {
         m_bRunning = true
         m_App!!.showLoadingDialog(ly_LoadingDialog)
 
-        var pQuery: Query = m_App!!.m_FirebaseDbCtrl!!.getDistanceList(seq!!)
+        var pQuery: Query = m_App!!.m_FirebaseDbCtrl!!.getDirectList(seq!!)
         //pQuery!!.addListenerForSingleValueEvent(listenerForSingleValueEvent)
         //pQuery!!.addChildEventListener(childEventListener)
         pQuery.addChildEventListener(object : ChildEventListener {
@@ -175,7 +176,7 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
                 // onChildAdded() will be called for each node at the first time
                 if(!m_strSeq.equals(dataSnapshot!!.key))
                 {
-                    val pInfo: distance = dataSnapshot!!.getValue(distance::class.java)!!
+                    val pInfo: direct = dataSnapshot!!.getValue(direct::class.java)!!
                     if(pInfo.user_fk.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
                     {
                         m_strSeq = dataSnapshot!!.key
@@ -237,7 +238,7 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     //--------------------------------------------------------------
     //
     @SuppressLint("MissingPermission")
-    fun showDistanceInputDialog()
+    fun showDirectInputDialog()
     {
 
         if(m_IfCallback != null)
@@ -266,16 +267,16 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
                 builder.setView(pLayout)
 
                 builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
-                    var pInfo:distance = distance()//init
+                    var pInfo:direct = direct()//init
                     pInfo.name = editName.text.toString()
                     pInfo.user_fk = m_App!!.m_SpCtrl!!.getSpUserKey()
                     pInfo.location_list = ArrayList()
                     pInfo.location_list!!.add(pLocationInfo)
 
                     if(m_IfCallback != null)
-                        m_IfCallback!!.setDistanceInfo(pInfo)
+                        m_IfCallback!!.setDirectInfo(pInfo)
 
-                    saveDistanceProc()
+                    saveDirectProc()
                 }
 
                 builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
@@ -295,24 +296,24 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
 
     //--------------------------------------------------------------
     //
-    fun saveDistanceProc()
+    fun saveDirectProc()
     {
-        var pInfo:distance? = null
+        var pInfo:direct? = null
 
         if(m_IfCallback != null)
         {
-            pInfo = m_IfCallback!!.getSavedDistanceInfo()
+            pInfo = m_IfCallback!!.getSavedDirectInfo()
 
             if(pInfo != null)
             {
-                var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setDistanceInfo(pInfo)
+                var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setDirectInfo(pInfo)
                 pDbRef.addListenerForSingleValueEvent(object : ValueEventListener
                 {
                     override fun onDataChange(dataSnapshot: DataSnapshot?)
                     {
                         if (dataSnapshot!!.exists())
                         {
-                            val pInfo: distance = dataSnapshot.getValue(distance::class.java)!!
+                            val pInfo: direct = dataSnapshot.getValue(direct::class.java)!!
                         }
 
                         pInfo = null
@@ -345,13 +346,13 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     fun setRefresh()
     {
         m_strSeq = null
-        m_arrDistance = ArrayList<distance>()
+        m_arrDirect = ArrayList<direct>()
         if(m_Adapter != null)
             m_Adapter!!.clearData()
 
         ly_SwipeRefresh.setRefreshing(false)
 
-        getDistanceListProc("")
+        getDirectListProc("")
     }
     /************************** callback **************************/
     //----------------------------------------------------------------------
@@ -368,9 +369,9 @@ class FrDistance : Fragment(), SwipeRefreshLayout.OnRefreshListener
     {
         fun checkPermission():Boolean
         fun checkLocationInfo():Boolean
-        fun setDistanceInfo(pInfo:distance)
-        fun getSavedDistanceInfo():distance
-        fun disableDistanceSave()
+        fun setDirectInfo(pInfo:direct)
+        fun getSavedDirectInfo():direct
+        fun disableDirectSave()
         fun getLocation(): Location
     }
     /************************** util **************************/

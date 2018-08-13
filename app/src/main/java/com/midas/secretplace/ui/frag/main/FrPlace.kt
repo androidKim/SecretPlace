@@ -54,8 +54,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context!!)
-
-
+        
         return view
     }
     //------------------------------------------------------------------------

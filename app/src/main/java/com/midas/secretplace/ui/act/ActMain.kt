@@ -53,7 +53,6 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context as ActMain)
 
-
         initValue()
         recvIntentData()
         initLayout()
@@ -71,8 +70,6 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
             super.onBackPressed()
         }
     }
-
-
     /*********************** User Function ***********************/
     //--------------------------------------------------------------
     //

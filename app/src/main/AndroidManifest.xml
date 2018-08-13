@@ -48,6 +48,10 @@
             android:name=".ui.act.ActDistanceDetail"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"></activity>
+        <activity
+            android:name=".ui.act.ActDirectDetail"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"></activity>
 
 
         <service

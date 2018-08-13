@@ -13,14 +13,14 @@ import com.google.firebase.database.ValueEventListener
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.direct
-import com.midas.secretplace.structure.core.distance
+
 import com.midas.secretplace.structure.core.location_info
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.frag.MapFragment
-import kotlinx.android.synthetic.main.act_distance_detail.*
+import kotlinx.android.synthetic.main.act_direct_detail.*
 
 
-class ActDistanceDetail : ActBase()
+class ActDirectDetail : ActBase()
 {
     /*********************** Define ***********************/
 
@@ -36,11 +36,11 @@ class ActDistanceDetail : ActBase()
         setTheme(R.style.AppTheme)
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.act_distance_detail)
+        setContentView(R.layout.act_direct_detail)
         m_Context = this
         m_App = MyApp()
         if(m_App!!.m_binit == false)
-            m_App!!.init(m_Context as ActDistanceDetail)
+            m_App!!.init(m_Context as ActDirectDetail)
 
         initValue()
         recvIntentData()
@@ -60,8 +60,8 @@ class ActDistanceDetail : ActBase()
     {
         var pIntent: Intent = intent
 
-        if(pIntent.hasExtra(Constant.INTENT_DATA_DISTANCE_OBJECT))
-            m_DistanceInfo =  pIntent.extras.get(Constant.INTENT_DATA_DISTANCE_OBJECT) as distance
+        if(pIntent.hasExtra(Constant.INTENT_DATA_DIRECT_OBJECT))
+            m_DirectInfo =  pIntent.extras.get(Constant.INTENT_DATA_DIRECT_OBJECT) as direct
     }
     //--------------------------------------------------------------
     //
@@ -81,9 +81,9 @@ class ActDistanceDetail : ActBase()
         mapFragment.getMapAsync(mapFragment)
         val mArgs = Bundle()
 
-        mArgs.putSerializable(Constant.INTENT_DATA_DISTANCE_OBJECT, m_DistanceInfo)
+        mArgs.putSerializable(Constant.INTENT_DATA_DIRECT_OBJECT, m_DirectInfo)
         mapFragment.arguments = mArgs
-        System.err.println("OnCreate end")
+
     }
     //--------------------------------------------------------------
     //
@@ -92,32 +92,32 @@ class ActDistanceDetail : ActBase()
         val builder = AlertDialog.Builder(m_Context!!)
         builder.setMessage(getString(R.string.str_msg_6))
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
-            if(m_DistanceInfo != null)
+            if(m_DirectInfo != null)
             {
 
                 var locationInfo = getLocation()
 
                 //first LatLng
                 var pLocationInfo: location_info = location_info(String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude))
-                if(m_DistanceInfo!!.location_list == null)
+                if(m_DirectInfo!!.location_list == null)
                 {
-                    m_DistanceInfo!!.location_list = ArrayList<location_info>()
-                    m_DistanceInfo!!.location_list!!.add(pLocationInfo)
+                    m_DirectInfo!!.location_list = ArrayList<location_info>()
+                    m_DirectInfo!!.location_list!!.add(pLocationInfo)
                 }
                 else
                 {
-                    m_DistanceInfo!!.location_list!!.add(pLocationInfo)
+                    m_DirectInfo!!.location_list!!.add(pLocationInfo)
                 }
 
-                var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.updateDistanceLocation()
-                pDbRef.child(m_DistanceInfo!!.seq).setValue(m_DistanceInfo!!)
+                var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.updateDirectLocation()
+                pDbRef.child(m_DirectInfo!!.seq).setValue(m_DirectInfo!!)
                 pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot?)
                     {
                         if (dataSnapshot!!.exists())
                         {
                             //refresh Map Marker..
-                            val pInfo: distance = dataSnapshot.getValue(distance::class.java)!!
+                            val pInfo: direct = dataSnapshot.getValue(direct::class.java)!!
                         }
                     }
 
@@ -147,7 +147,6 @@ class ActDistanceDetail : ActBase()
 
     }
     /*********************** listener ***********************/
-
 
 
     /*********************** interface ***********************/

@@ -22,7 +22,9 @@ import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnSuccessListener
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
+import com.midas.secretplace.structure.core.direct
 import com.midas.secretplace.structure.core.distance
+import com.midas.secretplace.ui.frag.main.FrDirectPick
 import com.midas.secretplace.ui.frag.main.FrDistance
 import com.midas.secretplace.ui.frag.main.FrPlace
 
@@ -30,7 +32,7 @@ import com.midas.secretplace.ui.frag.main.FrPlace
 Location Base Activity
  */
 abstract class ActBase:AppCompatActivity(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener,
-FrPlace.ifCallback, FrDistance.ifCallback
+FrPlace.ifCallback, FrDistance.ifCallback, FrDirectPick.ifCallback
 {
     //location_info..
     lateinit var mGoogleApiClient: GoogleApiClient
@@ -50,6 +52,7 @@ FrPlace.ifCallback, FrDistance.ifCallback
 
 
     var m_DistanceInfo:distance? = null
+    var m_DirectInfo: direct? = null
     //--------------------------------------------------------------
     //
     override fun onCreate(savedInstanceState: Bundle?)
@@ -367,4 +370,26 @@ FrPlace.ifCallback, FrDistance.ifCallback
     {
         m_DistanceInfo = null
     }
+    //--------------------------------------------------------------
+    //frDirect
+    override fun setDirectInfo(pInfo: direct)
+    {
+        if(pInfo == null)
+            return
+
+        m_DirectInfo = pInfo!!
+    }
+    //--------------------------------------------------------------
+    //frDirect
+    override fun getSavedDirectInfo(): direct
+    {
+        return m_DirectInfo!!
+    }
+    //--------------------------------------------------------------
+    //frDirect
+    override fun disableDirectSave()
+    {
+        m_DirectInfo = null
+    }
+
 }
