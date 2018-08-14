@@ -4,6 +4,9 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
+    <color name="primaryPressed">#303F9F</color>
+    <color name="primaryFocused">#303F9F</color>
+    <color name="primary">#3F51B5</color>
 
     <color name="color_black">#000000</color>
     <color name="color_white">#FFFFFF</color>

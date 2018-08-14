@@ -4,6 +4,8 @@
     <string name="navigation_drawer_open">Navigation Drawer Is Open</string>
     <string name="navigation_drawer_close">Navigation Drawer Is Close</string>
 
+    <string name="str_login_google">google</string>
+
     <string name="str_ok">Ok</string>
     <string name="str_no">No</string>
     <string name="str_cancel">Cancel</string>

@@ -11,14 +11,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.common.api.ResultCallback
-import com.google.android.gms.common.api.Status
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import kotlinx.android.synthetic.main.act_login.*
-
-
 
 
 class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
@@ -36,7 +32,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
     private var mGoogleApiClient: GoogleApiClient? = null
     /******************* Controller *******************/
     private var m_btn_GoogleLogin: Button? = null
-    private var m_btn_GoogleLogout: Button? = null
+
 
     /******************* System Function *******************/
     //------------------------------------------------
@@ -85,7 +81,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
     private fun initLayout()
     {
         m_btn_GoogleLogin = findViewById(R.id.btn_GoogleLogin)
-        m_btn_GoogleLogout = findViewById(R.id.btn_GoogleLogout)
+
 
         setGoogleLoginInit()
     }
@@ -111,6 +107,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
             startActivityForResult(signInIntent, RC_SIGN_IN)
         })
 
+        /*
         m_btn_GoogleLogout?.setOnClickListener(View.OnClickListener
         {
             Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
@@ -122,6 +119,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
                     }
                 })
         })
+        */
     }
 
     //-----------------------------------------------------------
@@ -130,13 +128,11 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
     {
         if (isLogin)
         {
-            m_btn_GoogleLogin?.visibility = View.VISIBLE
-            m_btn_GoogleLogout?.visibility = View.VISIBLE
+
         }
         else
         {
-            m_btn_GoogleLogin?.visibility = View.VISIBLE
-            m_btn_GoogleLogout?.visibility = View.VISIBLE
+
         }
     }
     //-----------------------------------------------------------
@@ -145,7 +141,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
     {
         if (result.isSuccess)
         {
-            m_App!!.showLoadingDialog(ly_LoadingDialog)
+            progressBar.visibility = View.VISIBLE
             setRefreshUi(true)
 
             val acct = result.signInAccount

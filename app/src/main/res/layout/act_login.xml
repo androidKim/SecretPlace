@@ -7,51 +7,29 @@
     tools:context=".ui.act.ActMain">
 
 
-    <RelativeLayout
-        android:id="@+id/ly_Base"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:padding="10dp"
-        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+    <Button
+        android:id="@+id/btn_GoogleLogin"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="14dp"
+        android:background="@drawable/shape_button_bg"
+        android:text="@string/str_login_google"
+        android:textAllCaps="true"
+        android:textColor="@color/color_white"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-            <Button
-                android:id="@+id/btn_GoogleLogin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:background="#F6563A"
-                android:text="Sign in with G+"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white" />
+    <ProgressBar
+        android:visibility="gone"
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
-                android:id="@+id/btn_GoogleLogout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:background="#F6563A"
-                android:text="Logout"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white" />
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_centerInParent="true"
-            android:id="@+id/ly_LoadingDialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-        </LinearLayout>
-
-    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>
