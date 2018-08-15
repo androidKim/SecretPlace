@@ -1,4 +1,4 @@
-package com.midas.secretplace.structure.core
+package com.midas.secretplace.structure
 
 class ReqBase
 {
@@ -11,7 +11,7 @@ class ReqBase
 
     companion object
     {
-        public val ITEM_COUNT:Int = 40
+        public val ITEM_COUNT:Int = 20
     }
 
 

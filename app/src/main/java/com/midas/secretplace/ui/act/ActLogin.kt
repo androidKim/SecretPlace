@@ -51,6 +51,17 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
         recvIntentData()
         initLayout()
     }
+
+    //------------------------------------------------
+    //
+    @Override
+    override fun onBackPressed()
+    {
+        super.onBackPressed()
+        finish()
+        System.exit(0)
+    }
+
     //-------------------------------------------------------------
     //
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)

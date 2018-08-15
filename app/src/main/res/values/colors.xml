@@ -13,4 +13,6 @@
     <color name="color_red">#FF0000</color>
     <color name="color_green">#00FF00</color>
     <color name="color_blue">#0000FF</color>
+    <color name="color_sky_blue">#48C5FC</color>
+
 </resources>

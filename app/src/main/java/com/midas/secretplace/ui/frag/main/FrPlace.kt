@@ -12,7 +12,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
@@ -20,7 +19,10 @@ import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
+import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import kotlinx.android.synthetic.main.frag_place.*
+
+
 
 
 class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
@@ -41,7 +43,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
 
     /**************************** Controller ****************************/
     var m_RecyclerView:RecyclerView? = null
-    var m_btn_SaveLocation:Button? = null
+
     /**************************** System Function ****************************/
     //------------------------------------------------------------------------
     //
@@ -62,7 +64,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         m_RecyclerView = view.findViewById(R.id.recyclerView)
-        m_btn_SaveLocation = view.findViewById(R.id.btn_SaveLocation)
 
         initValue()
         setInitLayout()
@@ -97,7 +98,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
         //event..
         ly_SwipeRefresh.setOnRefreshListener(this)
 
-        m_btn_SaveLocation?.setOnClickListener(View.OnClickListener
+        fbtn_SaveLocation?.setOnClickListener(View.OnClickListener
         {
             if(m_IfCallback != null)
             {
@@ -114,7 +115,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
             }
         })
 
-
         settingView()
     }
     //--------------------------------------------------------------
@@ -124,7 +124,9 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
         m_Adapter = PlaceRvAdapter(m_Context!!, m_arrPlace!!)
         m_RecyclerView!!.adapter = m_Adapter
 
-        var nSpanCnt = 3
+        m_RecyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
+
+        var nSpanCnt = 1
         /*
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode..
         {
@@ -163,7 +165,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
     fun getPlaceListProc(seq:String)
     {
         m_bRunning = true
-        m_App!!.showLoadingDialog(ly_LoadingDialog)
+        //m_App!!.showLoadingDialog(ly_LoadingDialog)
+        progressBar.visibility = View.VISIBLE
 
         var pQuery: Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(seq!!)
         //pQuery!!.addListenerForSingleValueEvent(listenerForSingleValueEvent)
@@ -175,6 +178,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
                 // onChildAdded() will be called for each node at the first time
                 if(!m_strSeq.equals(dataSnapshot!!.key))
                 {
+                    m_bPagingFinish = false
                     val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
                     if(pInfo.user_fk.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
                     {
@@ -223,7 +227,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
             override fun onDataChange(p0: DataSnapshot?)
             {
                 m_bRunning = false
-                m_App!!.hideLoadingDialog(ly_LoadingDialog)
+                //m_App!!.hideLoadingDialog(ly_LoadingDialog)
+                progressBar.visibility = View.GONE
             }
 
             override fun onCancelled(p0: DatabaseError?)

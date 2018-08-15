@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.act.ActMain">
 
-
-
     <Button
         android:id="@+id/btn_GoogleLogin"
         style="?android:attr/buttonStyleSmall"

@@ -11,8 +11,6 @@
     tools:openDrawer="start">
 
 
-
-
     <include layout="@layout/ly_main"/>
 
     <android.support.design.widget.NavigationView

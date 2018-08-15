@@ -5,11 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.LayoutInflater
+import com.midas.mytimeline.ui.adapter.PhotoRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
+import com.midas.secretplace.structure.core.photo
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.frag.MapFragment
+import kotlinx.android.synthetic.main.act_place_detail.*
 
 
 class ActPlaceDetail : AppCompatActivity()
@@ -17,9 +21,14 @@ class ActPlaceDetail : AppCompatActivity()
     /*********************** Define ***********************/
 
     /*********************** Member ***********************/
-    private var m_App: MyApp? = null
-    private var m_Context: Context? = null
-    private var m_PlaceInfo:place? = null
+    var m_App: MyApp? = null
+    var m_Context: Context? = null
+    var m_PlaceInfo:place? = null
+    var m_LayoutInflater:LayoutInflater? = null
+    var m_Adapter:PhotoRvAdapter? = null
+    var m_arrPhoto:ArrayList<photo>? = null
+    var m_strSeq:String? = null
+
     /*********************** Controller ***********************/
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
@@ -45,7 +54,8 @@ class ActPlaceDetail : AppCompatActivity()
     //
     fun initValue()
     {
-
+        m_strSeq = ""
+        m_arrPhoto = ArrayList<photo>()
     }
     //--------------------------------------------------------------
     //
@@ -63,18 +73,25 @@ class ActPlaceDetail : AppCompatActivity()
     //
     fun initLayout()
     {
+        m_LayoutInflater = LayoutInflater.from(m_Context)
+
+
+
         settingView()
     }
     //--------------------------------------------------------------
     //
     fun settingView()
     {
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as MapFragment
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
         mapFragment.getMapAsync(mapFragment)
         val mArgs = Bundle()
         mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo)
         mapFragment.arguments = mArgs
-        System.err.println("OnCreate end")
+
+        m_Adapter = PhotoRvAdapter(m_Context!!, m_arrPhoto!!)
+        recyclerView.adapter = m_Adapter
+
     }
     /************************* listener *************************/
 

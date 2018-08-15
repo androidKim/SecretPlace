@@ -3,7 +3,11 @@ package com.midas.secretplace.core
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.Query
-import com.midas.secretplace.structure.core.*
+import com.midas.secretplace.structure.ReqBase
+import com.midas.secretplace.structure.core.direct
+import com.midas.secretplace.structure.core.distance
+import com.midas.secretplace.structure.core.place
+import com.midas.secretplace.structure.core.user
 
 
 class FirebaseDbCtrl

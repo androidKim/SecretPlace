@@ -27,14 +27,9 @@
 
         <menu>
             <item
-                android:id="@+id/other_menu_option_one"
-                android:title="One"
-                android:icon="@drawable/ic_launcher_background"/>
-
-            <item
                 android:id="@+id/logout"
                 android:title="@string/str_msg_1"
-                android:icon="@drawable/ic_launcher_background"/>
+                android:icon="@drawable/baseline_exit_to_app_black_18dp"/>
         </menu>
 
     </item>

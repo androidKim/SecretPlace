@@ -11,7 +11,6 @@ import android.support.v7.app.AlertDialog
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
-import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.firebase.jobdispatcher.Constraint
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
@@ -68,6 +67,8 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
         else
         {
             super.onBackPressed()
+            finish()
+            System.exit(0)
         }
     }
     /*********************** User Function ***********************/
@@ -206,12 +207,7 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
             R.id.logout ->
             {
                 showLogoutDialog()
-            }
-
-            R.id.other_menu_option_one ->
-            {
-                Toast.makeText(this@ActMain,"Otra Opcion Uno Seleccionada",Toast.LENGTH_LONG).show()
-                result = true
+                return true
             }
         }
         drawer_layout.closeDrawer(GravityCompat.START)

@@ -164,7 +164,7 @@ class FrDirectPick : Fragment(), SwipeRefreshLayout.OnRefreshListener
     fun getDirectListProc(seq:String)
     {
         m_bRunning = true
-        m_App!!.showLoadingDialog(ly_LoadingDialog)
+        //m_App!!.showLoadingDialog(ly_LoadingDialog)
 
         var pQuery: Query = m_App!!.m_FirebaseDbCtrl!!.getDirectList(seq!!)
         //pQuery!!.addListenerForSingleValueEvent(listenerForSingleValueEvent)
@@ -225,7 +225,7 @@ class FrDirectPick : Fragment(), SwipeRefreshLayout.OnRefreshListener
             override fun onDataChange(p0: DataSnapshot?)
             {
                 m_bRunning = false
-                m_App!!.hideLoadingDialog(ly_LoadingDialog)
+                //m_App!!.hideLoadingDialog(ly_LoadingDialog)
             }
 
             override fun onCancelled(p0: DatabaseError?)
