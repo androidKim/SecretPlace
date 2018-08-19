@@ -1,4 +1,4 @@
-package com.midas.mytimeline.ui.adapter
+package com.midas.secretplace.ui.adapter
 
 
 import android.content.Context

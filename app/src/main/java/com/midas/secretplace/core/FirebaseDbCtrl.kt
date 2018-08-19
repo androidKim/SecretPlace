@@ -28,7 +28,6 @@ class FirebaseDbCtrl
         m_FirebaseDb = FirebaseDatabase.getInstance()
     }
 
-
     /************************* DB Setter *************************/
     //---------------------------------------------------------------
     //
