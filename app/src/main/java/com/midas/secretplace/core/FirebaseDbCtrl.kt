@@ -70,7 +70,7 @@ class FirebaseDbCtrl
     fun setPlaceInfo(pInfo:place):DatabaseReference
     {
         var pDbRef = m_FirebaseDb!!.getReference(TB_PLACE)!!.push()
-        pDbRef.setValue(pInfo)
+        pDbRef!!.child(pInfo.seq).setValue(pInfo)//where
         return pDbRef
     }
     //---------------------------------------------------------------

@@ -18,6 +18,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
@@ -91,7 +95,6 @@ class ActPlaceDetail : AppCompatActivity()
                     Toast.makeText(m_Context, "Image Saved!", Toast.LENGTH_SHORT).show()
                     //iv_Attach!!.setImageBitmap(bitmap)
 
-
                     val data = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
                     var value = 0.0
                     var storage = data.getReference().child("testImage.jpg").putFile(contentURI)
@@ -103,7 +106,30 @@ class ActPlaceDetail : AppCompatActivity()
                             .addOnSuccessListener {
                                 taskSnapshot ->
                                 val uri = taskSnapshot.downloadUrl
-                                Log.v("Download File","File.." +uri);
+                                Log.v("Download File","File.." +uri)
+
+                                m_PlaceInfo!!.img_url = taskSnapshot.downloadUrl.toString()
+                                //update
+                                var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
+                                pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                    override fun onDataChange(dataSnapshot: DataSnapshot?)
+                                    {
+                                        if (dataSnapshot!!.exists())
+                                        {
+                                            if(!m_strSeq.equals(dataSnapshot!!.key))
+                                            {
+                                                m_strSeq = dataSnapshot!!.key
+                                                val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
+                                            }
+                                        }
+                                    }
+
+                                    override fun onCancelled(p0: DatabaseError?)
+                                    {
+
+                                    }
+                                })
+
                             }
                             .addOnFailureListener{
                                 exception -> exception.printStackTrace()

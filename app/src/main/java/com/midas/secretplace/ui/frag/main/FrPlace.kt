@@ -183,6 +183,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
                     if(pInfo.user_fk.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
                     {
                         m_strSeq = dataSnapshot!!.key
+                        pInfo.seq = m_strSeq
                         m_Adapter!!.addData(pInfo)
                     }
                 }
@@ -249,8 +250,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
             {
                 var locationInfo = m_IfCallback!!.getLocation()
                 var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919
-
-                var pInfo:place = place(userKey!!, "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude))
+                var pInfo:place = place("null",userKey!!, "null", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), "null")
                 showPlaceInputDialog(pInfo)
             }
         }
