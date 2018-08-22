@@ -14,6 +14,7 @@ import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -25,10 +26,10 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
-import com.midas.secretplace.structure.core.photo
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
+import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.ui.frag.MapFragment
 import kotlinx.android.synthetic.main.act_place_detail.*
 import java.io.ByteArrayOutputStream
@@ -36,6 +37,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class ActPlaceDetail : AppCompatActivity()
@@ -55,7 +57,6 @@ class ActPlaceDetail : AppCompatActivity()
     var m_PlaceInfo:place? = null
     var m_LayoutInflater:LayoutInflater? = null
     var m_Adapter: PhotoRvAdapter? = null
-    var m_arrPhoto:ArrayList<photo>? = null
     var m_strSeq:String? = null
     var m_strImgpath:String ?= null;
 
@@ -108,7 +109,9 @@ class ActPlaceDetail : AppCompatActivity()
                                 val uri = taskSnapshot.downloadUrl
                                 Log.v("Download File","File.." +uri)
 
-                                m_PlaceInfo!!.img_url = taskSnapshot.downloadUrl.toString()
+                                if(m_PlaceInfo!!.img_list == null)
+                                    m_PlaceInfo!!.img_list = ArrayList<String>()
+                                m_PlaceInfo!!.img_list!!.add(taskSnapshot.downloadUrl.toString())
                                 //update
                                 var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
                                 pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -161,7 +164,6 @@ class ActPlaceDetail : AppCompatActivity()
     fun initValue()
     {
         m_strSeq = ""
-        m_arrPhoto = ArrayList<photo>()
     }
     //--------------------------------------------------------------
     //
@@ -192,14 +194,39 @@ class ActPlaceDetail : AppCompatActivity()
     //
     fun settingView()
     {
+        //map..
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
         mapFragment.getMapAsync(mapFragment)
         val mArgs = Bundle()
         mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo)
         mapFragment.arguments = mArgs
 
-        m_Adapter = PhotoRvAdapter(m_Context!!, m_arrPhoto!!)
-        recyclerView.adapter = m_Adapter
+        //name
+        tv_Name!!.text = m_PlaceInfo!!.name
+
+        //img list
+        if(m_PlaceInfo!!.img_list != null)
+        {
+            m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!.img_list!!)
+            recyclerView.adapter = m_Adapter
+
+            recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
+
+            var nSpanCnt = 1
+            /*
+            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode..
+            {
+                nSpanCnt = 4
+            }
+            */
+
+            val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
+            recyclerView!!.layoutManager = pLayoutManager
+            recyclerView!!.setHasFixedSize(true)
+
+            recyclerView!!.layoutManager = pLayoutManager
+        }
+
     }
     //-------------------------------------------------------------
     //

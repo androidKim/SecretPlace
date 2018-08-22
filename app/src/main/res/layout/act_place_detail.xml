@@ -13,11 +13,19 @@
         android:layout_height="200dp" />
 
     <LinearLayout
-        android:layout_gravity="right"
-        android:padding="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="left|center"
+        android:padding="15dp">
+
+        <TextView
+            android:layout_marginRight="10dp"
+            android:id="@+id/tv_Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_black"
+            android:textSize="15dp" />
 
         <ImageButton
             android:id="@+id/iBtn_AddPhoto"

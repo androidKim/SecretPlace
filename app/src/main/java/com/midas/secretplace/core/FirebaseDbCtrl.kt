@@ -69,8 +69,17 @@ class FirebaseDbCtrl
     //
     fun setPlaceInfo(pInfo:place):DatabaseReference
     {
-        var pDbRef = m_FirebaseDb!!.getReference(TB_PLACE)!!.push()
-        pDbRef!!.child(pInfo.seq).setValue(pInfo)//where
+        var pDbRef:DatabaseReference
+        if(!pInfo.seq.equals("") && !pInfo.seq.equals("null"))//update
+        {
+            pDbRef = m_FirebaseDb!!.getReference(TB_PLACE)
+            pDbRef!!.child(pInfo.seq).setValue(pInfo)
+        }
+        else//insert
+        {
+            pDbRef = m_FirebaseDb!!.getReference(TB_PLACE)!!.push()
+            pDbRef!!.setValue(pInfo)//insert
+        }
         return pDbRef
     }
     //---------------------------------------------------------------

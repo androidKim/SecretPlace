@@ -156,8 +156,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
             }
         })
 
-
-
         getPlaceListProc("")
     }
     //--------------------------------------------------------------
@@ -250,7 +248,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
             {
                 var locationInfo = m_IfCallback!!.getLocation()
                 var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919
-                var pInfo:place = place("null",userKey!!, "null", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), "null")
+                var tempArr:ArrayList<String> = ArrayList()
+                var pInfo:place = place("null",userKey!!, "null", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), tempArr)
                 showPlaceInputDialog(pInfo)
             }
         }
@@ -278,8 +277,10 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
                         if(!m_strSeq.equals(dataSnapshot!!.key))
                         {
                             m_strSeq = dataSnapshot!!.key
-                            val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
                         }
+
+                        pInfo.seq = dataSnapshot!!.key
+                        m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(pInfo)
                     }
                 }
 

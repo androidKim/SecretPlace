@@ -6,12 +6,13 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.midas.secretplace.R
-import com.midas.secretplace.structure.core.photo
 
-class PhotoRvAdapter(val context: Context, var photoList: ArrayList<photo>) :
+class PhotoRvAdapter(val context: Context, var photoList: ArrayList<String>) :
         RecyclerView.Adapter<PhotoRvAdapter.Holder>()
 {
     /*********************** System Function ***********************/
@@ -42,22 +43,25 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<photo>) :
     {
         var ly_Row = itemView?.findViewById<RelativeLayout>(R.id.ly_Row)
         var tv_Name = itemView?.findViewById<TextView>(R.id.tv_Name)
+        var iv_Photo = itemView?.findViewById<ImageView>(R.id.iv_Photo)
 
-        fun bind (pInfo: photo, pContext: Context)
+        fun bind (url: String, pContext: Context)
         {
-            ly_Row?.setTag(pInfo)
-            ly_Row?.setOnClickListener(onClickGoDetail)
+            Glide.with(context).load(url).into(iv_Photo)
+
+            //ly_Row?.setTag(pInfo)
+            //ly_Row?.setOnClickListener(onClickGoDetail)
         }
     }
     /*********************** User Function ***********************/
     //-----------------------------------------------------------
     //
-    fun addData(pInfo:photo)
+    fun addData(url:String)
     {
-        if(pInfo == null)
+        if(url == null)
             return
 
-        this.photoList.add(pInfo)
+        this.photoList.add(url)
         notifyDataSetChanged()
     }
     //-----------------------------------------------------------
@@ -70,7 +74,7 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<photo>) :
 
     //-----------------------------------------------------------
     //
-    fun refreshData(pArray:ArrayList<photo>)
+    fun refreshData(pArray:ArrayList<String>)
     {
         this.photoList = pArray
         notifyDataSetChanged()
