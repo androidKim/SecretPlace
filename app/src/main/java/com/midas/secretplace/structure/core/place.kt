@@ -11,11 +11,15 @@ class place:Serializable
     var lng:String? = null
     var img_list:ArrayList<String>? = null
 
+    @Transient
+    var isHeader:Boolean = false
+
     //필수..
     constructor()
     {
 
     }
+
     constructor(seq:String, user_fk:String, name:String, lat:String, lng:String, img_list:ArrayList<String>)
     {
         this.seq = seq

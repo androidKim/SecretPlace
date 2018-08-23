@@ -39,9 +39,8 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>) :
     override fun onBindViewHolder(holder: Holder, position: Int)
     {
         holder?.bind(placeList[position], context)
-
-
     }
+
     //-----------------------------------------------------------
     //
     inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView)
@@ -56,7 +55,9 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>) :
             ly_Row?.setOnClickListener(onClickGoDetail)
         }
     }
+
     /*********************** User Function ***********************/
+
     //-----------------------------------------------------------
     //
     fun addData(pInfo:place)

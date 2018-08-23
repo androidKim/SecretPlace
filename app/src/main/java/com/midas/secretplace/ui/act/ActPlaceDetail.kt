@@ -17,7 +17,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.Toast
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -40,7 +39,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ActPlaceDetail : AppCompatActivity()
+class ActPlaceDetail : AppCompatActivity(), PhotoRvAdapter.ifCallback
 {
     /*********************** Define ***********************/
     //-------------------------------------------------------------
@@ -183,11 +182,6 @@ class ActPlaceDetail : AppCompatActivity()
     {
         m_LayoutInflater = LayoutInflater.from(m_Context)
 
-        //event..
-        iBtn_AddPhoto.setOnClickListener(View.OnClickListener {
-            addPhoto()
-        })
-
         settingView()
     }
     //--------------------------------------------------------------
@@ -195,19 +189,23 @@ class ActPlaceDetail : AppCompatActivity()
     fun settingView()
     {
         //map..
+        /*
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
         mapFragment.getMapAsync(mapFragment)
         val mArgs = Bundle()
         mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo)
         mapFragment.arguments = mArgs
+        */
 
         //name
-        tv_Name!!.text = m_PlaceInfo!!.name
+        //tv_Name!!.text = m_PlaceInfo!!.name
 
         //img list
         if(m_PlaceInfo!!.img_list != null)
         {
-            m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!.img_list!!)
+            m_PlaceInfo!!.img_list!!.add("header")
+
+            m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!.img_list!!, this, supportFragmentManager)
             recyclerView.adapter = m_Adapter
 
             recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
@@ -271,24 +269,12 @@ class ActPlaceDetail : AppCompatActivity()
     }
     //-------------------------------------------------------------
     //add local image filename
+    /*
     fun addPhoto()
     {
-        //show dialog..
-        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create();
-        pAlert.setTitle("Do you want add photo?");
-        pAlert.setMessage("you can choice!!");
-        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Gallery",{
-            dialogInterface, i ->
-            checkPermissionWriteStorage();
-            pAlert.dismiss();
-        })
-        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Take Photo",{
-            dialogInterface, i ->
-            checkPermissionCamera();
-            pAlert.dismiss();
-        })
-        pAlert.show();
+
     }
+    */
 
     //-------------------------------------------------------------
     //
@@ -346,5 +332,37 @@ class ActPlaceDetail : AppCompatActivity()
 
     /************************* listener *************************/
 
-    /*********************** listener ***********************/
+
+    /************************* callback function *************************/
+    //-----------------------------------------------------
+    //adapter ifCallback
+    override fun addPhoto()
+    {
+        //show dialog..
+        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create();
+        pAlert.setTitle("Do you want add photo?");
+        pAlert.setMessage("you can choice!!");
+        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Gallery",{
+            dialogInterface, i ->
+            checkPermissionWriteStorage();
+            pAlert.dismiss();
+        })
+        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Take Photo",{
+            dialogInterface, i ->
+            checkPermissionCamera();
+            pAlert.dismiss();
+        })
+        pAlert.show();
+    }
+    //-----------------------------------------------------
+    //adapter ifCallback
+    override fun settingMapFragment(map: MapFragment)
+    {
+        map.getMapAsync(map)
+        val mArgs = Bundle()
+        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo)
+        map.arguments = mArgs
+    }
+    /*********************** interface ***********************/
+
 }
