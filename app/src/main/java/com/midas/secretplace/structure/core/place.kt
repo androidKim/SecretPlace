@@ -9,10 +9,7 @@ class place:Serializable
     var name:String? = null
     var lat:String? = null
     var lng:String? = null
-    var img_list:ArrayList<String>? = null
-
-    @Transient
-    var isHeader:Boolean = false
+    var img_list:ArrayList<photo>? = null
 
     //필수..
     constructor()
@@ -20,7 +17,7 @@ class place:Serializable
 
     }
 
-    constructor(seq:String, user_fk:String, name:String, lat:String, lng:String, img_list:ArrayList<String>)
+    constructor(seq:String, user_fk:String, name:String, lat:String, lng:String, img_list:ArrayList<photo>)
     {
         this.seq = seq
         this.user_fk = user_fk

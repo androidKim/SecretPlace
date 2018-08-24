@@ -6,6 +6,40 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/mapFragment"
+            android:name="com.midas.secretplace.ui.frag.MapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="150dp" />
+
+        <RelativeLayout
+            android:layout_below="@+id/mapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/color_white"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/iBtn_Expand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/baseline_expand_more_black_18dp"
+                android:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/iBtn_Collapse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/baseline_expand_less_black_18dp"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+    </RelativeLayout>
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/ly_SwipeRefresh"
         android:layout_width="match_parent"

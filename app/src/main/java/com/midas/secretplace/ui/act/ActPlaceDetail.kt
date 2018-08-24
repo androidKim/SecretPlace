@@ -13,6 +13,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
@@ -25,6 +26,8 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
+import com.midas.secretplace.core.FirebaseDbCtrl
+import com.midas.secretplace.structure.core.photo
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
@@ -39,8 +42,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ActPlaceDetail : AppCompatActivity(), PhotoRvAdapter.ifCallback
+class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, PhotoRvAdapter.ifCallback
 {
+
     /*********************** Define ***********************/
     //-------------------------------------------------------------
     //
@@ -109,8 +113,15 @@ class ActPlaceDetail : AppCompatActivity(), PhotoRvAdapter.ifCallback
                                 Log.v("Download File","File.." +uri)
 
                                 if(m_PlaceInfo!!.img_list == null)
-                                    m_PlaceInfo!!.img_list = ArrayList<String>()
-                                m_PlaceInfo!!.img_list!!.add(taskSnapshot.downloadUrl.toString())
+                                    m_PlaceInfo!!.img_list = ArrayList<photo>()
+
+                                var photoInfo:photo = photo()
+                                photoInfo.img_url = taskSnapshot.downloadUrl.toString()
+                                m_PlaceInfo!!.img_list!!.add(photoInfo)
+
+                                if(m_PlaceInfo!!.img_list!! != null)//remove header
+                                    m_PlaceInfo!!.img_list!!.removeAt(0)
+
                                 //update
                                 var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
                                 pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -182,6 +193,10 @@ class ActPlaceDetail : AppCompatActivity(), PhotoRvAdapter.ifCallback
     {
         m_LayoutInflater = LayoutInflater.from(m_Context)
 
+
+        //event..
+        ly_SwipeRefresh.setOnRefreshListener(this)
+
         settingView()
     }
     //--------------------------------------------------------------
@@ -189,42 +204,77 @@ class ActPlaceDetail : AppCompatActivity(), PhotoRvAdapter.ifCallback
     fun settingView()
     {
         //map..
-        /*
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
         mapFragment.getMapAsync(mapFragment)
         val mArgs = Bundle()
         mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo)
         mapFragment.arguments = mArgs
-        */
-
-        //name
-        //tv_Name!!.text = m_PlaceInfo!!.name
 
         //img list
-        if(m_PlaceInfo!!.img_list != null)
+        if(m_PlaceInfo!!.img_list == null)
+            m_PlaceInfo!!.img_list = ArrayList()
+
+
+        var pHeader:photo = photo()
+        pHeader.isHeader = true
+        pHeader.img_url = ""
+
+        m_PlaceInfo!!.img_list!!.add(0, pHeader)//setHeader
+
+        m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!.img_list!!, this, supportFragmentManager)
+        recyclerView.adapter = m_Adapter
+
+        recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
+
+        var nSpanCnt = 1
+        /*
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode..
         {
-            m_PlaceInfo!!.img_list!!.add("header")
-
-            m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!.img_list!!, this, supportFragmentManager)
-            recyclerView.adapter = m_Adapter
-
-            recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
-
-            var nSpanCnt = 1
-            /*
-            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode..
-            {
-                nSpanCnt = 4
-            }
-            */
-
-            val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
-            recyclerView!!.layoutManager = pLayoutManager
-            recyclerView!!.setHasFixedSize(true)
-
-            recyclerView!!.layoutManager = pLayoutManager
+            nSpanCnt = 4
         }
+        */
 
+        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
+        recyclerView!!.layoutManager = pLayoutManager
+        recyclerView!!.setHasFixedSize(true)
+
+        recyclerView!!.layoutManager = pLayoutManager
+    }
+    //-------------------------------------------------------------
+    //
+    fun getPlaceInfoProc(seq:String)
+    {
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq)//where
+        pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
+        {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
+                if(pInfo != null)
+                {
+                    m_PlaceInfo = pInfo
+
+                    settingView()
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+    }
+
+    //-------------------------------------------------------------
+    //
+    fun setRefresh()
+    {
+        if(m_Adapter != null)
+            m_Adapter!!.clearData()
+
+        ly_SwipeRefresh!!.setRefreshing(false)
+
+        getPlaceInfoProc(m_PlaceInfo!!.seq!!)
     }
     //-------------------------------------------------------------
     //
@@ -335,13 +385,20 @@ class ActPlaceDetail : AppCompatActivity(), PhotoRvAdapter.ifCallback
 
     /************************* callback function *************************/
     //-----------------------------------------------------
+    //Swipe Refresh Listener
+    override fun onRefresh()
+    {
+        setRefresh()
+    }
+
+    //-----------------------------------------------------
     //adapter ifCallback
     override fun addPhoto()
     {
         //show dialog..
         val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create();
-        pAlert.setTitle("Do you want add photo?");
-        pAlert.setMessage("you can choice!!");
+        pAlert.setTitle("Do you want add photo?")
+        pAlert.setMessage("you can choice!!")
         pAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Gallery",{
             dialogInterface, i ->
             checkPermissionWriteStorage();
@@ -353,15 +410,6 @@ class ActPlaceDetail : AppCompatActivity(), PhotoRvAdapter.ifCallback
             pAlert.dismiss();
         })
         pAlert.show();
-    }
-    //-----------------------------------------------------
-    //adapter ifCallback
-    override fun settingMapFragment(map: MapFragment)
-    {
-        map.getMapAsync(map)
-        val mArgs = Bundle()
-        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo)
-        map.arguments = mArgs
     }
     /*********************** interface ***********************/
 

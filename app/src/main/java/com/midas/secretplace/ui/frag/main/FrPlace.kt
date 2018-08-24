@@ -16,6 +16,7 @@ import android.widget.EditText
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
+import com.midas.secretplace.structure.core.photo
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
@@ -182,6 +183,11 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
                     {
                         m_strSeq = dataSnapshot!!.key
                         pInfo.seq = m_strSeq
+                        if(pInfo.img_list != null)
+                        {
+                            //pInfo!!.img_list!!.removeAt(0)
+                        }
+
                         m_Adapter!!.addData(pInfo)
                     }
                 }
@@ -248,7 +254,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
             {
                 var locationInfo = m_IfCallback!!.getLocation()
                 var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919
-                var tempArr:ArrayList<String> = ArrayList()
+                var tempArr:ArrayList<photo> = ArrayList()
                 var pInfo:place = place("null",userKey!!, "null", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), tempArr)
                 showPlaceInputDialog(pInfo)
             }

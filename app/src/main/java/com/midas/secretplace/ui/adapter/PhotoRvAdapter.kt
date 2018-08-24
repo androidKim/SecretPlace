@@ -2,6 +2,7 @@ package com.midas.secretplace.ui.adapter
 
 
 import android.content.Context
+
 import android.support.v4.app.FragmentManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -13,9 +14,13 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.midas.secretplace.R
+import com.midas.secretplace.structure.core.photo
 import com.midas.secretplace.ui.frag.MapFragment
+import android.view.InflateException
 
-class PhotoRvAdapter(val context: Context, var photoList: ArrayList<String>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
+
+
+class PhotoRvAdapter(val context: Context, var photoList: ArrayList<photo>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>()
 {
 
@@ -28,7 +33,7 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<String>, var
         {
             val view = LayoutInflater.from(context).inflate(R.layout.ly_place_detail_header, parent, false)
             val holder:HeaderHolder = HeaderHolder(view)
-            return (holder)
+            return holder
         }
         else if (viewType == TYPE_ITEM)
         {
@@ -63,7 +68,7 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<String>, var
     //
     override fun getItemViewType(position: Int): Int
     {
-        return if(photoList[position].equals("header"))
+        return if(photoList[position].isHeader)
         {
             TYPE_HEADER
         }
@@ -73,19 +78,15 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<String>, var
         }
     }
     //-----------------------------------------------------------
-    //
+    //Header..
     inner class HeaderHolder(itemView:View?) : RecyclerView.ViewHolder(itemView)
     {
         var tv_Name = itemView?.findViewById<TextView>(R.id.tv_Name)
         var iBtn_AddPhoto = itemView?.findViewById<ImageButton>(R.id.iBtn_AddPhoto)
-        var mapFragment = m_FrManager.findFragmentById(R.id.mapFragment) as MapFragment
 
-        fun bind (url: String, pContext: Context)
+        fun bind (pInfo: photo, pContext: Context)
         {
-            if(m_IfCallback != null)
-                m_IfCallback.settingMapFragment(mapFragment)
-
-            tv_Name!!.text = url
+            tv_Name!!.text = pInfo.img_url
 
             //event..
             iBtn_AddPhoto!!.setOnClickListener(View.OnClickListener {
@@ -104,9 +105,9 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<String>, var
         var tv_Name = itemView?.findViewById<TextView>(R.id.tv_Name)
         var iv_Photo = itemView?.findViewById<ImageView>(R.id.iv_Photo)
 
-        fun bind (url: String, pContext: Context)
+        fun bind (pInfo: photo, pContext: Context)
         {
-            Glide.with(context).load(url).into(iv_Photo)
+            Glide.with(context).load(pInfo.img_url).into(iv_Photo)
             //ly_Row?.setTag(pInfo)
             //ly_Row?.setOnClickListener(onClickGoDetail)
         }
@@ -122,25 +123,25 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<String>, var
 
     //-----------------------------------------------------------
     //
-    fun addData(url:String)
+    fun addData(pInfo:photo)
     {
-        if(url == null)
+        if(pInfo == null)
             return
 
-        this.photoList.add(url)
+        this.photoList.add(pInfo)
         notifyDataSetChanged()
     }
     //-----------------------------------------------------------
     //
     fun clearData()
     {
-        this.photoList.clear()
+        photoList.clear()
         notifyDataSetChanged()
     }
 
     //-----------------------------------------------------------
     //
-    fun refreshData(pArray:ArrayList<String>)
+    fun refreshData(pArray:ArrayList<photo>)
     {
         this.photoList = pArray
         notifyDataSetChanged()
@@ -171,7 +172,6 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<String>, var
     //
     interface ifCallback
     {
-        fun settingMapFragment(map:MapFragment)
         fun addPhoto()
     }
 }
