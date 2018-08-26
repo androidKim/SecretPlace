@@ -18,12 +18,16 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.Toast
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
+import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
@@ -33,6 +37,7 @@ import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.ui.frag.MapFragment
+import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_place_detail.*
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -42,7 +47,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, PhotoRvAdapter.ifCallback
+class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback
 {
 
     /*********************** Define ***********************/
@@ -197,6 +202,28 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //event..
         ly_SwipeRefresh.setOnRefreshListener(this)
 
+        //map expand
+        ly_MapExpand.setOnClickListener(View.OnClickListener {
+            ly_MapExpand.visibility = View.GONE
+            ly_MapCollapse.visibility = View.VISIBLE
+
+            //expand map..
+            val params = mapFragment!!.getView()!!.getLayoutParams()
+            params.height = RelativeLayout.LayoutParams.MATCH_PARENT
+            mapFragment!!.getView()!!.setLayoutParams(params)
+        })
+
+        //map collapse
+        ly_MapCollapse.setOnClickListener(View.OnClickListener {
+
+            ly_MapExpand.visibility = View.VISIBLE
+            ly_MapCollapse.visibility = View.GONE
+
+            val params = mapFragment!!.getView()!!.getLayoutParams()
+            params.height = 600
+            mapFragment!!.getView()!!.setLayoutParams(params)
+        })
+
         settingView()
     }
     //--------------------------------------------------------------
@@ -205,7 +232,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         //map..
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
-        mapFragment.getMapAsync(mapFragment)
+        mapFragment!!.getMapAsync(mapFragment)
         val mArgs = Bundle()
         mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo)
         mapFragment.arguments = mArgs
@@ -221,7 +248,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         m_PlaceInfo!!.img_list!!.add(0, pHeader)//setHeader
 
-        m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!.img_list!!, this, supportFragmentManager)
+        m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_PlaceInfo!!.img_list!!, this, supportFragmentManager)
         recyclerView.adapter = m_Adapter
 
         recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
@@ -396,7 +423,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun addPhoto()
     {
         //show dialog..
-        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create();
+        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create()
         pAlert.setTitle("Do you want add photo?")
         pAlert.setMessage("you can choice!!")
         pAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Gallery",{

@@ -16,6 +16,7 @@ import android.widget.EditText
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
+import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.photo
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
@@ -26,7 +27,7 @@ import kotlinx.android.synthetic.main.frag_place.*
 
 
 
-class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
+class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter.ifCallback
 {
     /**************************** Define ****************************/
 
@@ -122,7 +123,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
     //
     fun settingView()
     {
-        m_Adapter = PlaceRvAdapter(m_Context!!, m_arrPlace!!)
+        m_Adapter = PlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
         m_RecyclerView!!.adapter = m_Adapter
 
         m_RecyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
@@ -328,6 +329,16 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener
     //
     override fun onRefresh()
     {
+        setRefresh()
+    }
+    /******************************** callback function ********************************/
+    //----------------------------------------------------------------------
+    //listAdapter callback
+    override fun deleteProc(pInfo: place)
+    {
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.seq)//where
+        pDbRef!!.removeValue()
+
         setRefresh()
     }
 

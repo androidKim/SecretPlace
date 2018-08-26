@@ -17,10 +17,10 @@ import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.photo
 import com.midas.secretplace.ui.frag.MapFragment
 import android.view.InflateException
+import com.midas.secretplace.structure.core.place
 
 
-
-class PhotoRvAdapter(val context: Context, var photoList: ArrayList<photo>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
+class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList: ArrayList<photo>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>()
 {
 
@@ -86,7 +86,7 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<photo>, var 
 
         fun bind (pInfo: photo, pContext: Context)
         {
-            tv_Name!!.text = pInfo.img_url
+            tv_Name!!.text = m_PlaceInfo.name
 
             //event..
             iBtn_AddPhoto!!.setOnClickListener(View.OnClickListener {
@@ -102,7 +102,6 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<photo>, var 
     inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView)
     {
         var ly_Row = itemView?.findViewById<RelativeLayout>(R.id.ly_Row)
-        var tv_Name = itemView?.findViewById<TextView>(R.id.tv_Name)
         var iv_Photo = itemView?.findViewById<ImageView>(R.id.iv_Photo)
 
         fun bind (pInfo: photo, pContext: Context)
