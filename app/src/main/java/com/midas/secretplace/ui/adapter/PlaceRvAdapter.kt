@@ -95,10 +95,23 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var 
     //
     fun goDetail(view:View)
     {
-        val pInfo:place = view.getTag() as place
-        var pIntent = Intent(view.context, ActPlaceDetail::class.java)
-        pIntent.putExtra(Constant.INTENT_DATA_PLACE_OBJECT, pInfo as Serializable)
-        view.context.startActivity(pIntent)
+        if(m_IfCallback != null)
+        {
+            var bPermission:Boolean = m_IfCallback.checkPermission()
+            if(bPermission)
+            {
+                val pInfo:place = view.getTag() as place
+                var pIntent = Intent(view.context, ActPlaceDetail::class.java)
+                pIntent.putExtra(Constant.INTENT_DATA_PLACE_OBJECT, pInfo as Serializable)
+                view.context.startActivity(pIntent)
+                return
+            }
+            else
+            {
+                Toast.makeText(context, context.resources.getString(R.string.str_msg_7), Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
     }
 
     //----------------------------------------------------------------------------
@@ -150,5 +163,6 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var 
     interface ifCallback
     {
         fun deleteProc(pInfo:place)
+        fun checkPermission():Boolean
     }
 }

@@ -341,6 +341,13 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
         setRefresh()
     }
+    //----------------------------------------------------------------------
+    //listAdapter callback
+    override fun checkPermission(): Boolean
+    {
+        var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
+        return bPermissionVal
+    }
 
     /******************************** interface ********************************/
     //----------------------------------------------------------------------

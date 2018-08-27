@@ -16,12 +16,11 @@
             android:layout_width="match_parent"
             android:layout_height="300dp" />
 
-
         <RelativeLayout
             android:layout_gravity="bottom"
             android:id="@+id/ly_MapSizeControll"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_below="@+id/ly_Top"
             android:background="@color/color_white"
             android:gravity="center">
@@ -30,7 +29,7 @@
             <LinearLayout
                 android:id="@+id/ly_MapExpand"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:visibility="visible">
@@ -45,7 +44,7 @@
             <LinearLayout
                 android:id="@+id/ly_MapCollapse"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:visibility="gone">
@@ -58,7 +57,6 @@
             </LinearLayout>
         </RelativeLayout>
     </FrameLayout>
-
 
 
     <android.support.v4.widget.SwipeRefreshLayout

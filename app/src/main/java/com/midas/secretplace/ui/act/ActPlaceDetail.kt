@@ -20,6 +20,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.Toast
 import com.google.firebase.database.DataSnapshot
@@ -31,6 +32,7 @@ import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
+import com.midas.secretplace.structure.ReqBase
 import com.midas.secretplace.structure.core.photo
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
@@ -43,13 +45,15 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback
 {
-
     /*********************** Define ***********************/
     //-------------------------------------------------------------
     //
@@ -65,7 +69,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_PlaceInfo:place? = null
     var m_LayoutInflater:LayoutInflater? = null
     var m_Adapter: PhotoRvAdapter? = null
-    var m_strSeq:String? = null
     var m_strImgpath:String ?= null;
 
     /*********************** Controller ***********************/
@@ -106,7 +109,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
                     val data = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
                     var value = 0.0
-                    var storage = data.getReference().child("testImage.jpg").putFile(contentURI)
+
+                    var timestamp:Long = System.currentTimeMillis()
+                    var fileName:String = String.format("%s_%s",timestamp, "img")
+                    var storage = data.getReference().child(fileName).putFile(contentURI)
                             .addOnProgressListener { taskSnapshot ->
                                 value = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
                                 Log.v("value","value=="+value)
@@ -134,11 +140,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                     {
                                         if (dataSnapshot!!.exists())
                                         {
-                                            if(!m_strSeq.equals(dataSnapshot!!.key))
-                                            {
-                                                m_strSeq = dataSnapshot!!.key
-                                                val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
-                                            }
+                                            setRefresh()
                                         }
                                     }
 
@@ -178,7 +180,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun initValue()
     {
-        m_strSeq = ""
+
     }
     //--------------------------------------------------------------
     //
@@ -197,7 +199,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun initLayout()
     {
         m_LayoutInflater = LayoutInflater.from(m_Context)
-
 
         //event..
         ly_SwipeRefresh.setOnRefreshListener(this)
@@ -224,6 +225,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             mapFragment!!.getView()!!.setLayoutParams(params)
         })
 
+
         settingView()
     }
     //--------------------------------------------------------------
@@ -237,40 +239,71 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo)
         mapFragment.arguments = mArgs
 
-        //img list
-        if(m_PlaceInfo!!.img_list == null)
-            m_PlaceInfo!!.img_list = ArrayList()
 
+        //getPlaceInfoProc(m_PlaceInfo!!.seq!!)
 
-        var pHeader:photo = photo()
-        pHeader.isHeader = true
-        pHeader.img_url = ""
-
-        m_PlaceInfo!!.img_list!!.add(0, pHeader)//setHeader
-
-        m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_PlaceInfo!!.img_list!!, this, supportFragmentManager)
-        recyclerView.adapter = m_Adapter
-
-        recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
-
-        var nSpanCnt = 1
-        /*
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode..
-        {
-            nSpanCnt = 4
-        }
-        */
-
-        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
-        recyclerView!!.layoutManager = pLayoutManager
-        recyclerView!!.setHasFixedSize(true)
-
-        recyclerView!!.layoutManager = pLayoutManager
+        settingPlaceView()
     }
+    //--------------------------------------------------------------
+    //
+    fun settingPlaceView()
+    {
+        //if(m_Adapter == null)
+        //{
+            //img list
+            if(m_PlaceInfo!!.img_list == null)
+                m_PlaceInfo!!.img_list = ArrayList()
+
+            var pHeader:photo = photo()
+            pHeader.isHeader = true
+            pHeader.img_url = ""
+
+            m_PlaceInfo!!.img_list!!.add(0, pHeader)//setHeader
+
+            m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_PlaceInfo!!.img_list!!, this, supportFragmentManager)
+            recyclerView.adapter = m_Adapter
+            recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))//set recyclerview grid Item spacing
+            var nSpanCnt = 1
+            /*
+            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode.
+                nSpanCnt = 4
+            */
+
+            val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
+            recyclerView!!.layoutManager = pLayoutManager
+            recyclerView!!.setHasFixedSize(true)
+        //}
+        //else//addData
+        //{
+            //m_Adapter!!.addData(null)
+        //}
+    }
+
     //-------------------------------------------------------------
     //
     fun getPlaceInfoProc(seq:String)
     {
+        /*
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq).child("img_list").limitToFirst(ReqBase.ITEM_COUNT)
+        pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot?)
+            {
+                val pInfo: place = p0!!.getValue(place::class.java)!!
+                if(pInfo != null)
+                {
+                    m_PlaceInfo = pInfo
+
+                    settingPlaceView()
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+        */
+
         var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq)//where
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
         {
@@ -281,7 +314,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 {
                     m_PlaceInfo = pInfo
 
-                    settingView()
+                    settingPlaceView()
                 }
             }
 
@@ -291,7 +324,12 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }
         })
     }
+    //-------------------------------------------------------------
+    //
+    fun getImageListProc(index:Int)
+    {
 
+    }
     //-------------------------------------------------------------
     //
     fun setRefresh()
@@ -325,7 +363,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
         if(permission != PackageManager.PERMISSION_GRANTED)
         {
-            permissionCamerra();
+            permissionCamerra()
         }
         else
         {
@@ -406,7 +444,31 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         }
         return ""
     }
+    //-------------------------------------------------------------
+    //
+    fun editContentProc(strName:String)
+    {
+        //update
+        if(m_PlaceInfo!!.img_list!! != null)//remove header
+            m_PlaceInfo!!.img_list!!.removeAt(0)
 
+        m_PlaceInfo!!.name = strName
+        var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
+        pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                if (dataSnapshot!!.exists())
+                {
+                    setRefresh()
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+    }
     /************************* listener *************************/
 
 
@@ -436,8 +498,32 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             checkPermissionCamera();
             pAlert.dismiss();
         })
-        pAlert.show();
+        pAlert.show()
     }
+    //-----------------------------------------------------
+    //adapter ifCallback
+    override fun editContent()
+    {
+        //show dialog..
+        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create()
+        pAlert.setTitle("Do you want edit content?")
+        pAlert.setMessage("you can choice!!")
+        var editName: EditText? = EditText(m_Context)
+        editName!!.hint = getString(R.string.str_msg_4)
+        pAlert.setView(editName)
+        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Ok",{
+            dialogInterface, i ->
+            var name:String = editName.text.toString()
+            editContentProc(name)
+            pAlert.dismiss()
+        })
+        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "No",{
+            dialogInterface, i ->
+            pAlert.dismiss()
+        })
+        pAlert.show()
+    }
+
     /*********************** interface ***********************/
 
 }
