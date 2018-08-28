@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <files-path name="name" path="path" /> <!-- Context.getFilesDir(). -->
+    <cache-path name="name" path="path" /> <!-- getCacheDir(). -->
+    <external-path name="storage/emulated" path="." /> <!-- Environment.getExternalStorageDirectory(). -->
+    <external-files-path name="name" path="path" /> <!-- Context#getExternalFilesDir(String) Context.getExternalFilesDir(null). -->
+    <external-cache-path name="name" path="path" /> <!-- Context.getExternalCacheDir(). -->
+    <cache-path name="images" path="./images" /> <!-- getCacheDir(). -->
+</paths>

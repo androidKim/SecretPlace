@@ -8,11 +8,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.FileProvider
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
@@ -69,7 +71,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_PlaceInfo:place? = null
     var m_LayoutInflater:LayoutInflater? = null
     var m_Adapter: PhotoRvAdapter? = null
-    var m_strImgpath:String ?= null;
+    var selectedImage: Uri? = null
+    var imageUri: Uri? = null
+    var m_strImgpath:String ?= null
+
 
     /*********************** Controller ***********************/
     /*********************** System Function ***********************/
@@ -104,7 +109,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 {
                     val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, contentURI)
                     m_strImgpath = saveImage(bitmap)
-                    Toast.makeText(m_Context, "Image Saved!", Toast.LENGTH_SHORT).show()
                     //iv_Attach!!.setImageBitmap(bitmap)
 
                     val data = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
@@ -159,18 +163,80 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 catch (e: IOException)
                 {
                     e.printStackTrace()
-                    Toast.makeText(m_Context, "Failed!", Toast.LENGTH_SHORT).show()
                 }
             }
         }
         else if (requestCode == REQUEST_TAKE_PHOTO)//take photo
         {
-            if (data != null)
+
+            try
             {
-                val thumbnail = data!!.extras!!.get("data") as Bitmap
-                //iv_Attach!!.setImageBitmap(thumbnail)
-                m_strImgpath = saveImage(thumbnail)
-                Toast.makeText(m_Context, "Image Saved!", Toast.LENGTH_SHORT).show()
+                //val bitmap = data!!.extras!!.get("data") as Bitmap
+                //m_strImgpath = saveImage(bitmap)
+                //val contentURI = Util.getImageUri(m_Context!!, bitmap)
+
+                try
+                {
+                    selectedImage = imageUri
+                }
+                catch (e: Exception)
+                {
+                    Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show()
+                }
+
+
+                val data = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
+                var value = 0.0
+
+                var timestamp:Long = System.currentTimeMillis()
+                var fileName:String = String.format("%s_%s",timestamp, "img")
+                var storage = data.getReference().child(fileName).putFile(selectedImage!!)
+                        .addOnProgressListener { taskSnapshot ->
+                            value = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
+                            Log.v("value","value=="+value)
+
+                        }
+                        .addOnSuccessListener {
+                            taskSnapshot ->
+                            val uri = taskSnapshot.downloadUrl
+                            Log.v("Download File","File.." +uri)
+
+                            if(m_PlaceInfo!!.img_list == null)
+                                m_PlaceInfo!!.img_list = ArrayList<photo>()
+
+                            var photoInfo:photo = photo()
+                            photoInfo.img_url = taskSnapshot.downloadUrl.toString()
+                            m_PlaceInfo!!.img_list!!.add(photoInfo)
+
+                            if(m_PlaceInfo!!.img_list!! != null)//remove header
+                                m_PlaceInfo!!.img_list!!.removeAt(0)
+
+                            //update
+                            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
+                            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(dataSnapshot: DataSnapshot?)
+                                {
+                                    if (dataSnapshot!!.exists())
+                                    {
+                                        setRefresh()
+                                    }
+                                }
+
+                                override fun onCancelled(p0: DatabaseError?)
+                                {
+
+                                }
+                            })
+
+                        }
+                        .addOnFailureListener{
+                            exception -> exception.printStackTrace()
+                        }
+
+            }
+            catch (e: IOException)
+            {
+                e.printStackTrace()
             }
         }
     }
@@ -407,6 +473,14 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun takePhoto()
     {
         val pIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        var timestamp:Long = System.currentTimeMillis()
+        var fileName:String = String.format("%s_%s",timestamp, "img")
+        val photo = File((Environment.getExternalStorageDirectory()).toString() + IMAGE_DIRECTORY, fileName)
+
+        pIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(m_Context!!, "com.midas.secretplace.fileprovider", photo))
+        imageUri = FileProvider.getUriForFile(m_Context!!, "com.midas.secretplace.fileprovider", photo)
+
         if (pIntent.resolveActivity(packageManager) != null)
         {
             startActivityForResult(pIntent, REQUEST_TAKE_PHOTO)
@@ -417,7 +491,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun saveImage(myBitmap: Bitmap):String
     {
         val bytes = ByteArrayOutputStream()
-        myBitmap.compress(Bitmap.CompressFormat.JPEG, 90, bytes)
+        myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
         val wallpaperDirectory = File((Environment.getExternalStorageDirectory()).toString() + IMAGE_DIRECTORY)
         // have the object build the directory structure, if needed.
         Log.d("fee",wallpaperDirectory.toString())
