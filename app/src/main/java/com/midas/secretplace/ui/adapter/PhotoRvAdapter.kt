@@ -8,19 +8,16 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.photo
 import com.midas.secretplace.ui.frag.MapFragment
 import android.view.InflateException
+import android.widget.*
+import com.midas.secretplace.structure.core.place
 
 
-
-class PhotoRvAdapter(val context: Context, var photoList: ArrayList<photo>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
+class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList: ArrayList<photo>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>()
 {
 
@@ -82,27 +79,31 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<photo>, var 
     inner class HeaderHolder(itemView:View?) : RecyclerView.ViewHolder(itemView)
     {
         var tv_Name = itemView?.findViewById<TextView>(R.id.tv_Name)
-        var iBtn_AddPhoto = itemView?.findViewById<ImageButton>(R.id.iBtn_AddPhoto)
+        var ly_AddPhoto = itemView?.findViewById<LinearLayout>(R.id.ly_AddPhoto)
+        var ly_EditContent = itemView?.findViewById<LinearLayout>(R.id.ly_EditContent)
 
         fun bind (pInfo: photo, pContext: Context)
         {
-            tv_Name!!.text = pInfo.img_url
+            tv_Name!!.text = m_PlaceInfo.name
 
             //event..
-            iBtn_AddPhoto!!.setOnClickListener(View.OnClickListener {
+            ly_AddPhoto!!.setOnClickListener(View.OnClickListener {
                 if(m_IfCallback != null)
                     m_IfCallback.addPhoto()
             })
+
+            ly_EditContent!!.setOnClickListener({
+                if(m_IfCallback != null)
+                    m_IfCallback.editContent()
+            })
         }
     }
-
 
     //-----------------------------------------------------------
     //
     inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView)
     {
         var ly_Row = itemView?.findViewById<RelativeLayout>(R.id.ly_Row)
-        var tv_Name = itemView?.findViewById<TextView>(R.id.tv_Name)
         var iv_Photo = itemView?.findViewById<ImageView>(R.id.iv_Photo)
 
         fun bind (pInfo: photo, pContext: Context)
@@ -123,12 +124,12 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<photo>, var 
 
     //-----------------------------------------------------------
     //
-    fun addData(pInfo:photo)
+    fun addData(pArray:ArrayList<photo>)
     {
-        if(pInfo == null)
+        if(pArray == null)
             return
 
-        this.photoList.add(pInfo)
+        this.photoList.addAll(pArray)
         notifyDataSetChanged()
     }
     //-----------------------------------------------------------
@@ -173,5 +174,6 @@ class PhotoRvAdapter(val context: Context, var photoList: ArrayList<photo>, var 
     interface ifCallback
     {
         fun addPhoto()
+        fun editContent()
     }
 }

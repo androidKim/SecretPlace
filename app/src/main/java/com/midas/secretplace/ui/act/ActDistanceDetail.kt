@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.view.View
+import android.widget.RelativeLayout
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -18,6 +19,10 @@ import com.midas.secretplace.structure.core.location_info
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.frag.MapFragment
 import kotlinx.android.synthetic.main.act_distance_detail.*
+import kotlinx.android.synthetic.main.act_place_detail.*
+import android.view.ViewGroup
+
+
 
 
 class ActDistanceDetail : ActBase()
@@ -28,6 +33,7 @@ class ActDistanceDetail : ActBase()
     private var m_App: MyApp? = null
     private var m_Context: Context? = null
     /*********************** Controller ***********************/
+
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
     //
@@ -67,9 +73,13 @@ class ActDistanceDetail : ActBase()
     //
     fun initLayout()
     {
+
+        //event..
         btn_AddLocation.setOnClickListener(View.OnClickListener {
             showAddLocationDialog()
         })
+
+
 
         settingView()
     }
@@ -77,10 +87,9 @@ class ActDistanceDetail : ActBase()
     //
     fun settingView()
     {
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as MapFragment
-        mapFragment.getMapAsync(mapFragment)
+        val m_MapFragment = supportFragmentManager.findFragmentById(R.id.map) as MapFragment
+        m_MapFragment!!.getMapAsync(m_MapFragment)
         val mArgs = Bundle()
-
         mArgs.putSerializable(Constant.INTENT_DATA_DISTANCE_OBJECT, m_DistanceInfo)
         mapFragment.arguments = mArgs
         System.err.println("OnCreate end")

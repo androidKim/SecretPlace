@@ -10,9 +10,9 @@ import com.midas.secretplace.ui.frag.main.FrPlace
 class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPagerAdapter(fm)
 {
     /************************** Define **************************/
-    private val TAB_NAME_0 = "한 곳"
-    private val TAB_NAME_1 = "여러 곳"
-    private val TAB_NAME_2 = "직접 지정"
+    private val TAB_NAME_0 = "My Place"
+    private val TAB_NAME_1 = "Our Place"
+    private val TAB_NAME_2 = "Pick Place"
     private val COUNT = 3
     /************************** System Fucntion **************************/
     //--------------------------------------------------------

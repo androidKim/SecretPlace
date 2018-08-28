@@ -15,5 +15,5 @@
     <string name="str_msg_4">Title</string>
     <string name="str_msg_5">Save</string>
     <string name="str_msg_6">add current location</string>
-    <string name="str_msg_7"></string>
+    <string name="str_msg_7">please permit permission for location</string>
 </resources>

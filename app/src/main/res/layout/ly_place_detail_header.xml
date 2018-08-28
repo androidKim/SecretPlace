@@ -3,31 +3,73 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@color/color_white">
+    android:layout_height="100dp"
+    android:background="@color/color_white"
+    android:gravity="center"
+    android:orientation="vertical">
 
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="left|center"
-        android:padding="15dp">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_marginRight="10dp"
-            android:id="@+id/tv_Name"
+        <LinearLayout
+            android:id="@+id/ly_Content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@+id/ly_EditContainer"
+            android:gravity="left|center"
+            android:orientation="horizontal"
+            android:padding="15dp">
+
+            <TextView
+                android:id="@+id/tv_Name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:textColor="@color/color_black"
+                android:textSize="15dp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ly_EditContainer"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/color_black"
-            android:textSize="15dp" />
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/iBtn_AddPhoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/outline_add_photo_alternate_black_18dp" />
+            <LinearLayout
+                android:id="@+id/ly_AddPhoto"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:orientation="vertical">
 
-    </LinearLayout>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/outline_add_photo_alternate_black_18dp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/ly_EditContent"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/baseline_edit_black_18dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+
 </LinearLayout>
