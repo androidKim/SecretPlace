@@ -115,20 +115,6 @@ class FirebaseDbCtrl
     /************************* DB Getter *************************/
     //---------------------------------------------------------------
     //
-    fun getPlaceList(seq:String) : Query
-    {
-        //var pDbRefResult:DatabaseReference = m_FirebaseDb!!.getReference("place_list")
-        var pQuery:Query? = null
-        if(!seq.equals(""))
-            pQuery = m_FirebaseDb!!.getReference(TB_PLACE).orderByKey().startAt(seq).limitToFirst(ReqBase.ITEM_COUNT)
-        else
-            pQuery = m_FirebaseDb!!.getReference(TB_PLACE).orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
-
-        return pQuery
-    }
-
-    //---------------------------------------------------------------
-    //
     fun getDistanceList(seq:String) : Query
     {
         var pQuery:Query? = null

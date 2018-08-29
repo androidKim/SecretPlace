@@ -17,6 +17,7 @@ import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.core.FirebaseDbCtrl
+import com.midas.secretplace.structure.ReqBase
 import com.midas.secretplace.structure.core.photo
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
@@ -168,9 +169,17 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         //m_App!!.showLoadingDialog(ly_LoadingDialog)
         progressBar.visibility = View.VISIBLE
 
-        var pQuery: Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(seq!!)
+        //var pQuery: Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(seq!!)
         //pQuery!!.addListenerForSingleValueEvent(listenerForSingleValueEvent)
         //pQuery!!.addChildEventListener(childEventListener)
+
+        var pQuery:Query? = null
+
+        if(seq != null)
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByKey().startAt(seq).limitToFirst(ReqBase.ITEM_COUNT)
+        else
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
+
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {

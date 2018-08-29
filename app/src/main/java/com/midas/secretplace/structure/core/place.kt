@@ -1,5 +1,6 @@
 package com.midas.secretplace.structure.core
 
+import com.google.firebase.database.Exclude
 import java.io.Serializable
 
 class place:Serializable
@@ -9,7 +10,7 @@ class place:Serializable
     var name:String? = null
     var lat:String? = null
     var lng:String? = null
-    var img_list:ArrayList<photo>? = null
+    @get:Exclude var img_list:ArrayList<photo>? = null//
 
     //필수..
     constructor()

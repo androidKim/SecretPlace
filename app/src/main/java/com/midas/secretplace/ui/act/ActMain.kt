@@ -194,7 +194,6 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
         dialog.show()
     }
 
-
     /*********************** listener ***********************/
     //--------------------------------------------------------------
     //
@@ -213,8 +212,5 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
         drawer_layout.closeDrawer(GravityCompat.START)
         return result
     }
-
-
-
     /*********************** util ***********************/
 }

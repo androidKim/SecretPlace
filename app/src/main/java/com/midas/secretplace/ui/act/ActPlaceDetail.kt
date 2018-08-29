@@ -18,19 +18,15 @@ import android.support.v4.content.FileProvider
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.Toast
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
-import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
@@ -41,15 +37,11 @@ import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.ui.frag.MapFragment
-import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_place_detail.*
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -74,8 +66,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var selectedImage: Uri? = null
     var imageUri: Uri? = null
     var m_strImgpath:String ?= null
-
-
+    var m_nPageNum:Int = 0
+    var m_bRunning:Boolean? = false
     /*********************** Controller ***********************/
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
@@ -338,6 +330,28 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
             recyclerView!!.layoutManager = pLayoutManager
             recyclerView!!.setHasFixedSize(true)
+
+            recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
+            {
+                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
+                {
+                    val visibleItemCount = pLayoutManager.childCount
+                    val totalItemCount = pLayoutManager.itemCount
+                    val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
+
+                    if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)
+                    {
+                        // Call your API to load more items
+                        if(m_PlaceInfo != null)
+                        {
+                            if(m_PlaceInfo!!.seq != null)
+                            {
+                                getImageListProc(m_PlaceInfo!!.seq!!)
+                            }
+                        }
+                    }
+                }
+        })
         //}
         //else//addData
         //{
@@ -370,7 +384,9 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         })
         */
 
+        //place Object
         var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq)//where
+
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
         {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -389,12 +405,75 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             }
         })
+
+        getImageListProc(seq)
     }
     //-------------------------------------------------------------
     //
-    fun getImageListProc(index:Int)
+    fun getImageListProc(seq:String)
     {
+        m_bRunning = true
+        progressBar.visibility = View.VISIBLE
+        //image list..
+        var pQuery:Query?= null
 
+        //testcode
+        m_nPageNum = 0//진행중..
+
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq).child("img_list").orderByKey().startAt(String.format("%s",m_nPageNum)).limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                // A new message has been added
+                // onChildAdded() will be called for each node at the first time
+
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
+
+                // A message has changed
+                //val message = dataSnapshot.getValue(Message::class.java)
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            {
+                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
+
+                // A message has been removed
+                //val message = dataSnapshot.getValue(Message::class.java)
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
+
+                // A message has changed position
+                //val message = dataSnapshot.getValue(Message::class.java)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError?)
+            {
+                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+            }
+        })
+
+        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                m_bRunning = false
+                var arrImage:ArrayList<photo> = dataSnapshot!!.getValue(object : GenericTypeIndicator<ArrayList<photo>>() {})!!
+                m_Adapter!!.addData(arrImage)
+                progressBar.visibility = View.GONE
+                m_nPageNum+=ReqBase.ITEM_COUNT
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
     }
     //-------------------------------------------------------------
     //
