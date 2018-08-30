@@ -124,7 +124,18 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
 
     //-----------------------------------------------------------
     //
-    fun addData(pArray:ArrayList<photo>)
+    fun addItem(pInfo:photo)
+    {
+        if(pInfo == null)
+            return
+
+        this.photoList.add(pInfo)
+        notifyDataSetChanged()
+    }
+
+    //-----------------------------------------------------------
+    //
+    fun addList(pArray:ArrayList<photo>)
     {
         if(pArray == null)
             return

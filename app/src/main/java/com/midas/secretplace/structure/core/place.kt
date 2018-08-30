@@ -10,7 +10,7 @@ class place:Serializable
     var name:String? = null
     var lat:String? = null
     var lng:String? = null
-    @get:Exclude var img_list:ArrayList<photo>? = null//
+    @get:Exclude @set:Exclude var img_list:ArrayList<photo>? = null//
 
     //필수..
     constructor()
