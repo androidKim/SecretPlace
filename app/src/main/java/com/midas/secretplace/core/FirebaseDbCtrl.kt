@@ -67,21 +67,25 @@ class FirebaseDbCtrl
     }
     //---------------------------------------------------------------
     //
-    fun setPlaceInfo(pInfo:place):DatabaseReference
+    /*
+    fun setPlaceInfo(pInfo:place_list_item):DatabaseReference
     {
         var pDbRef:DatabaseReference
-        if(!pInfo.seq.equals("") && !pInfo.seq.equals("null"))//update
+        if(pInfo.place_info == null)//update
         {
-            pDbRef = m_FirebaseDb!!.getReference(TB_PLACE)
-            pDbRef!!.child(pInfo.seq).setValue(pInfo)
+            //pDbRef =
+
+            return m_FirebaseDb!!.getReference(TB_PLACE)!!.child("place_info").push()!!.setValue(pInfo!!.place_info)//insert
         }
         else//insert
         {
-            pDbRef = m_FirebaseDb!!.getReference(TB_PLACE)!!.push()
-            pDbRef!!.setValue(pInfo)//insert
+            //pDbRef =
+            return m_FirebaseDb!!.getReference(TB_PLACE)!!.child("place_info").setValue(pInfo!!.place_info)
+
         }
-        return pDbRef
+        //return pDbRef
     }
+    */
     //---------------------------------------------------------------
     //
     fun setDistanceInfo(pInfo:distance):DatabaseReference

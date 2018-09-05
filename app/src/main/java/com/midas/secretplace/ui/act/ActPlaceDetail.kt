@@ -33,6 +33,7 @@ import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.ReqBase
 import com.midas.secretplace.structure.core.photo
 import com.midas.secretplace.structure.core.place
+import com.midas.secretplace.structure.core.place_list_item
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
@@ -60,7 +61,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     /*********************** Member ***********************/
     var m_App: MyApp? = null
     var m_Context: Context? = null
-    var m_PlaceInfo:place? = null
+    var m_PlaceListItem:place_list_item? = place_list_item()
     var m_LayoutInflater:LayoutInflater? = null
     var m_Adapter: PhotoRvAdapter? = null
     var selectedImage: Uri? = null
@@ -69,6 +70,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_strImgLastSeq:String? = null
     var m_bRunning:Boolean? = false
     var m_bFinish:Boolean? = false
+    var m_arrItem:ArrayList<photo>? = null
     /*********************** Controller ***********************/
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
@@ -119,18 +121,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                 val uri = taskSnapshot.downloadUrl
                                 Log.v("Download File","File.." +uri)
 
-                                if(m_PlaceInfo!!.img_list == null)
-                                    m_PlaceInfo!!.img_list = ArrayList<photo>()
-
-                                //var photoInfo:photo = photo()
-                                //photoInfo.img_url = taskSnapshot.downloadUrl.toString()
-                                //m_PlaceInfo!!.img_list!!.add(photoInfo)
-
-                                if(m_PlaceInfo!!.img_list!! != null)//remove header
-                                    m_PlaceInfo!!.img_list!!.removeAt(0)
-
                                 //update
-                                var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceInfo!!.seq).child("img_list").push()//where
+                                var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceListItem!!.place_info!!.seq).child("img_list").push()//where
                                 pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
 
                                 //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
@@ -196,19 +188,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                             val uri = taskSnapshot.downloadUrl
                             Log.v("Download File","File.." +uri)
 
-                            if(m_PlaceInfo!!.img_list == null)
-                                m_PlaceInfo!!.img_list = ArrayList<photo>()
-
-                            //var photoInfo:photo = photo()
-                            //photoInfo.img_url = taskSnapshot.downloadUrl.toString()
-                            //m_PlaceInfo!!.img_list!!.add(photoInfo)
-
-                            if(m_PlaceInfo!!.img_list!! != null)//remove header
-                                m_PlaceInfo!!.img_list!!.removeAt(0)
-
                             //update
-                            //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
-                            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceInfo!!.seq).child("img_list").push()//where
+                            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceListItem!!.place_info!!.seq).child("img_list").push()//where
                             pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
                             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
                                 override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -243,6 +224,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun initValue()
     {
+        m_arrItem = ArrayList<photo>()
         m_strImgLastSeq = null
     }
     //--------------------------------------------------------------
@@ -255,7 +237,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             return
 
         if(pIntent.hasExtra(Constant.INTENT_DATA_PLACE_OBJECT))
-            m_PlaceInfo =  pIntent.extras.get(Constant.INTENT_DATA_PLACE_OBJECT) as place
+            m_PlaceListItem!!.place_info =  pIntent.extras.get(Constant.INTENT_DATA_PLACE_OBJECT) as place
     }
     //--------------------------------------------------------------
     //
@@ -288,7 +270,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             mapFragment!!.getView()!!.setLayoutParams(params)
         })
 
-
         settingView()
     }
     //--------------------------------------------------------------
@@ -299,7 +280,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
         mapFragment!!.getMapAsync(mapFragment)
         val mArgs = Bundle()
-        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo)
+        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceListItem!!.place_info)
         mapFragment.arguments = mArgs
 
 
@@ -313,16 +294,16 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //if(m_Adapter == null)
         //{
             //img list
-            if(m_PlaceInfo!!.img_list == null)
-                m_PlaceInfo!!.img_list = ArrayList()
+            if(m_PlaceListItem!!.img_list == null)
+                m_PlaceListItem!!.img_list = ArrayList()
 
             var pHeader:photo = photo()
             pHeader.isHeader = true
             pHeader.img_url = ""
 
-            m_PlaceInfo!!.img_list!!.add(0, pHeader)//setHeader
+            m_arrItem!!.add(0, pHeader)//setHeader
 
-            m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_PlaceInfo!!.img_list!!, this, supportFragmentManager)
+            m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceListItem!!.place_info!!, m_arrItem!!, this, supportFragmentManager)
             recyclerView.adapter = m_Adapter
             recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))//set recyclerview grid Item spacing
             var nSpanCnt = 1
@@ -384,8 +365,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         */
 
         //place Object
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq)//where
-
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq).child("place_info")//where
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
         {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -393,8 +373,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
                 if(pInfo != null)
                 {
-                    m_PlaceInfo = pInfo
-
+                    m_PlaceListItem!!.place_info = pInfo
+                    m_PlaceListItem!!.place_info!!.seq = seq
                     settingPlaceView()
                 }
             }
@@ -418,9 +398,9 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         var pQuery:Query?= null
 
         if(m_strImgLastSeq != null)
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceInfo!!.seq).child("img_list").orderByKey().startAt(m_strImgLastSeq).limitToFirst(ReqBase.ITEM_COUNT)
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceListItem!!.place_info!!.seq).child("img_list").orderByKey().startAt(m_strImgLastSeq).limitToFirst(ReqBase.ITEM_COUNT)
         else
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceInfo!!.seq).child("img_list").orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceListItem!!.place_info!!.seq).child("img_list").orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
 
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -474,6 +454,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                 m_strImgLastSeq = it!!.key
 
                                 var strUrl:String = it.getValue(String::class.java)!!
+                                m_PlaceListItem!!.img_list!!.add(strUrl)
+
                                 var pInfo:photo = photo()
                                 pInfo.img_url = strUrl
                                 m_Adapter!!.addItem(pInfo!!)
@@ -488,6 +470,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                             m_strImgLastSeq = it!!.key
 
                             var strUrl:String = it.getValue(String::class.java)!!
+                            m_PlaceListItem!!.img_list!!.add(strUrl)
+
                             var pInfo:photo = photo()
                             pInfo.img_url = strUrl
                             m_Adapter!!.addItem(pInfo!!)
@@ -515,7 +499,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(-20))//init
 
         ly_SwipeRefresh!!.setRefreshing(false)
-        getPlaceInfoProc(m_PlaceInfo!!.seq!!)
+        getPlaceInfoProc(m_PlaceListItem!!.place_info!!.seq!!)
     }
     //-------------------------------------------------------------
     //
@@ -632,11 +616,12 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun editContentProc(strName:String)
     {
         //update
-        if(m_PlaceInfo!!.img_list!! != null)//remove header
-            m_PlaceInfo!!.img_list!!.removeAt(0)
+        m_PlaceListItem!!.place_info!!.name = strName
 
-        m_PlaceInfo!!.name = strName
-        var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
+        var pDbRef: DatabaseReference? = null
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_PlaceListItem!!.place_info!!.seq).child("place_info")
+        pDbRef!!.setValue(m_PlaceListItem!!.place_info)
+
         pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
             {

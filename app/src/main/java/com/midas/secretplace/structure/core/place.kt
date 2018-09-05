@@ -5,26 +5,22 @@ import java.io.Serializable
 
 class place:Serializable
 {
-    var seq:String? = null
     var user_fk:String? = null
     var name:String? = null
     var lat:String? = null
     var lng:String? = null
-    @get:Exclude @set:Exclude var img_list:ArrayList<photo>? = null//
-
+    @get:Exclude @set:Exclude var seq:String? = null
     //필수..
     constructor()
     {
 
     }
 
-    constructor(seq:String, user_fk:String, name:String, lat:String, lng:String, img_list:ArrayList<photo>)
+    constructor(user_fk:String, name:String, lat:String, lng:String)
     {
-        this.seq = seq
         this.user_fk = user_fk
         this.name = name
         this.lat = lat
         this.lng = lng
-        this.img_list = img_list
     }
 }
