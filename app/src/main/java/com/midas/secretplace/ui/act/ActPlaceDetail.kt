@@ -647,7 +647,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         setRefresh()
     }
-
     //-----------------------------------------------------
     //adapter ifCallback
     override fun addPhoto()
@@ -691,7 +690,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         })
         pAlert.show()
     }
-
     /*********************** interface ***********************/
 
 }
