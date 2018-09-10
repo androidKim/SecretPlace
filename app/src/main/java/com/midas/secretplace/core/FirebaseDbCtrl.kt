@@ -17,11 +17,12 @@ class FirebaseDbCtrl
         //Table..
         val TB_USER:String = "tb_user"
         val TB_PLACE:String = "tb_place"
+        val TB_ATTACH:String = "tb_attach"
         val TB_DISTANCE:String = "tb_distance"
         val TB_DIRECT:String = "tb_direct"
     }
 
-    public var m_FirebaseDb: FirebaseDatabase? = null
+    var m_FirebaseDb: FirebaseDatabase? = null
     var m_PlaceList:ArrayList<place> = ArrayList<place>()
     constructor()
     {
