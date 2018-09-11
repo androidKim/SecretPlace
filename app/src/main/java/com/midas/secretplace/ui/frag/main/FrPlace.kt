@@ -19,7 +19,6 @@ import com.midas.secretplace.R
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.ReqBase
 import com.midas.secretplace.structure.core.place
-import com.midas.secretplace.structure.core.place_list_item
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
@@ -40,7 +39,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     var m_Adapter:PlaceRvAdapter? = null
     var m_arrPlace:ArrayList<place>? = null
 
-    var m_strSeq:String? = null
+    var m_strSeq:String? = ""
     var m_bRunning:Boolean = false
     var m_bPagingFinish:Boolean = false
 
@@ -174,11 +173,15 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         //pQuery!!.addChildEventListener(childEventListener)
 
         var pQuery:Query? = null
-
-        if(seq != null)
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByKey().startAt(seq).limitToFirst(ReqBase.ITEM_COUNT)
+        if(!m_strSeq.equals(""))
+        {
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_strSeq).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+        }
         else
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
+        {
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+        }
+
 
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -188,13 +191,9 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 if(!m_strSeq.equals(dataSnapshot!!.key))
                 {
                     m_bPagingFinish = false
-                    val pInfo:place_list_item = dataSnapshot!!.getValue(place_list_item::class.java)!!
-                    if(pInfo!!.place_info!!.user_fk.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
-                    {
-                        m_strSeq = dataSnapshot!!.key
-                        pInfo!!.place_info!!.seq = dataSnapshot!!.key
-                        m_Adapter!!.addData(pInfo!!.place_info!!)
-                    }
+                    val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                    m_strSeq = dataSnapshot!!.key
+                    m_Adapter!!.addData(pInfo!!)
                 }
                 else
                 {
@@ -258,20 +257,16 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             if(bCheckLocation)
             {
                 var locationInfo = m_IfCallback!!.getLocation()
-                var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919
+                var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919...xxx
 
-                var placeInfo:place = place(userKey!!, "null", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude))
-                var tempArr:ArrayList<String> = ArrayList()
-
-
-                var pInfo:place_list_item = place_list_item(placeInfo, tempArr)
+                var pInfo:place = place(userKey!!, "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude))
                 showPlaceInputDialog(pInfo)
             }
         }
     }
     //--------------------------------------------------------------
     //
-    fun showPlaceInputDialog(pInfo:place_list_item)
+    fun showPlaceInputDialog(pInfo:place)
     {
         if(pInfo == null)
             return
@@ -282,34 +277,19 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         editName!!.hint = getString(R.string.str_msg_4)
         builder.setView(editName)
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
-            pInfo!!.place_info!!.name = editName.text.toString()
+            pInfo!!.name = editName.text.toString()
 
             var pDbRef:DatabaseReference? = null
-
-
-            if(pInfo.place_info!!.seq == null)//insert
-            {
-                //pDbRef =
-                pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.push()
-                pDbRef!!.child("place_info").setValue(pInfo!!.place_info)//insert
-            }
-            else//update
-            {
-                //pDbRef =
-                pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_info!!.seq)
-                pDbRef!!.child("place_info").setValue(pInfo!!.place_info)
-                //m_FirebaseDb!!.getReference(TB_USER)!!.child(pInfo.sns_type+pInfo.sns_key).setValue(pInfo)
-            }
-
+            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.push()//insert..
+            pDbRef!!.setValue(pInfo!!)//insert
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(dataSnapshot: DataSnapshot?)
                 {
                     if (dataSnapshot!!.exists())
                     {
-                        if(!m_strSeq.equals(dataSnapshot!!.key))
-                        {
-                            m_strSeq = dataSnapshot!!.key
-                        }
+                        m_strSeq = dataSnapshot!!.key
+                        pInfo!!.place_key = dataSnapshot!!.key
+                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(dataSnapshot!!.key).setValue(pInfo)//update..
                     }
                 }
 
@@ -336,7 +316,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //
     fun setRefresh()
     {
-        m_strSeq = null
+        m_strSeq = ""
         m_arrPlace = ArrayList<place>()
         if(m_Adapter != null)
             m_Adapter!!.clearData()
@@ -358,7 +338,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //listAdapter callback
     override fun deleteProc(pInfo: place)
     {
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.seq)//where
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
         pDbRef!!.removeValue()
 
         setRefresh()
