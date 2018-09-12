@@ -17,7 +17,7 @@ import android.widget.*
 import com.midas.secretplace.structure.core.place
 
 
-class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList: ArrayList<photo>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
+class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList: ArrayList<String>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>()
 {
 
@@ -65,7 +65,7 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
     //
     override fun getItemViewType(position: Int): Int
     {
-        return if(photoList[position].isHeader)
+        return if(photoList[position].equals("header"))
         {
             TYPE_HEADER
         }
@@ -82,7 +82,7 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
         var ly_AddPhoto = itemView?.findViewById<LinearLayout>(R.id.ly_AddPhoto)
         var ly_EditContent = itemView?.findViewById<LinearLayout>(R.id.ly_EditContent)
 
-        fun bind (pInfo: photo, pContext: Context)
+        fun bind (pInfo: String, pContext: Context)
         {
             tv_Name!!.text = m_PlaceInfo.name
 
@@ -106,9 +106,9 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
         var ly_Row = itemView?.findViewById<RelativeLayout>(R.id.ly_Row)
         var iv_Photo = itemView?.findViewById<ImageView>(R.id.iv_Photo)
 
-        fun bind (pInfo: photo, pContext: Context)
+        fun bind (pInfo: String, pContext: Context)
         {
-            Glide.with(context).load(pInfo.img_url).into(iv_Photo)
+            Glide.with(context).load(pInfo).into(iv_Photo)
             //ly_Row?.setTag(pInfo)
             //ly_Row?.setOnClickListener(onClickGoDetail)
         }
@@ -124,7 +124,7 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
 
     //-----------------------------------------------------------
     //
-    fun addItem(pInfo:photo)
+    fun addItem(pInfo:String)
     {
         if(pInfo == null)
             return
@@ -135,7 +135,7 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
 
     //-----------------------------------------------------------
     //
-    fun addList(pArray:ArrayList<photo>)
+    fun addList(pArray:ArrayList<String>)
     {
         if(pArray == null)
             return
@@ -153,7 +153,7 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
 
     //-----------------------------------------------------------
     //
-    fun refreshData(pArray:ArrayList<photo>)
+    fun refreshData(pArray:ArrayList<String>)
     {
         this.photoList = pArray
         notifyDataSetChanged()

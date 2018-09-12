@@ -17,7 +17,7 @@ class FirebaseDbCtrl
         //Table..
         val TB_USER:String = "tb_user"
         val TB_PLACE:String = "tb_place"
-        val TB_ATTACH:String = "tb_attach"
+        val TB_IMG:String = "tb_img"
         val TB_DISTANCE:String = "tb_distance"
         val TB_DIRECT:String = "tb_direct"
     }
@@ -51,6 +51,7 @@ class FirebaseDbCtrl
         //pInfo.name="업데이트되나"
 
         //insert & update..
+
         m_FirebaseDb!!.getReference(TB_USER)!!.child(pInfo.sns_type+pInfo.sns_key).setValue(pInfo)
 
         //ref.child("myDb").child("awais@gmailcom").child("leftSpace").setValue("YourDateHere");

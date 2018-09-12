@@ -69,7 +69,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_strImgLastSeq:String? = null
     var m_bRunning:Boolean? = false
     var m_bFinish:Boolean? = false
-    var m_arrItem:ArrayList<photo>? = null
+    var m_arrItem:ArrayList<String>? = null
     /*********************** Controller ***********************/
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
@@ -121,7 +121,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                 Log.v("Download File","File.." +uri)
 
                                 //update
-                                var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceListItem!!.place_key).child("img_list").push()//where
+                                var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceListItem!!.place_key).child("img_list").push()//where
                                 pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
 
                                 //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
@@ -188,7 +188,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                             Log.v("Download File","File.." +uri)
 
                             //update
-                            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceListItem!!.place_key).child("img_list").push()//where
+                            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceListItem!!.place_key).child("img_list").push()//where
                             pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
                             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
                                 override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -223,7 +223,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun initValue()
     {
-        m_arrItem = ArrayList<photo>()
+        m_arrItem = ArrayList<String>()
         m_strImgLastSeq = null
     }
     //--------------------------------------------------------------
@@ -292,11 +292,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         //if(m_Adapter == null)
         //{
-            var pHeader:photo = photo()
-            pHeader.isHeader = true
-            pHeader.img_url = ""
-
-            m_arrItem!!.add(0, pHeader)//setHeader
+            m_arrItem!!.add(0, "header")//setHeader
 
             m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceListItem!!, m_arrItem!!, this, supportFragmentManager)
             recyclerView.adapter = m_Adapter
@@ -338,29 +334,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun getPlaceInfoProc(seq:String)
     {
-        /*
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq).child("img_list").limitToFirst(ReqBase.ITEM_COUNT)
-        pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(p0: DataSnapshot?)
-            {
-                val pInfo: place = p0!!.getValue(place::class.java)!!
-                if(pInfo != null)
-                {
-                    m_PlaceInfo = pInfo
-
-                    settingPlaceView()
-                }
-            }
-
-            override fun onCancelled(p0: DatabaseError?)
-            {
-
-            }
-        })
-        */
-
         //place Object
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq).child("place_info")//where
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq)//where
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
         {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -392,9 +367,9 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         var pQuery:Query?= null
 
         if(m_strImgLastSeq != null)
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_ATTACH)!!.child("place_key").startAt(m_PlaceListItem!!.place_key).limitToFirst(ReqBase.ITEM_COUNT)
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child("place_key").startAt(m_PlaceListItem!!.place_key).limitToFirst(ReqBase.ITEM_COUNT)
         else
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_ATTACH)!!.child(m_PlaceListItem!!.place_key).child("img_list").orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceListItem!!.place_key).child("img_list").orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
 
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -448,11 +423,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                 m_strImgLastSeq = it!!.key
 
                                 var strUrl:String = it.getValue(String::class.java)!!
-                                //m_PlaceListItem!!.img_list!!.add(strUrl)
-
-                                var pInfo:photo = photo()
-                                pInfo.img_url = strUrl
-                                m_Adapter!!.addItem(pInfo!!)
+                                m_Adapter!!.addItem(strUrl)
                             }
                             else//not add same key..
                             {
@@ -464,11 +435,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                             m_strImgLastSeq = it!!.key
 
                             var strUrl:String = it.getValue(String::class.java)!!
-                            //m_PlaceListItem!!.img_list!!.add(strUrl)
-
-                            var pInfo:photo = photo()
-                            pInfo.img_url = strUrl
-                            m_Adapter!!.addItem(pInfo!!)
+                            m_Adapter!!.addItem(strUrl)
                         }
                     }
                 }

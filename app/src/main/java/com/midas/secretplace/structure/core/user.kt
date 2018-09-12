@@ -33,16 +33,4 @@ class user
         this.name = name
         this.img_url = img_url
     }
-
-    @Exclude
-    fun toMap(): Map<String, Any>
-    {
-        val result:HashMap<String, Any> = HashMap()
-        result.put("sns_type", sns_type!!)
-        result.put("sns_key", sns_key!!)
-        result.put("user_key", user_key!!)
-        result.put("name", name!!)
-        result.put("img_url", img_url!!)
-        return result
-    }
 }

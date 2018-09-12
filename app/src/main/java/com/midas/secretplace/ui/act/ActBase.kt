@@ -171,7 +171,6 @@ FrPlace.ifCallback, FrDistance.ifCallback, FrDirectPick.ifCallback
     override fun onLocationChanged(location: Location)
     {
         var msg = "Updated Location: Latitude " + location.longitude.toString() + location.longitude;
-        Toast.makeText(applicationContext, "onLocationChanged", Toast.LENGTH_SHORT).show()
         mLocation = location
     }
     //--------------------------------------------------------------
