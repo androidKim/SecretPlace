@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import com.midas.secretplace.ui.frag.main.FrDirectPick
-import com.midas.secretplace.ui.frag.main.FrDistance
+import com.midas.secretplace.ui.frag.main.FrGroup
 import com.midas.secretplace.ui.frag.main.FrPlace
 
 class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPagerAdapter(fm)
@@ -23,7 +23,7 @@ class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPager
         when (position)
         {
             0 -> fragment = FrPlace()
-            1 -> fragment = FrDistance()
+            1 -> fragment = FrGroup()
             2 -> fragment = FrDirectPick()
         }
 

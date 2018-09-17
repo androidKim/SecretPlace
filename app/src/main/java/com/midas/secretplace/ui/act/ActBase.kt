@@ -15,7 +15,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
@@ -25,14 +24,14 @@ import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.direct
 import com.midas.secretplace.structure.core.distance
 import com.midas.secretplace.ui.frag.main.FrDirectPick
-import com.midas.secretplace.ui.frag.main.FrDistance
+import com.midas.secretplace.ui.frag.main.FrGroup
 import com.midas.secretplace.ui.frag.main.FrPlace
 
 /*
 Location Base Activity
  */
 abstract class ActBase:AppCompatActivity(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener,
-FrPlace.ifCallback, FrDistance.ifCallback, FrDirectPick.ifCallback
+FrPlace.ifCallback, FrGroup.ifCallback, FrDirectPick.ifCallback
 {
     //location_info..
     lateinit var mGoogleApiClient: GoogleApiClient
@@ -51,7 +50,7 @@ FrPlace.ifCallback, FrDistance.ifCallback, FrDirectPick.ifCallback
     lateinit var locationManager: LocationManager
 
 
-    var m_DistanceInfo:distance? = null
+
     var m_DirectInfo: direct? = null
     //--------------------------------------------------------------
     //
@@ -348,27 +347,6 @@ FrPlace.ifCallback, FrDistance.ifCallback, FrDirectPick.ifCallback
         LocationServices.getFusedLocationProviderClient(m_Context!!).requestLocationUpdates(mLocationRequest, locationCallback, null)
     }
     */
-    //--------------------------------------------------------------
-    //frDistance
-    override fun setDistanceInfo(pInfo: distance)
-    {
-        if(pInfo == null)
-            return
-
-        m_DistanceInfo = pInfo!!
-    }
-    //--------------------------------------------------------------
-    //frDistance
-    override fun getSavedDistanceInfo(): distance
-    {
-        return m_DistanceInfo!!
-    }
-    //--------------------------------------------------------------
-    //frDistance
-    override fun disableDistanceSave()
-    {
-        m_DistanceInfo = null
-    }
     //--------------------------------------------------------------
     //frDirect
     override fun setDirectInfo(pInfo: direct)

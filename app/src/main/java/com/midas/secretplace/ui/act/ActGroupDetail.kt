@@ -31,7 +31,8 @@ import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.ReqBase
-import com.midas.secretplace.structure.core.photo
+import com.midas.secretplace.structure.core.group
+
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
@@ -46,7 +47,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback
+class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback
 {
     /*********************** Define ***********************/
     //-------------------------------------------------------------
@@ -60,7 +61,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     /*********************** Member ***********************/
     var m_App: MyApp? = null
     var m_Context: Context? = null
-    var m_PlaceInfo:place? = place()
+    var m_GroupInfo:group? = group()
     var m_LayoutInflater:LayoutInflater? = null
     var m_Adapter: PhotoRvAdapter? = null
     var selectedImage: Uri? = null
@@ -83,7 +84,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         m_Context = this
         m_App = MyApp()
         if(m_App!!.m_binit == false)
-            m_App!!.init(m_Context as ActPlaceDetail)
+            m_App!!.init(m_Context as ActGroupDetail)
 
         initValue()
         recvIntentData()
@@ -94,6 +95,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)//Intent?  <-- null이 올수도있다
     {
         super.onActivityResult(requestCode, resultCode, data)
+        /*
         if(requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM)//select gallery
         {
             if (data != null)
@@ -216,6 +218,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 e.printStackTrace()
             }
         }
+        */
     }
 
     /*********************** User Function ***********************/
@@ -236,7 +239,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             return
 
         if(pIntent.hasExtra(Constant.INTENT_DATA_PLACE_OBJECT))
-            m_PlaceInfo =  pIntent.extras.get(Constant.INTENT_DATA_PLACE_OBJECT) as place
+            m_GroupInfo =  pIntent.extras.get(Constant.INTENT_DATA_PLACE_OBJECT) as group
     }
     //--------------------------------------------------------------
     //
@@ -279,19 +282,19 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
         mapFragment!!.getMapAsync(mapFragment)
         val mArgs = Bundle()
-        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo!!)
+        mArgs.putSerializable(Constant.INTENT_DATA_GROUP_OBJECT, m_GroupInfo!!)
         mapFragment.arguments = mArgs
 
 
         //getPlaceInfoProc(m_PlaceInfo!!.seq!!)
-        settingPlaceView()
+        settingGroupView()
     }
     //--------------------------------------------------------------
     //
-    fun settingPlaceView()
+    fun settingGroupView()
     {
-        //if(m_Adapter == null)
-        //{
+        /*
+
             m_arrItem!!.add(0, "header")//setHeader
 
             m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
@@ -318,16 +321,12 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//더보기..
                     {
                         // Call your API to load more items
-                        if(!m_bFinish!!)
-                            getImageListProc()
+                        //if(!m_bFinish!!)
+                            //getImageListProc()
                     }
                 }
         })
-        //}
-        //else//addData
-        //{
-            //m_Adapter!!.addData(null)
-        //}
+        */
     }
 
     //-------------------------------------------------------------
@@ -335,16 +334,16 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun getPlaceInfoProc(seq:String)
     {
         //place Object
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq)//where
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!.child(seq)//where
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
         {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
             {
-                val pInfo: place = dataSnapshot!!.getValue(place::class.java)!!
+                val pInfo: group = dataSnapshot!!.getValue(group::class.java)!!
                 if(pInfo != null)
                 {
-                    m_PlaceInfo = pInfo
-                    settingPlaceView()
+                    m_GroupInfo = pInfo
+                    settingGroupView()
                 }
             }
 
@@ -354,11 +353,14 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }
         })
 
+        /*
         if(!m_bRunning!!)
             getImageListProc()//imageList
+            */
     }
     //-------------------------------------------------------------
     //
+    /*
     fun getImageListProc()
     {
         m_bRunning = true
@@ -453,6 +455,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }
         })
     }
+    */
     //-------------------------------------------------------------
     //
     fun setRefresh()
@@ -464,7 +467,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(-20))//init
 
         ly_SwipeRefresh!!.setRefreshing(false)
-        getPlaceInfoProc(m_PlaceInfo!!.place_key!!)
+        getPlaceInfoProc(m_GroupInfo!!.group_key!!)
     }
     //-------------------------------------------------------------
     //
@@ -581,11 +584,11 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun editContentProc(strName:String)
     {
         //update
-        m_PlaceInfo!!.name = strName
+        m_GroupInfo!!.name = strName
 
         var pDbRef: DatabaseReference? = null
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_PlaceInfo!!.place_key)
-        pDbRef!!.setValue(m_PlaceInfo!!)
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP).child(m_GroupInfo!!.group_key)
+        pDbRef!!.setValue(m_GroupInfo!!)
 
         pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -617,7 +620,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun addPhoto()
     {
         //show dialog..
-        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create()
+        val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
         pAlert.setTitle("Do you want add photo?")
         pAlert.setMessage("you can choice!!")
         pAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Gallery",{
@@ -637,7 +640,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun editContent()
     {
         //show dialog..
-        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create()
+        val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
         pAlert.setTitle("Do you want edit content?")
         pAlert.setMessage("you can choice!!")
         var editName: EditText? = EditText(m_Context)

@@ -18,7 +18,7 @@ class FirebaseDbCtrl
         val TB_USER:String = "tb_user"
         val TB_PLACE:String = "tb_place"
         val TB_IMG:String = "tb_img"
-        val TB_DISTANCE:String = "tb_distance"
+        val TB_GROUP:String = "tb_group"
         val TB_DIRECT:String = "tb_direct"
     }
 
@@ -90,21 +90,6 @@ class FirebaseDbCtrl
     */
     //---------------------------------------------------------------
     //
-    fun setDistanceInfo(pInfo:distance):DatabaseReference
-    {
-        var pDbRef = m_FirebaseDb!!.getReference(TB_DISTANCE)!!.push()
-        pDbRef.setValue(pInfo)
-        return pDbRef
-    }
-    //---------------------------------------------------------------
-    //
-    fun updateDistanceLocation():DatabaseReference
-    {
-        var pDbRef:DatabaseReference = m_FirebaseDb!!.getReference(TB_DISTANCE)
-        return pDbRef
-    }
-    //---------------------------------------------------------------
-    //
     fun setDirectInfo(pInfo: direct):DatabaseReference
     {
         var pDbRef = m_FirebaseDb!!.getReference(TB_DIRECT)!!.push()
@@ -119,18 +104,6 @@ class FirebaseDbCtrl
         return pDbRef
     }
     /************************* DB Getter *************************/
-    //---------------------------------------------------------------
-    //
-    fun getDistanceList(seq:String) : Query
-    {
-        var pQuery:Query? = null
-        if(!seq.equals(""))
-            pQuery = m_FirebaseDb!!.getReference(TB_DISTANCE).orderByKey().startAt(seq).limitToFirst(ReqBase.ITEM_COUNT)
-        else
-            pQuery = m_FirebaseDb!!.getReference(TB_DISTANCE).orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
-
-        return pQuery
-    }
     //---------------------------------------------------------------
     //
     fun getDirectList(seq:String) : Query

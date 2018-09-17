@@ -186,18 +186,19 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
-                // A new message has been added
-                // onChildAdded() will be called for each node at the first time
-                if(!m_strSeq.equals(dataSnapshot!!.key))
+                if(dataSnapshot!!.exists())
                 {
-                    m_bPagingFinish = false
-                    val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                    m_strSeq = dataSnapshot!!.key
-                    m_Adapter!!.addData(pInfo!!)
+                    if(!m_strSeq.equals(dataSnapshot!!.key))
+                    {
+                        m_bPagingFinish = false
+                        val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                        m_strSeq = dataSnapshot!!.key
+                        pInfo.place_key = dataSnapshot!!.key
+                        m_Adapter!!.addData(pInfo!!)
+                    }
                 }
                 else
                 {
-                    //no more data
                     m_bPagingFinish = true
                 }
             }
@@ -235,8 +236,10 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot?)
             {
+                if(!p0!!.exists())
+                    m_bPagingFinish = true
+
                 m_bRunning = false
-                //m_App!!.hideLoadingDialog(ly_LoadingDialog)
                 progressBar.visibility = View.GONE
             }
 
@@ -339,6 +342,9 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     override fun deleteProc(pInfo: place)
     {
         var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
+        pDbRef!!.removeValue()
+
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
         pDbRef!!.removeValue()
 
         setRefresh()

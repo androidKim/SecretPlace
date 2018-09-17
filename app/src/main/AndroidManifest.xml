@@ -45,7 +45,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"></activity>
         <activity
-            android:name=".ui.act.ActDistanceDetail"
+            android:name=".ui.act.ActGroupDetail"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"></activity>
         <activity
