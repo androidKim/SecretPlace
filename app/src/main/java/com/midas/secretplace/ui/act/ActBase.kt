@@ -21,9 +21,6 @@ import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnSuccessListener
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
-import com.midas.secretplace.structure.core.direct
-import com.midas.secretplace.structure.core.distance
-import com.midas.secretplace.ui.frag.main.FrDirectPick
 import com.midas.secretplace.ui.frag.main.FrGroup
 import com.midas.secretplace.ui.frag.main.FrPlace
 
@@ -31,7 +28,7 @@ import com.midas.secretplace.ui.frag.main.FrPlace
 Location Base Activity
  */
 abstract class ActBase:AppCompatActivity(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener,
-FrPlace.ifCallback, FrGroup.ifCallback, FrDirectPick.ifCallback
+FrPlace.ifCallback, FrGroup.ifCallback
 {
     //location_info..
     lateinit var mGoogleApiClient: GoogleApiClient
@@ -48,10 +45,6 @@ FrPlace.ifCallback, FrGroup.ifCallback, FrDirectPick.ifCallback
      */
 
     lateinit var locationManager: LocationManager
-
-
-
-    var m_DirectInfo: direct? = null
     //--------------------------------------------------------------
     //
     override fun onCreate(savedInstanceState: Bundle?)
@@ -193,9 +186,8 @@ FrPlace.ifCallback, FrGroup.ifCallback, FrDirectPick.ifCallback
         })
     }
     /*********************** User Function ***********************/
-
     //--------------------------------------------------------------
-    //
+    //f
     private fun checkPermissionLocation():Boolean
     {
         var bResult:Boolean = false
@@ -319,7 +311,7 @@ FrPlace.ifCallback, FrGroup.ifCallback, FrDirectPick.ifCallback
         return bResult
     }
     //--------------------------------------------------------------
-    //frPlace, frDistance
+    //
     override fun checkLocationInfo(): Boolean
     {
         var bResult:Boolean = false
@@ -336,37 +328,4 @@ FrPlace.ifCallback, FrGroup.ifCallback, FrDirectPick.ifCallback
 
         return mLocation
     }
-    //--------------------------------------------------------------
-    //frDistance
-    /*
-    override fun setLocationManagerInterval(nInterval: Long)
-    {
-        mLocationRequest!!.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-        mLocationRequest!!.setInterval(nInterval)
-        mLocationRequest!!.setFastestInterval(nInterval)
-        LocationServices.getFusedLocationProviderClient(m_Context!!).requestLocationUpdates(mLocationRequest, locationCallback, null)
-    }
-    */
-    //--------------------------------------------------------------
-    //frDirect
-    override fun setDirectInfo(pInfo: direct)
-    {
-        if(pInfo == null)
-            return
-
-        m_DirectInfo = pInfo!!
-    }
-    //--------------------------------------------------------------
-    //frDirect
-    override fun getSavedDirectInfo(): direct
-    {
-        return m_DirectInfo!!
-    }
-    //--------------------------------------------------------------
-    //frDirect
-    override fun disableDirectSave()
-    {
-        m_DirectInfo = null
-    }
-
 }

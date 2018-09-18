@@ -18,6 +18,7 @@ import android.support.v4.content.FileProvider
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
@@ -66,7 +67,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var selectedImage: Uri? = null
     var imageUri: Uri? = null
     var m_strImgpath:String ?= null
-    var m_strImgLastSeq:String? = null
+    //var m_strImgLastSeq:String? = null
     var m_bRunning:Boolean? = false
     var m_bFinish:Boolean? = false
     var m_arrItem:ArrayList<String>? = null
@@ -224,7 +225,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun initValue()
     {
         m_arrItem = ArrayList<String>()
-        m_strImgLastSeq = null
+        //m_strImgLastSeq = null
     }
     //--------------------------------------------------------------
     //
@@ -265,7 +266,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             ly_MapCollapse.visibility = View.GONE
 
             val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = 600
+            params.height = 0
             mapFragment!!.getView()!!.setLayoutParams(params)
         })
 
@@ -306,7 +307,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
             recyclerView!!.layoutManager = pLayoutManager
             recyclerView!!.setHasFixedSize(true)
-
             recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
             {
                 override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
@@ -318,8 +318,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//더보기..
                     {
                         // Call your API to load more items
-                        if(!m_bFinish!!)
-                            getImageListProc()
+                        //if(!m_bFinish!!)
+                            //getImageListProc()
                     }
                 }
         })
@@ -328,6 +328,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //{
             //m_Adapter!!.addData(null)
         //}
+
+
+        if(!m_bRunning!!)
+            getImageListProc()//imageList
     }
 
     //-------------------------------------------------------------
@@ -366,10 +370,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //image list..
         var pQuery:Query?= null
 
-        if(m_strImgLastSeq != null)
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child("place_key").startAt(m_PlaceInfo!!.place_key).limitToFirst(ReqBase.ITEM_COUNT)
-        else
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
+        //if(m_strImgLastSeq != null)
+            //pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child("place_key").startAt(m_PlaceInfo!!.place_key).limitToFirst(ReqBase.ITEM_COUNT)
+        //else
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").orderByKey()//.limitToFirst(ReqBase.ITEM_COUNT)
 
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -416,27 +420,27 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     val children = dataSnapshot!!.children
                     children.forEach {
 
-                        if(m_strImgLastSeq != null)
-                        {
-                            if(!m_strImgLastSeq.equals(it!!.key))
-                            {
-                                m_strImgLastSeq = it!!.key
+                        //if(m_strImgLastSeq != null)
+                        //{
+                            //if(!m_strImgLastSeq.equals(it!!.key))
+                            //{
+                                //m_strImgLastSeq = it!!.key
 
                                 var strUrl:String = it.getValue(String::class.java)!!
                                 m_Adapter!!.addItem(strUrl)
-                            }
-                            else//not add same key..
-                            {
-                                m_bFinish = true//get lastitem detect
-                            }
-                        }
-                        else
-                        {
-                            m_strImgLastSeq = it!!.key
+                            //}
+                            //else//not add same key..
+                            //{
+                                //m_bFinish = true//get lastitem detect
+                            //}
+                        //}
+                        //else
+                        //{
+                            //m_strImgLastSeq = it!!.key
 
-                            var strUrl:String = it.getValue(String::class.java)!!
-                            m_Adapter!!.addItem(strUrl)
-                        }
+                            //var strUrl:String = it.getValue(String::class.java)!!
+                            //m_Adapter!!.addItem(strUrl)
+                        //}
                     }
                 }
                 else

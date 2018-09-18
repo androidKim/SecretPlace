@@ -26,7 +26,7 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
         var args = arguments
         var pPlaceInfo:place? = null
         var pGroupInfo: group? = null
-        var pDirectInfo:direct? = null
+
 
         if(args!!.containsKey(Constant.INTENT_DATA_PLACE_OBJECT))
         {
@@ -80,34 +80,6 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
                         .color(Color.RED))
             }
             */
-        }
-        else if(pDirectInfo != null)
-        {
-            var arrLatLng:ArrayList<LatLng> = ArrayList()
-            var pLatLngInfo:LatLng? = null
-            if(pDirectInfo.location_list != null)
-            {
-                for (i in 0 until pDirectInfo.location_list!!.size)
-                {
-                    var pInfo: location_info = pDirectInfo.location_list!!.get(i)
-                    var nLat:Double = pInfo.lat!!.toDouble()
-                    var nLng:Double = pInfo.lng!!.toDouble()
-                    pLatLngInfo = LatLng(nLat, nLng)
-                    arrLatLng!!.add(pLatLngInfo)
-                    mMap.addMarker(MarkerOptions().position(pLatLngInfo).title(pDirectInfo.name))
-                }
-            }
-
-            //poly line..
-            if(pLatLngInfo != null && arrLatLng.size > 0)
-            {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pLatLngInfo, m_nZoomLevel))
-
-                val line = map.addPolyline(PolylineOptions()
-                        .addAll(arrLatLng!!)
-                        .width(5f)
-                        .color(Color.RED))
-            }
         }
         else
         {

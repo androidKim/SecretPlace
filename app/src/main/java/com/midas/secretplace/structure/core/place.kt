@@ -7,6 +7,7 @@ class place:Serializable
 {
     var user_key:String? = null
     var place_key:String? = null
+    var group_key:String? = null
     var name:String? = null
     var lat:String? = null
     var lng:String? = null
@@ -16,10 +17,11 @@ class place:Serializable
 
     }
 
-    constructor(user_key:String, place_key:String, name:String, lat:String, lng:String)
+    constructor(user_key:String, place_key:String,group_key:String, name:String, lat:String, lng:String)
     {
         this.user_key = user_key
         this.place_key = place_key
+        this.group_key = group_key
         this.name = name
         this.lat = lat
         this.lng = lng

@@ -4,8 +4,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.Query
 import com.midas.secretplace.structure.ReqBase
-import com.midas.secretplace.structure.core.direct
-import com.midas.secretplace.structure.core.distance
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.structure.core.user
 
@@ -88,32 +86,6 @@ class FirebaseDbCtrl
         //return pDbRef
     }
     */
-    //---------------------------------------------------------------
-    //
-    fun setDirectInfo(pInfo: direct):DatabaseReference
-    {
-        var pDbRef = m_FirebaseDb!!.getReference(TB_DIRECT)!!.push()
-        pDbRef.setValue(pInfo)
-        return pDbRef
-    }
-    //---------------------------------------------------------------
-    //
-    fun updateDirectLocation():DatabaseReference
-    {
-        var pDbRef:DatabaseReference = m_FirebaseDb!!.getReference(TB_DIRECT)
-        return pDbRef
-    }
-    /************************* DB Getter *************************/
-    //---------------------------------------------------------------
-    //
-    fun getDirectList(seq:String) : Query
-    {
-        var pQuery:Query? = null
-        if(!seq.equals(""))
-            pQuery = m_FirebaseDb!!.getReference(TB_DIRECT).orderByKey().startAt(seq).limitToFirst(ReqBase.ITEM_COUNT)
-        else
-            pQuery = m_FirebaseDb!!.getReference(TB_DIRECT).orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
 
-        return pQuery
-    }
+
 }
