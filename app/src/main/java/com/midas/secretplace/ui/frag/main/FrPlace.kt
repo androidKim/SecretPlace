@@ -39,7 +39,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     var m_Adapter:PlaceRvAdapter? = null
     var m_arrPlace:ArrayList<place>? = null
 
-    var m_strSeq:String? = ""
+    //var m_strPlaceLastSeq:String? = ""
     var m_bRunning:Boolean = false
     var m_bPagingFinish:Boolean = false
 
@@ -90,7 +90,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //
     fun initValue()
     {
-        m_strSeq = ""
+        //m_strPlaceLastSeq = ""
         m_arrPlace = ArrayList<place>()
     }
     //------------------------------------------------------------------------
@@ -152,8 +152,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 if(!m_bRunning && (visibleItemCount + firstVisible) >= totalItemCount)
                 {
                     // Call your API to load more items
-                    if(!m_bPagingFinish)
-                        getPlaceListProc(m_strSeq!!)
+                    //if(!m_bPagingFinish)
+                        //getPlaceListProc(m_strPlaceLastSeq!!)
                 }
             }
         })
@@ -173,31 +173,35 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         //pQuery!!.addChildEventListener(childEventListener)
 
         var pQuery:Query? = null
-        if(!m_strSeq.equals(""))
+        /*
+        if(!m_strPlaceLastSeq.equals(""))
         {
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_strSeq).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_strPlaceLastSeq).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
         }
         else
         {
             pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
         }
+        */
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
 
 
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
-                // A new message has been added
-                // onChildAdded() will be called for each node at the first time
-                if(!m_strSeq.equals(dataSnapshot!!.key))
+                if(dataSnapshot!!.exists())
                 {
-                    m_bPagingFinish = false
-                    val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                    m_strSeq = dataSnapshot!!.key
-                    m_Adapter!!.addData(pInfo!!)
+                    //if(!m_strPlaceLastSeq.equals(dataSnapshot!!.key))
+                    //{
+                        m_bPagingFinish = false
+                        val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                        //m_strPlaceLastSeq = dataSnapshot!!.key
+                        pInfo.place_key = dataSnapshot!!.key
+                        m_Adapter!!.addData(pInfo!!)
+                    //}
                 }
                 else
                 {
-                    //no more data
                     m_bPagingFinish = true
                 }
             }
@@ -235,8 +239,10 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot?)
             {
+                if(!p0!!.exists())
+                    m_bPagingFinish = true
+
                 m_bRunning = false
-                //m_App!!.hideLoadingDialog(ly_LoadingDialog)
                 progressBar.visibility = View.GONE
             }
 
@@ -259,7 +265,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 var locationInfo = m_IfCallback!!.getLocation()
                 var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919...xxx
 
-                var pInfo:place = place(userKey!!, "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude))
+                var pInfo:place = place(userKey!!, "", "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude))
                 showPlaceInputDialog(pInfo)
             }
         }
@@ -287,7 +293,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 {
                     if (dataSnapshot!!.exists())
                     {
-                        m_strSeq = dataSnapshot!!.key
+                        //m_strPlaceLastSeq = dataSnapshot!!.key
                         pInfo!!.place_key = dataSnapshot!!.key
                         m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(dataSnapshot!!.key).setValue(pInfo)//update..
                     }
@@ -316,7 +322,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //
     fun setRefresh()
     {
-        m_strSeq = ""
+        //m_strPlaceLastSeq = ""
         m_arrPlace = ArrayList<place>()
         if(m_Adapter != null)
             m_Adapter!!.clearData()
@@ -339,6 +345,9 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     override fun deleteProc(pInfo: place)
     {
         var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
+        pDbRef!!.removeValue()
+
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
         pDbRef!!.removeValue()
 
         setRefresh()

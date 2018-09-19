@@ -10,11 +10,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.midas.secretplace.common.Constant
-import com.midas.secretplace.structure.core.direct
-import com.midas.secretplace.structure.core.distance
-import com.midas.secretplace.structure.core.location_info
-import com.midas.secretplace.structure.core.place
-
+import com.midas.secretplace.structure.core.*
 
 
 class MapFragment : SupportMapFragment(), OnMapReadyCallback
@@ -29,20 +25,16 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
     {
         var args = arguments
         var pPlaceInfo:place? = null
-        var pDistanceInfo:distance? = null
-        var pDirectInfo:direct? = null
+        var pGroupInfo: group? = null
+
 
         if(args!!.containsKey(Constant.INTENT_DATA_PLACE_OBJECT))
         {
             pPlaceInfo = args!!.getSerializable(Constant.INTENT_DATA_PLACE_OBJECT) as place
         }
-        else if(args!!.containsKey(Constant.INTENT_DATA_DISTANCE_OBJECT))
+        else if(args!!.containsKey(Constant.INTENT_DATA_GROUP_OBJECT))
         {
-            pDistanceInfo = args!!.getSerializable(Constant.INTENT_DATA_DISTANCE_OBJECT) as distance
-        }
-        else if(args!!.containsKey(Constant.INTENT_DATA_DIRECT_OBJECT))
-        {
-            pDirectInfo = args!!.getSerializable(Constant.INTENT_DATA_DIRECT_OBJECT) as direct
+            pGroupInfo = args!!.getSerializable(Constant.INTENT_DATA_GROUP_OBJECT) as group
         }
         else
         {
@@ -59,8 +51,9 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
             mMap.addMarker(MarkerOptions().position(sydney).title(pPlaceInfo.name))
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, m_nZoomLevel))
         }
-        else if(pDistanceInfo != null)
+        else if(pGroupInfo != null)
         {
+            /*
             var arrLatLng:ArrayList<LatLng> = ArrayList()
             var pLatLngInfo:LatLng? = null
             if(pDistanceInfo.location_list != null)
@@ -86,34 +79,7 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
                         .width(5f)
                         .color(Color.RED))
             }
-        }
-        else if(pDirectInfo != null)
-        {
-            var arrLatLng:ArrayList<LatLng> = ArrayList()
-            var pLatLngInfo:LatLng? = null
-            if(pDirectInfo.location_list != null)
-            {
-                for (i in 0 until pDirectInfo.location_list!!.size)
-                {
-                    var pInfo: location_info = pDirectInfo.location_list!!.get(i)
-                    var nLat:Double = pInfo.lat!!.toDouble()
-                    var nLng:Double = pInfo.lng!!.toDouble()
-                    pLatLngInfo = LatLng(nLat, nLng)
-                    arrLatLng!!.add(pLatLngInfo)
-                    mMap.addMarker(MarkerOptions().position(pLatLngInfo).title(pDirectInfo.name))
-                }
-            }
-
-            //poly line..
-            if(pLatLngInfo != null && arrLatLng.size > 0)
-            {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pLatLngInfo, m_nZoomLevel))
-
-                val line = map.addPolyline(PolylineOptions()
-                        .addAll(arrLatLng!!)
-                        .width(5f)
-                        .color(Color.RED))
-            }
+            */
         }
         else
         {

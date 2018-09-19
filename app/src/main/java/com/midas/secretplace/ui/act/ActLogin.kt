@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import com.google.android.gms.auth.api.Auth
@@ -11,7 +12,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.firebase.database.*
 import com.midas.secretplace.R
+import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import kotlinx.android.synthetic.main.act_login.*
@@ -162,13 +165,69 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
             if(strImgUrl == null)
                 strImgUrl = ""
 
-            var userKey:String? = String.format("%s%s", user.SNS_TYPE_GOOGLE, snsKey)
-            var pInfo: user = user(user.SNS_TYPE_GOOGLE, snsKey!!, userKey!!, strUserName!!, strImgUrl)
-            m_App!!.m_FirebaseDbCtrl!!.setUser(pInfo)
+            var pInfo: user = user(user.SNS_TYPE_GOOGLE, snsKey!!, "", strUserName!!, strImgUrl)
 
-            m_App!!.m_SpCtrl!!.setSpUserKey(userKey!!)
-            m_App!!.m_SpCtrl!!.setSnsType(user.SNS_TYPE_GOOGLE)
-            m_App!!.goMain(m_Context!!)
+            var pQuery:Query= m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).orderByChild("sns_key").equalTo(snsKey)
+            pQuery.addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                {
+                    if (dataSnapshot!!.exists())//exist..
+                    {
+                        val pRes:user = dataSnapshot!!.getValue(user::class.java)!!
+                        pRes.user_key = dataSnapshot.key
+                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key).setValue(pRes)//update..
+                        m_App!!.m_SpCtrl!!.setSpUserKey(pRes.user_key!!)
+                        m_App!!.m_SpCtrl!!.setSnsType(user.SNS_TYPE_GOOGLE)
+                        m_App!!.goMain(m_Context!!)
+                    }
+                    else
+                    {
+
+                    }
+                }
+
+                override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                {
+                    Log.d("onChildChanged", "")
+                }
+
+                override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+                {
+                    Log.d("onChildRemoved", "")
+                }
+
+                override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                {
+                    Log.d("onChildMoved", "")
+                }
+
+                override fun onCancelled(databaseError: DatabaseError?)
+                {
+                    Log.d("onCancelled", "")
+                }
+            })
+
+
+            pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot?)
+                {
+                    if(dataSnapshot!!.exists())
+                    {
+
+                    }
+                    else
+                    {
+                        //first Insert..
+                        var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.push()//insert..
+                        pDbRef!!.setValue(pInfo!!)//insert
+                    }
+                }
+
+                override fun onCancelled(p0: DatabaseError?)
+                {
+                    Log.d("onCancelled", "")
+                }
+            })
         }
     }
 }

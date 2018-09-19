@@ -15,24 +15,20 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnSuccessListener
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
-import com.midas.secretplace.structure.core.direct
-import com.midas.secretplace.structure.core.distance
-import com.midas.secretplace.ui.frag.main.FrDirectPick
-import com.midas.secretplace.ui.frag.main.FrDistance
+import com.midas.secretplace.ui.frag.main.FrGroup
 import com.midas.secretplace.ui.frag.main.FrPlace
 
 /*
 Location Base Activity
  */
 abstract class ActBase:AppCompatActivity(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener,
-FrPlace.ifCallback, FrDistance.ifCallback, FrDirectPick.ifCallback
+FrPlace.ifCallback, FrGroup.ifCallback
 {
     //location_info..
     lateinit var mGoogleApiClient: GoogleApiClient
@@ -49,10 +45,6 @@ FrPlace.ifCallback, FrDistance.ifCallback, FrDirectPick.ifCallback
      */
 
     lateinit var locationManager: LocationManager
-
-
-    var m_DistanceInfo:distance? = null
-    var m_DirectInfo: direct? = null
     //--------------------------------------------------------------
     //
     override fun onCreate(savedInstanceState: Bundle?)
@@ -171,7 +163,6 @@ FrPlace.ifCallback, FrDistance.ifCallback, FrDirectPick.ifCallback
     override fun onLocationChanged(location: Location)
     {
         var msg = "Updated Location: Latitude " + location.longitude.toString() + location.longitude;
-        Toast.makeText(applicationContext, "onLocationChanged", Toast.LENGTH_SHORT).show()
         mLocation = location
     }
     //--------------------------------------------------------------
@@ -195,9 +186,8 @@ FrPlace.ifCallback, FrDistance.ifCallback, FrDirectPick.ifCallback
         })
     }
     /*********************** User Function ***********************/
-
     //--------------------------------------------------------------
-    //
+    //f
     private fun checkPermissionLocation():Boolean
     {
         var bResult:Boolean = false
@@ -321,7 +311,7 @@ FrPlace.ifCallback, FrDistance.ifCallback, FrDirectPick.ifCallback
         return bResult
     }
     //--------------------------------------------------------------
-    //frPlace, frDistance
+    //
     override fun checkLocationInfo(): Boolean
     {
         var bResult:Boolean = false
@@ -338,58 +328,4 @@ FrPlace.ifCallback, FrDistance.ifCallback, FrDirectPick.ifCallback
 
         return mLocation
     }
-    //--------------------------------------------------------------
-    //frDistance
-    /*
-    override fun setLocationManagerInterval(nInterval: Long)
-    {
-        mLocationRequest!!.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-        mLocationRequest!!.setInterval(nInterval)
-        mLocationRequest!!.setFastestInterval(nInterval)
-        LocationServices.getFusedLocationProviderClient(m_Context!!).requestLocationUpdates(mLocationRequest, locationCallback, null)
-    }
-    */
-    //--------------------------------------------------------------
-    //frDistance
-    override fun setDistanceInfo(pInfo: distance)
-    {
-        if(pInfo == null)
-            return
-
-        m_DistanceInfo = pInfo!!
-    }
-    //--------------------------------------------------------------
-    //frDistance
-    override fun getSavedDistanceInfo(): distance
-    {
-        return m_DistanceInfo!!
-    }
-    //--------------------------------------------------------------
-    //frDistance
-    override fun disableDistanceSave()
-    {
-        m_DistanceInfo = null
-    }
-    //--------------------------------------------------------------
-    //frDirect
-    override fun setDirectInfo(pInfo: direct)
-    {
-        if(pInfo == null)
-            return
-
-        m_DirectInfo = pInfo!!
-    }
-    //--------------------------------------------------------------
-    //frDirect
-    override fun getSavedDirectInfo(): direct
-    {
-        return m_DirectInfo!!
-    }
-    //--------------------------------------------------------------
-    //frDirect
-    override fun disableDirectSave()
-    {
-        m_DirectInfo = null
-    }
-
 }

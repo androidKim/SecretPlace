@@ -3,17 +3,15 @@ package com.midas.secretplace.ui.adapter
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import com.midas.secretplace.ui.frag.main.FrDirectPick
-import com.midas.secretplace.ui.frag.main.FrDistance
+import com.midas.secretplace.ui.frag.main.FrGroup
 import com.midas.secretplace.ui.frag.main.FrPlace
 
 class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPagerAdapter(fm)
 {
     /************************** Define **************************/
-    private val TAB_NAME_0 = "My Place"
-    private val TAB_NAME_1 = "Our Place"
-    private val TAB_NAME_2 = "Pick Place"
-    private val COUNT = 3
+    private val TAB_NAME_0 = "One Place"
+    private val TAB_NAME_1 = "Group Place"
+    private val COUNT = 2
     /************************** System Fucntion **************************/
     //--------------------------------------------------------
     //
@@ -23,8 +21,7 @@ class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPager
         when (position)
         {
             0 -> fragment = FrPlace()
-            1 -> fragment = FrDistance()
-            2 -> fragment = FrDirectPick()
+            1 -> fragment = FrGroup()
         }
 
         return fragment
@@ -46,10 +43,6 @@ class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPager
         else if(position == 1)
         {
             return TAB_NAME_1
-        }
-        else if(position == 2)
-        {
-            return TAB_NAME_2
         }
         else
         {
