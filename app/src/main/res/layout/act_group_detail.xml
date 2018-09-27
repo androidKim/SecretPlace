@@ -63,11 +63,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/ly_Top">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/horizontalRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:orientation="horizontal"></android.support.v7.widget.RecyclerView>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/horizontalRecyclerView"></android.support.v7.widget.RecyclerView>
+        </RelativeLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
 
 

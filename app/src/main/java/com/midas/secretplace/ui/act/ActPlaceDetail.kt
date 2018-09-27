@@ -322,7 +322,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                             //getImageListProc()
                     }
                 }
-        })
+            })
         //}
         //else//addData
         //{

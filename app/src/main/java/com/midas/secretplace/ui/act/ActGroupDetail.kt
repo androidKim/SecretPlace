@@ -40,7 +40,7 @@ import com.midas.mytimeline.ui.adapter.HorizontalPlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
-import com.midas.secretplace.structure.ReqBase
+
 import com.midas.secretplace.structure.core.group
 
 import com.midas.secretplace.structure.core.place
@@ -57,7 +57,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,HorizontalPlaceRvAdapter.ifCallback,PhotoRvAdapter.ifCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener
+class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,HorizontalPlaceRvAdapter.ifCallback,PhotoRvAdapter.ifCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, MapFragment.ifCallback
 {
     /*********************** Define ***********************/
     //-------------------------------------------------------------
@@ -93,12 +93,12 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_Adapter: PhotoRvAdapter? = null
     var selectedImage: Uri? = null
     var imageUri: Uri? = null
-
+    var m_PlaceInfo:place? = place()
     var m_strImgpath:String ?= null
     //var m_strPlaceLastSeq:String? = ""
     var m_bRunning:Boolean? = false
     var m_bFinish:Boolean? = false
-    var m_arrItem:ArrayList<String>? = null//imglist(vertical listview)
+    var m_arrItem:ArrayList<String>? = ArrayList()//imglist(vertical listview)
     /*********************** Controller ***********************/
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
@@ -305,14 +305,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun settingView()
     {
-        //map..
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
-        mapFragment!!.getMapAsync(mapFragment)
-        val mArgs = Bundle()
-        mArgs.putSerializable(Constant.INTENT_DATA_GROUP_OBJECT, m_GroupInfo!!)
-        mapFragment.arguments = mArgs
-
-
         //getPlaceInfoProc(m_PlaceInfo!!.seq!!)
         settingGroupView()
     }
@@ -323,7 +315,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //getplacelist..
         getPlaceListProc()
 
-        /*
         m_arrItem!!.add(0, "header")//setHeader
 
         m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
@@ -338,7 +329,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
         recyclerView!!.layoutManager = pLayoutManager
         recyclerView!!.setHasFixedSize(true)
-
         recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
         {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
@@ -351,12 +341,25 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 {
                     // Call your API to load more items
                     //if(!m_bFinish!!)
-                        //getImageListProc()
+                    //getImageListProc()
                 }
             }
-         })*/
+        })
     }
 
+    //-------------------------------------------------------------
+    //
+    fun setRefreshImgList()
+    {
+        initValue()
+        if(m_Adapter != null)
+            m_Adapter!!.clearData()
+
+        recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(-20))//init
+
+        ly_SwipeRefresh!!.setRefreshing(false)
+        getImageListProc()
+    }
     //-------------------------------------------------------------
     //
     fun getPlaceListProc()
@@ -366,16 +369,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //image list..
         var pQuery:Query?= null
 
-
-        //if(!m_strPlaceLastSeq.equals(""))
-        //{
-            //pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_strPlaceLastSeq).orderByChild("group_key").equalTo(m_GroupInfo!!.group_key)//.limitToFirst(ReqBase.ITEM_COUNT)
-        //}
-        //else
-        //{
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("group_key").equalTo(m_GroupInfo!!.group_key)//.limitToFirst(ReqBase.ITEM_COUNT)
-        //}
-
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("group_key").equalTo(m_GroupInfo!!.group_key)//.limitToFirst(ReqBase.ITEM_COUNT)
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
@@ -429,6 +423,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
                 m_bRunning = false
                 progressBar.visibility = View.GONE
+
+                settingMapView()
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -436,6 +432,17 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             }
         })
+    }
+
+    fun settingMapView()
+    {
+        //map..
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
+        mapFragment!!.getMapAsync(mapFragment)
+        val mArgs = Bundle()
+        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_LIST_OBJECT, m_arrPlace!!)
+        mapFragment.arguments = mArgs
+        mapFragment.setIfCallback(this)
     }
 
     //-------------------------------------------------------------
@@ -530,7 +537,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
     //-------------------------------------------------------------
     //
-    /*
     fun getImageListProc()
     {
         m_bRunning = true
@@ -538,10 +544,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //image list..
         var pQuery:Query?= null
 
-        if(m_strImgLastSeq != null)
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child("place_key").startAt(m_PlaceInfo!!.place_key).limitToFirst(ReqBase.ITEM_COUNT)
-        else
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
+        //if(m_strImgLastSeq != null)
+        //pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child("place_key").startAt(m_PlaceInfo!!.place_key).limitToFirst(ReqBase.ITEM_COUNT)
+        //else
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").orderByKey()//.limitToFirst(ReqBase.ITEM_COUNT)
 
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -588,27 +594,27 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     val children = dataSnapshot!!.children
                     children.forEach {
 
-                        if(m_strImgLastSeq != null)
-                        {
-                            if(!m_strImgLastSeq.equals(it!!.key))
-                            {
-                                m_strImgLastSeq = it!!.key
+                        //if(m_strImgLastSeq != null)
+                        //{
+                        //if(!m_strImgLastSeq.equals(it!!.key))
+                        //{
+                        //m_strImgLastSeq = it!!.key
 
-                                var strUrl:String = it.getValue(String::class.java)!!
-                                m_Adapter!!.addItem(strUrl)
-                            }
-                            else//not add same key..
-                            {
-                                m_bFinish = true//get lastitem detect
-                            }
-                        }
-                        else
-                        {
-                            m_strImgLastSeq = it!!.key
+                        var strUrl:String = it.getValue(String::class.java)!!
+                        m_Adapter!!.addItem(strUrl)
+                        //}
+                        //else//not add same key..
+                        //{
+                        //m_bFinish = true//get lastitem detect
+                        //}
+                        //}
+                        //else
+                        //{
+                        //m_strImgLastSeq = it!!.key
 
-                            var strUrl:String = it.getValue(String::class.java)!!
-                            m_Adapter!!.addItem(strUrl)
-                        }
+                        //var strUrl:String = it.getValue(String::class.java)!!
+                        //m_Adapter!!.addItem(strUrl)
+                        //}
                     }
                 }
                 else
@@ -624,19 +630,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             }
         })
-    }
-    */
-    //-------------------------------------------------------------
-    //
-    fun setRefresh()
-    {
-        initValue()
-        if(m_HorizontalAdapter != null)
-            m_HorizontalAdapter!!.clearData()
-
-        ly_SwipeRefresh!!.setRefreshing(false)
-
-        getPlaceListProc()
     }
     //-------------------------------------------------------------
     //
@@ -857,7 +850,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             {
                 if (dataSnapshot!!.exists())
                 {
-                    setRefresh()
+                    //setRefresh()
                 }
             }
 
@@ -893,8 +886,19 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //Swipe Refresh Listener
     override fun onRefresh()
     {
-        setRefresh()
+        //setRefresh()
     }
+    //-----------------------------------------------------
+    //horizontal place adapter ifCallback
+    override fun selectPlaceItem(pInfo: place)
+    {
+        m_PlaceInfo = pInfo
+
+        //refresh img list..
+        setRefreshImgList()
+        getImageListProc()
+    }
+
     //-----------------------------------------------------
     //adapter ifCallback
     override fun addPhoto()
@@ -938,6 +942,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         })
         pAlert.show()
     }
+
+
+
     /*********************** interface ***********************/
 
 }

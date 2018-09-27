@@ -55,6 +55,7 @@ class HorizontalPlaceRvAdapter(val context: Context, var placeList: ArrayList<pl
             tv_Lat!!.text = pInfo.lat
             tv_Lng!!.text = pInfo.lng
             ly_Row!!.setTag(pInfo)
+            ly_Row!!.setOnClickListener(onClickPlaceItem)
         }
     }
 
@@ -85,13 +86,29 @@ class HorizontalPlaceRvAdapter(val context: Context, var placeList: ArrayList<pl
         this.placeList = pArray
         notifyDataSetChanged()
     }
-
+    //----------------------------------------------------------------------------
+    //
+    fun selectPlaceItem(view:View)
+    {
+        if(m_IfCallback != null)
+        {
+            val pInfo:place = view.getTag() as place
+            m_IfCallback!!.selectPlaceItem(pInfo)
+        }
+    }
     /*********************** Listener ***********************/
-
+    //----------------------------------------------------------------------------
+    //onClick Go Deltail
+    val onClickPlaceItem = View.OnClickListener { view ->
+        when(view.getId())
+        {
+            R.id.ly_Row -> selectPlaceItem(view)
+        }
+    }
 
     /*********************** interface ***********************/
     interface ifCallback
     {
-
+        fun selectPlaceItem(pInfo:place)
     }
 }
