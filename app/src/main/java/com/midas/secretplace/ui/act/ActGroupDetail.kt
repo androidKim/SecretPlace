@@ -93,7 +93,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_Adapter: PhotoRvAdapter? = null
     var selectedImage: Uri? = null
     var imageUri: Uri? = null
-    var m_PlaceInfo:place? = place()
+    var m_PlaceInfo:place? = null
     var m_strImgpath:String ?= null
     //var m_strPlaceLastSeq:String? = ""
     var m_bRunning:Boolean? = false
@@ -232,7 +232,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun initValue()
     {
-        m_arrPlace = ArrayList<place>()
+        m_arrPlace = ArrayList<place>()//placelist
+        m_arrItem = ArrayList()//img list
     }
     //--------------------------------------------------------------
     //
@@ -305,46 +306,19 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun settingView()
     {
-        //getPlaceInfoProc(m_PlaceInfo!!.seq!!)
-        settingGroupView()
-    }
-    //--------------------------------------------------------------
-    //
-    fun settingGroupView()
-    {
         //getplacelist..
         getPlaceListProc()
+    }
+    //-------------------------------------------------------------
+    //
+    fun setRefresh()
+    {
+        initValue()
+        if(m_HorizontalAdapter != null)
+            m_HorizontalAdapter!!.clearData()
 
-        m_arrItem!!.add(0, "header")//setHeader
-
-        m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
-        recyclerView.adapter = m_Adapter
-        recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))//set recyclerview grid Item spacing
-        var nSpanCnt = 1
-        /*
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode.
-            nSpanCnt = 4
-        */
-
-        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
-        recyclerView!!.layoutManager = pLayoutManager
-        recyclerView!!.setHasFixedSize(true)
-        recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
-        {
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
-            {
-                val visibleItemCount = pLayoutManager.childCount
-                val totalItemCount = pLayoutManager.itemCount
-                val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
-
-                if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//더보기..
-                {
-                    // Call your API to load more items
-                    //if(!m_bFinish!!)
-                    //getImageListProc()
-                }
-            }
-        })
+        ly_SwipeRefresh!!.setRefreshing(false)
+        getPlaceListProc()
     }
 
     //-------------------------------------------------------------
@@ -355,7 +329,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         if(m_Adapter != null)
             m_Adapter!!.clearData()
 
-        recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(-20))//init
+        m_arrItem!!.add(0, "header")//setHeader
+        m_Adapter!!.addList(m_arrItem!!)
+        m_Adapter!!.setPlaceInfo(m_PlaceInfo!!)
 
         ly_SwipeRefresh!!.setRefreshing(false)
         getImageListProc()
@@ -377,6 +353,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 // onChildAdded() will be called for each node at the first time
 
                 val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                if(m_PlaceInfo == null)
+                    m_PlaceInfo = pInfo
+
                 //m_strPlaceLastSeq = dataSnapshot!!.key
                 pInfo.place_key = dataSnapshot!!.key
                 m_HorizontalAdapter!!.addData(pInfo!!)
@@ -425,6 +404,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 progressBar.visibility = View.GONE
 
                 settingMapView()
+                settingImgListView()
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -433,7 +413,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }
         })
     }
-
+    //-------------------------------------------------------------
+    //
     fun settingMapView()
     {
         //map..
@@ -444,37 +425,40 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         mapFragment.arguments = mArgs
         mapFragment.setIfCallback(this)
     }
-
-    //-------------------------------------------------------------
+    //--------------------------------------------------------------
     //
-    fun getPlaceInfoProc(seq:String)
+    fun settingImgListView()
     {
-        //place Object
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!.child(seq)//where
-        pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
+        m_arrItem!!.add(0, "header")//setHeader
+        m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
+        recyclerView.adapter = m_Adapter
+
+        var nSpanCnt = 1
+        /*
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode.
+            nSpanCnt = 4
+        */
+
+        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
+        recyclerView!!.layoutManager = pLayoutManager
+        recyclerView!!.setHasFixedSize(true)
+        recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
         {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
             {
-                val pInfo: group = dataSnapshot!!.getValue(group::class.java)!!
-                if(pInfo != null)
+                val visibleItemCount = pLayoutManager.childCount
+                val totalItemCount = pLayoutManager.itemCount
+                val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
+
+                if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//더보기..
                 {
-                    m_GroupInfo = pInfo
-                    settingGroupView()
+                    // Call your API to load more items
+                    //if(!m_bFinish!!)
+                    //getImageListProc()
                 }
             }
-
-            override fun onCancelled(p0: DatabaseError?)
-            {
-
-            }
         })
-
-        /*
-        if(!m_bRunning!!)
-            getImageListProc()//imageList
-            */
     }
-
     //--------------------------------------------------------------
     //
     fun seveLocationDialog()
@@ -886,7 +870,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //Swipe Refresh Listener
     override fun onRefresh()
     {
-        //setRefresh()
+        setRefresh()
     }
     //-----------------------------------------------------
     //horizontal place adapter ifCallback
@@ -896,7 +880,16 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         //refresh img list..
         setRefreshImgList()
-        getImageListProc()
+    }
+    //-----------------------------------------------------
+    //horizontal place adapter ifCallback
+    override fun deletePlaceItem(pInfo: place)
+    {
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
+        pDbRef!!.removeValue()
+
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
+        pDbRef!!.removeValue()
     }
 
     //-----------------------------------------------------

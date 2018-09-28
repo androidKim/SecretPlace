@@ -14,14 +14,31 @@
 
         <LinearLayout
             android:id="@+id/ly_Row"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="3dp">
+
+            <LinearLayout
+                android:id="@+id/ly_Delete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:orientation="vertical"
+                android:padding="5dp">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:background="@drawable/baseline_delete_black_18dp" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tv_Name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="@color/color_black"
                 android:textSize="15dp" />
 
@@ -29,14 +46,14 @@
                 android:id="@+id/tv_Lat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/color_black"
+                android:textColor="@color/colorPrimaryDark"
                 android:textSize="13dp" />
 
             <TextView
                 android:id="@+id/tv_Lng"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/color_black"
+                android:textColor="@color/colorPrimaryDark"
                 android:textSize="13dp" />
 
         </LinearLayout>

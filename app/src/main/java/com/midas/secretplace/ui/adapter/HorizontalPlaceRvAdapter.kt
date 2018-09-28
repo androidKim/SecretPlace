@@ -45,6 +45,7 @@ class HorizontalPlaceRvAdapter(val context: Context, var placeList: ArrayList<pl
     inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView)
     {
         var ly_Row = itemView?.findViewById<LinearLayout>(R.id.ly_Row)
+        var ly_Delete = itemView?.findViewById<LinearLayout>(R.id.ly_Delete)
         var tv_Nmae = itemView?.findViewById<TextView>(R.id.tv_Name)
         var tv_Lat = itemView?.findViewById<TextView>(R.id.tv_Lat)
         var tv_Lng = itemView?.findViewById<TextView>(R.id.tv_Lng)
@@ -56,6 +57,9 @@ class HorizontalPlaceRvAdapter(val context: Context, var placeList: ArrayList<pl
             tv_Lng!!.text = pInfo.lng
             ly_Row!!.setTag(pInfo)
             ly_Row!!.setOnClickListener(onClickPlaceItem)
+
+            ly_Delete!!.setTag(pInfo)
+            ly_Delete!!.setOnClickListener(onClickDeleteItem)
         }
     }
 
@@ -96,6 +100,32 @@ class HorizontalPlaceRvAdapter(val context: Context, var placeList: ArrayList<pl
             m_IfCallback!!.selectPlaceItem(pInfo)
         }
     }
+    //----------------------------------------------------------------------------
+    //
+    fun deletePlaceItem(view:View)
+    {
+        if(m_IfCallback != null)
+        {
+            var pInfo:place = view.getTag() as place
+            val builder = AlertDialog.Builder(context!!)
+            builder.setMessage("Delete?")
+            builder.setPositiveButton(context.getString(R.string.str_ok)){dialog, which ->
+                //show dialog..
+                m_IfCallback!!.deletePlaceItem(pInfo)
+            }
+
+            builder.setNegativeButton(context.getString(R.string.str_no)){dialog,which ->
+
+            }
+
+            builder.setNeutralButton(context.getString(R.string.str_cancel)){_,_ ->
+
+            }
+
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
+        }
+    }
     /*********************** Listener ***********************/
     //----------------------------------------------------------------------------
     //onClick Go Deltail
@@ -105,10 +135,19 @@ class HorizontalPlaceRvAdapter(val context: Context, var placeList: ArrayList<pl
             R.id.ly_Row -> selectPlaceItem(view)
         }
     }
+    //----------------------------------------------------------------------------
+    //delete item
+    val onClickDeleteItem = View.OnClickListener { view ->
+        when(view.getId())
+        {
+            R.id.ly_Delete -> deletePlaceItem(view)
+        }
+    }
 
     /*********************** interface ***********************/
     interface ifCallback
     {
         fun selectPlaceItem(pInfo:place)
+        fun deletePlaceItem(pInfo:place)
     }
 }

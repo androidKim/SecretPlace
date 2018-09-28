@@ -121,7 +121,15 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
         private const val TYPE_HEADER = 0
         private const val TYPE_ITEM = 1
     }
+    //-----------------------------------------------------------
+    //
+    fun setPlaceInfo(pInfo:place)
+    {
+        if(pInfo == null)
+            return
 
+        m_PlaceInfo = pInfo
+    }
     //-----------------------------------------------------------
     //
     fun addItem(pInfo:String)
