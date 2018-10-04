@@ -7,6 +7,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.midas.secretplace.common.Constant
@@ -17,6 +18,7 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
 {
     private lateinit var mMap: GoogleMap
     private val m_nZoomLevel = 13.0f //This goes up to 21
+    private var m_IfCallback:ifCallback? = null
     /********************** System function **********************/
     //------------------------------------------------------------
     //
@@ -25,16 +27,16 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
     {
         var args = arguments
         var pPlaceInfo:place? = null
-        var pGroupInfo: group? = null
+        var pPlaceList:ArrayList<place>? = null
 
 
         if(args!!.containsKey(Constant.INTENT_DATA_PLACE_OBJECT))
         {
             pPlaceInfo = args!!.getSerializable(Constant.INTENT_DATA_PLACE_OBJECT) as place
         }
-        else if(args!!.containsKey(Constant.INTENT_DATA_GROUP_OBJECT))
+        else if(args!!.containsKey(Constant.INTENT_DATA_PLACE_LIST_OBJECT))
         {
-            pGroupInfo = args!!.getSerializable(Constant.INTENT_DATA_GROUP_OBJECT) as group
+            pPlaceList = args!!.getSerializable(Constant.INTENT_DATA_PLACE_LIST_OBJECT) as ArrayList<place>
         }
         else
         {
@@ -51,22 +53,38 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
             mMap.addMarker(MarkerOptions().position(sydney).title(pPlaceInfo.name))
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, m_nZoomLevel))
         }
-        else if(pGroupInfo != null)
+        else if(pPlaceList != null)
         {
-            /*
+
             var arrLatLng:ArrayList<LatLng> = ArrayList()
             var pLatLngInfo:LatLng? = null
-            if(pDistanceInfo.location_list != null)
+
+            for (i in 0 until pPlaceList!!.size)
             {
-                for (i in 0 until pDistanceInfo.location_list!!.size)
-                {
-                    var pInfo: location_info = pDistanceInfo.location_list!!.get(i)
-                    var nLat:Double = pInfo.lat!!.toDouble()
-                    var nLng:Double = pInfo.lng!!.toDouble()
-                    pLatLngInfo = LatLng(nLat, nLng)
-                    arrLatLng!!.add(pLatLngInfo)
-                    mMap.addMarker(MarkerOptions().position(pLatLngInfo).title(pDistanceInfo.name))
-                }
+                var pInfo: place = pPlaceList.get(i)
+                var nLat:Double = pInfo.lat!!.toDouble()
+                var nLng:Double = pInfo.lng!!.toDouble()
+                pLatLngInfo = LatLng(nLat, nLng)
+                arrLatLng!!.add(pLatLngInfo)
+                var pMarker:Marker = mMap.addMarker(MarkerOptions().position(pLatLngInfo).title(pInfo.name))
+                pMarker!!.tag = pInfo
+
+                mMap!!.setOnMarkerClickListener(object : GoogleMap.OnMarkerClickListener {
+                    override fun onMarkerClick(pMarker: Marker): Boolean {
+                        var pInfo:place = pMarker.tag as place
+
+                        if(m_IfCallback != null)
+                            m_IfCallback!!.selectPlaceItem(pInfo)
+
+                        return false
+                    }
+                })
+
+                mMap!!.setOnMapClickListener(object : GoogleMap.OnMapClickListener {
+                    override fun onMapClick(latLng: LatLng) {
+
+                    }
+                })
             }
 
             //poly line..
@@ -79,7 +97,7 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
                         .width(5f)
                         .color(Color.RED))
             }
-            */
+
         }
         else
         {
@@ -87,14 +105,25 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
         }
     }
     /********************** User function **********************/
-
     //------------------------------------------------------------
     //
     companion object
     {
 
     }
-
+    //------------------------------------------------------------
+    //
+    fun setIfCallback(pCallback:ifCallback)
+    {
+        m_IfCallback = pCallback
+    }
+    /********************** interface **********************/
+    //------------------------------------------------------------
+    //
+    interface ifCallback
+    {
+        fun selectPlaceItem(pInfo:place)
+    }
 
 
 }

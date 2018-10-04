@@ -22,6 +22,7 @@ import android.support.v4.content.FileProvider
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
@@ -35,10 +36,11 @@ import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
+import com.midas.mytimeline.ui.adapter.HorizontalPlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
-import com.midas.secretplace.structure.ReqBase
+
 import com.midas.secretplace.structure.core.group
 
 import com.midas.secretplace.structure.core.place
@@ -55,7 +57,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener
+class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,HorizontalPlaceRvAdapter.ifCallback,PhotoRvAdapter.ifCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, MapFragment.ifCallback
 {
     /*********************** Define ***********************/
     //-------------------------------------------------------------
@@ -87,15 +89,16 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_GroupInfo:group? = group()
     var m_arrPlace:ArrayList<place>? = ArrayList()//group의 place list(horizontal listview)
     var m_LayoutInflater:LayoutInflater? = null
+    var m_HorizontalAdapter:HorizontalPlaceRvAdapter? = null
     var m_Adapter: PhotoRvAdapter? = null
     var selectedImage: Uri? = null
     var imageUri: Uri? = null
-
+    var m_PlaceInfo:place? = null
     var m_strImgpath:String ?= null
     //var m_strPlaceLastSeq:String? = ""
     var m_bRunning:Boolean? = false
     var m_bFinish:Boolean? = false
-    var m_arrItem:ArrayList<String>? = null//imglist(vertical listview)
+    var m_arrItem:ArrayList<String>? = ArrayList()//imglist(vertical listview)
     /*********************** Controller ***********************/
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
@@ -229,7 +232,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun initValue()
     {
-        m_arrItem = ArrayList<String>()
+        m_arrPlace = ArrayList<place>()//placelist
+        m_arrItem = ArrayList()//img list
     }
     //--------------------------------------------------------------
     //
@@ -252,6 +256,12 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //event..
         ly_SwipeRefresh.setOnRefreshListener(this)
 
+        //horizontal rv
+        m_HorizontalAdapter = HorizontalPlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
+        horizontalRecyclerView!!.adapter = m_HorizontalAdapter
+        val pLayoutManager = LinearLayoutManager(m_Context, LinearLayoutManager.HORIZONTAL,false)
+        horizontalRecyclerView!!.layoutManager = pLayoutManager
+
         //map expand
         ly_MapExpand.setOnClickListener(View.OnClickListener {
             ly_MapExpand.visibility = View.GONE
@@ -259,7 +269,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             //expand map..
             val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = RelativeLayout.LayoutParams.MATCH_PARENT
+            //params.height = RelativeLayout.LayoutParams.MATCH_PARENT
+            params.height = 1500
             mapFragment!!.getView()!!.setLayoutParams(params)
         })
 
@@ -295,58 +306,36 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun settingView()
     {
-        //map..
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
-        mapFragment!!.getMapAsync(mapFragment)
-        val mArgs = Bundle()
-        mArgs.putSerializable(Constant.INTENT_DATA_GROUP_OBJECT, m_GroupInfo!!)
-        mapFragment.arguments = mArgs
-
-
-        //getPlaceInfoProc(m_PlaceInfo!!.seq!!)
-        settingGroupView()
-    }
-    //--------------------------------------------------------------
-    //
-    fun settingGroupView()
-    {
         //getplacelist..
         getPlaceListProc()
+    }
+    //-------------------------------------------------------------
+    //
+    fun setRefresh()
+    {
+        initValue()
+        if(m_HorizontalAdapter != null)
+            m_HorizontalAdapter!!.clearData()
 
-        /*
-        m_arrItem!!.add(0, "header")//setHeader
-
-        m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
-        recyclerView.adapter = m_Adapter
-        recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))//set recyclerview grid Item spacing
-        var nSpanCnt = 1
-        /*
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode.
-            nSpanCnt = 4
-        */
-
-        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
-        recyclerView!!.layoutManager = pLayoutManager
-        recyclerView!!.setHasFixedSize(true)
-
-        recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
-        {
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
-            {
-                val visibleItemCount = pLayoutManager.childCount
-                val totalItemCount = pLayoutManager.itemCount
-                val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
-
-                if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//더보기..
-                {
-                    // Call your API to load more items
-                    //if(!m_bFinish!!)
-                        //getImageListProc()
-                }
-            }
-         })*/
+        ly_SwipeRefresh!!.setRefreshing(false)
+        getPlaceListProc()
     }
 
+    //-------------------------------------------------------------
+    //
+    fun setRefreshImgList()
+    {
+        initValue()
+        if(m_Adapter != null)
+            m_Adapter!!.clearData()
+
+        m_arrItem!!.add(0, "header")//setHeader
+        m_Adapter!!.addList(m_arrItem!!)
+        m_Adapter!!.setPlaceInfo(m_PlaceInfo!!)
+
+        ly_SwipeRefresh!!.setRefreshing(false)
+        getImageListProc()
+    }
     //-------------------------------------------------------------
     //
     fun getPlaceListProc()
@@ -356,21 +345,20 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //image list..
         var pQuery:Query?= null
 
-
-        //if(!m_strPlaceLastSeq.equals(""))
-        //{
-            //pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_strPlaceLastSeq).orderByChild("group_key").equalTo(m_GroupInfo!!.group_key)//.limitToFirst(ReqBase.ITEM_COUNT)
-        //}
-        //else
-        //{
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("group_key").equalTo(m_GroupInfo!!.group_key)//.limitToFirst(ReqBase.ITEM_COUNT)
-        //}
-
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("group_key").equalTo(m_GroupInfo!!.group_key)//.limitToFirst(ReqBase.ITEM_COUNT)
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 // A new message has been added
                 // onChildAdded() will be called for each node at the first time
+
+                val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                if(m_PlaceInfo == null)
+                    m_PlaceInfo = pInfo
+
+                //m_strPlaceLastSeq = dataSnapshot!!.key
+                pInfo.place_key = dataSnapshot!!.key
+                m_HorizontalAdapter!!.addData(pInfo!!)
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -408,41 +396,15 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             {
                 if(dataSnapshot!!.exists())
                 {
-                    val children = dataSnapshot!!.children
-                    children.forEach {
-
-                        //if(m_strPlaceLastSeq != null)
-                        //{
-                            //if(!m_strPlaceLastSeq.equals(it!!.key))
-                            //{
-                                //m_strPlaceLastSeq = it!!.key
-
-                                //setting horizontal placelist view..
 
 
-                                //var strUrl:String = it.getValue(String::class.java)!!
-                                //m_Adapter!!.addItem(strUrl)
-                            //}
-                            //else//not add same key..
-                            //{
-                                //m_bFinish = true//get lastitem detect
-                            //}
-                        //}
-                        //else
-                        //{
-                            //m_strPlaceLastSeq = it!!.key
-
-                            //var strUrl:String = it.getValue(String::class.java)!!
-                            //m_Adapter!!.addItem(strUrl)
-                        //}
-                    }
                 }
-                else
-                {
-                    m_bFinish = true//
-                }
+
                 m_bRunning = false
                 progressBar.visibility = View.GONE
+
+                settingMapView()
+                settingImgListView()
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -451,37 +413,52 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }
         })
     }
-
     //-------------------------------------------------------------
     //
-    fun getPlaceInfoProc(seq:String)
+    fun settingMapView()
     {
-        //place Object
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!.child(seq)//where
-        pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
+        //map..
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
+        mapFragment!!.getMapAsync(mapFragment)
+        val mArgs = Bundle()
+        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_LIST_OBJECT, m_arrPlace!!)
+        mapFragment.arguments = mArgs
+        mapFragment.setIfCallback(this)
+    }
+    //--------------------------------------------------------------
+    //
+    fun settingImgListView()
+    {
+        m_arrItem!!.add(0, "header")//setHeader
+        m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
+        recyclerView.adapter = m_Adapter
+
+        var nSpanCnt = 1
+        /*
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode.
+            nSpanCnt = 4
+        */
+
+        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
+        recyclerView!!.layoutManager = pLayoutManager
+        recyclerView!!.setHasFixedSize(true)
+        recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
         {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
             {
-                val pInfo: group = dataSnapshot!!.getValue(group::class.java)!!
-                if(pInfo != null)
+                val visibleItemCount = pLayoutManager.childCount
+                val totalItemCount = pLayoutManager.itemCount
+                val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
+
+                if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//더보기..
                 {
-                    m_GroupInfo = pInfo
-                    settingGroupView()
+                    // Call your API to load more items
+                    //if(!m_bFinish!!)
+                    //getImageListProc()
                 }
             }
-
-            override fun onCancelled(p0: DatabaseError?)
-            {
-
-            }
         })
-
-        /*
-        if(!m_bRunning!!)
-            getImageListProc()//imageList
-            */
     }
-
     //--------------------------------------------------------------
     //
     fun seveLocationDialog()
@@ -544,7 +521,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
     //-------------------------------------------------------------
     //
-    /*
     fun getImageListProc()
     {
         m_bRunning = true
@@ -552,10 +528,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //image list..
         var pQuery:Query?= null
 
-        if(m_strImgLastSeq != null)
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child("place_key").startAt(m_PlaceInfo!!.place_key).limitToFirst(ReqBase.ITEM_COUNT)
-        else
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").orderByKey().limitToFirst(ReqBase.ITEM_COUNT)
+        //if(m_strImgLastSeq != null)
+        //pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child("place_key").startAt(m_PlaceInfo!!.place_key).limitToFirst(ReqBase.ITEM_COUNT)
+        //else
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").orderByKey()//.limitToFirst(ReqBase.ITEM_COUNT)
 
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -602,27 +578,27 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     val children = dataSnapshot!!.children
                     children.forEach {
 
-                        if(m_strImgLastSeq != null)
-                        {
-                            if(!m_strImgLastSeq.equals(it!!.key))
-                            {
-                                m_strImgLastSeq = it!!.key
+                        //if(m_strImgLastSeq != null)
+                        //{
+                        //if(!m_strImgLastSeq.equals(it!!.key))
+                        //{
+                        //m_strImgLastSeq = it!!.key
 
-                                var strUrl:String = it.getValue(String::class.java)!!
-                                m_Adapter!!.addItem(strUrl)
-                            }
-                            else//not add same key..
-                            {
-                                m_bFinish = true//get lastitem detect
-                            }
-                        }
-                        else
-                        {
-                            m_strImgLastSeq = it!!.key
+                        var strUrl:String = it.getValue(String::class.java)!!
+                        m_Adapter!!.addItem(strUrl)
+                        //}
+                        //else//not add same key..
+                        //{
+                        //m_bFinish = true//get lastitem detect
+                        //}
+                        //}
+                        //else
+                        //{
+                        //m_strImgLastSeq = it!!.key
 
-                            var strUrl:String = it.getValue(String::class.java)!!
-                            m_Adapter!!.addItem(strUrl)
-                        }
+                        //var strUrl:String = it.getValue(String::class.java)!!
+                        //m_Adapter!!.addItem(strUrl)
+                        //}
                     }
                 }
                 else
@@ -638,20 +614,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             }
         })
-    }
-    */
-    //-------------------------------------------------------------
-    //
-    fun setRefresh()
-    {
-        initValue()
-        if(m_Adapter != null)
-            m_Adapter!!.clearData()
-
-        recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(-20))//init
-
-        ly_SwipeRefresh!!.setRefreshing(false)
-        getPlaceInfoProc(m_GroupInfo!!.group_key!!)
     }
     //-------------------------------------------------------------
     //
@@ -872,7 +834,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             {
                 if (dataSnapshot!!.exists())
                 {
-                    setRefresh()
+                    //setRefresh()
                 }
             }
 
@@ -910,6 +872,26 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         setRefresh()
     }
+    //-----------------------------------------------------
+    //horizontal place adapter ifCallback
+    override fun selectPlaceItem(pInfo: place)
+    {
+        m_PlaceInfo = pInfo
+
+        //refresh img list..
+        setRefreshImgList()
+    }
+    //-----------------------------------------------------
+    //horizontal place adapter ifCallback
+    override fun deletePlaceItem(pInfo: place)
+    {
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
+        pDbRef!!.removeValue()
+
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
+        pDbRef!!.removeValue()
+    }
+
     //-----------------------------------------------------
     //adapter ifCallback
     override fun addPhoto()
@@ -953,6 +935,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         })
         pAlert.show()
     }
+
+
+
     /*********************** interface ***********************/
 
 }
