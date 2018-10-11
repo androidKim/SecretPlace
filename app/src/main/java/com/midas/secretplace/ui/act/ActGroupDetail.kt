@@ -128,6 +128,135 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         recvIntentData()
         initLayout()
     }
+    //---------------------------------------------------------------------------------------------------
+    //
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)//Intent?  <-- null이 올수도있다
+    {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM)//select gallery
+        {
+            if (data != null)
+            {
+                val contentURI = data!!.data
+                try
+                {
+                    val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, contentURI)
+                    m_strImgpath = saveImage(bitmap)
+                    //iv_Attach!!.setImageBitmap(bitmap)
+
+                    val data = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
+                    var value = 0.0
+
+                    var timestamp:Long = System.currentTimeMillis()
+                    var fileName:String = String.format("%s_%s",timestamp, "img")
+                    var storage = data.getReference().child(fileName).putFile(contentURI)
+                            .addOnProgressListener { taskSnapshot ->
+                                value = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
+                                Log.v("value","value=="+value)
+                            }
+                            .addOnSuccessListener {
+                                taskSnapshot ->
+                                val uri = taskSnapshot.downloadUrl
+                                Log.v("Download File","File.." +uri)
+
+                                //update
+                                var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
+                                pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
+
+                                //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
+                                pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                    override fun onDataChange(dataSnapshot: DataSnapshot?)
+                                    {
+                                        if (dataSnapshot!!.exists())
+                                        {
+                                            setRefresh()
+                                        }
+                                    }
+
+                                    override fun onCancelled(p0: DatabaseError?)
+                                    {
+
+                                    }
+                                })
+
+                            }
+                            .addOnFailureListener{
+                                exception -> exception.printStackTrace()
+                            }
+
+                }
+                catch (e: IOException)
+                {
+                    e.printStackTrace()
+                }
+            }
+        }
+        else if (requestCode == REQUEST_TAKE_PHOTO)//take photo
+        {
+
+            try
+            {
+                //val bitmap = data!!.extras!!.get("data") as Bitmap
+                //m_strImgpath = saveImage(bitmap)
+                //val contentURI = Util.getImageUri(m_Context!!, bitmap)
+
+                try
+                {
+                    selectedImage = imageUri
+                }
+                catch (e: Exception)
+                {
+                    Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show()
+                }
+
+
+                val data = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
+                var value = 0.0
+
+                var timestamp:Long = System.currentTimeMillis()
+                var fileName:String = String.format("%s_%s",timestamp, "img")
+                var storage = data.getReference().child(fileName).putFile(selectedImage!!)
+                        .addOnProgressListener { taskSnapshot ->
+                            value = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
+                            Log.v("value","value=="+value)
+
+                        }
+                        .addOnSuccessListener {
+                            taskSnapshot ->
+                            val uri = taskSnapshot.downloadUrl
+                            Log.v("Download File","File.." +uri)
+
+                            //update
+                            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
+                            pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
+                            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(dataSnapshot: DataSnapshot?)
+                                {
+                                    if (dataSnapshot!!.exists())
+                                    {
+                                        setRefresh()
+                                    }
+                                }
+
+                                override fun onCancelled(p0: DatabaseError?)
+                                {
+
+                                }
+                            })
+
+                        }
+                        .addOnFailureListener{
+                            exception -> exception.printStackTrace()
+                        }
+
+            }
+            catch (e: IOException)
+            {
+                e.printStackTrace()
+            }
+        }
+    }
+
     //--------------------------------------------------------------
     //
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray)
@@ -272,6 +401,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             //params.height = RelativeLayout.LayoutParams.MATCH_PARENT
             params.height = 1500
             mapFragment!!.getView()!!.setLayoutParams(params)
+
+            val horizontalParam = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+            horizontalParam.addRule(RelativeLayout.BELOW, R.id.ly_Top)
+            ly_SwipeRefresh.layoutParams = horizontalParam
         })
 
         //map collapse
@@ -281,8 +414,12 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             ly_MapCollapse.visibility = View.GONE
 
             val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = 0
+            params.height = tv_GroupName.height
             mapFragment!!.getView()!!.setLayoutParams(params)
+
+            val horizontalParam = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+            horizontalParam.addRule(RelativeLayout.BELOW, R.id.ly_Top)
+            ly_SwipeRefresh.layoutParams = horizontalParam
         })
 
         fbtn_SaveLocation?.setOnClickListener(View.OnClickListener
@@ -299,13 +436,40 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }
         })
 
-        settingView()
-    }
+        if(m_GroupInfo != null)
+        {
+            if(m_GroupInfo!!.name != null)
+            {
+                tv_GroupName.text = m_GroupInfo!!.name
 
-    //--------------------------------------------------------------
-    //
-    fun settingView()
-    {
+                //group명변경
+                ly_EditGroupName.setOnClickListener(View.OnClickListener
+                {
+
+                    //show dialog..
+                    val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
+                    pAlert.setTitle("Do you want edit name?")
+                    pAlert.setMessage("you can choice!!")
+                    var editName: EditText? = EditText(m_Context)
+                    editName!!.hint = getString(R.string.str_msg_4)
+                    pAlert.setView(editName)
+                    pAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Ok",{
+                        dialogInterface, i ->
+                        var name:String = editName.text.toString()
+                        editGroupName(name)
+                        pAlert.dismiss()
+                    })
+                    pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "No",{
+                        dialogInterface, i ->
+                        pAlert.dismiss()
+                    })
+                    pAlert.show()
+
+
+                })
+            }
+        }
+
         //getplacelist..
         getPlaceListProc()
     }
@@ -429,6 +593,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun settingImgListView()
     {
+        if(m_PlaceInfo == null)
+            return
+
         m_arrItem!!.add(0, "header")//setHeader
         m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
         recyclerView.adapter = m_Adapter
@@ -788,6 +955,38 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     }
     //-------------------------------------------------------------
     //
+    fun editGroupName(strName:String)
+    {
+        m_GroupInfo!!.name = strName
+
+        //update
+        var pDbRef: DatabaseReference? = null
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP).child(m_GroupInfo!!.group_key)
+        pDbRef!!.setValue(m_GroupInfo!!)
+
+        pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                if (dataSnapshot!!.exists())
+                {
+                    val pInfo: group = dataSnapshot!!.getValue(group::class.java)!!
+                    if(pInfo != null)
+                    {
+                        tv_GroupName!!.text = pInfo!!.name
+                        m_GroupInfo = pInfo
+                    }
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+    }
+
+    //-------------------------------------------------------------
+    //
     fun saveImage(myBitmap: Bitmap):String
     {
         val bytes = ByteArrayOutputStream()
@@ -823,11 +1022,11 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun editContentProc(strName:String)
     {
         //update
-        m_GroupInfo!!.name = strName
+        m_PlaceInfo!!.name = strName
 
         var pDbRef: DatabaseReference? = null
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP).child(m_GroupInfo!!.group_key)
-        pDbRef!!.setValue(m_GroupInfo!!)
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_PlaceInfo!!.place_key)
+        pDbRef!!.setValue(m_PlaceInfo!!)
 
         pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot?)

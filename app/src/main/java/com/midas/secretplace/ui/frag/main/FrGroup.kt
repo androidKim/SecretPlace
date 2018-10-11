@@ -341,14 +341,8 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
     //listAdapter callback
     override fun deleteGroupProc(pInfo: group)
     {
-        /*
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!.child(pInfo.group_key)//where
         pDbRef!!.removeValue()
-
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
-        pDbRef!!.removeValue()
-        */
-
         setRefresh()
     }
     //----------------------------------------------------------------------
