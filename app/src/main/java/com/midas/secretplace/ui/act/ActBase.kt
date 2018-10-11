@@ -213,6 +213,7 @@ FrPlace.ifCallback, FrGroup.ifCallback
         }
         else
         {
+
             if(mLocation.latitude <= 0 || mLocation.longitude <= 0)
             {
                 var fusedLocationProviderClient : FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -227,8 +228,10 @@ FrPlace.ifCallback, FrGroup.ifCallback
             }
             else
             {
-                bResult = true
+
             }
+
+            bResult = true
         }
         return bResult
     }
