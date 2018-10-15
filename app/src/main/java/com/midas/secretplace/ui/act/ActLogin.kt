@@ -1,5 +1,6 @@
 package com.midas.secretplace.ui.act
 
+
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -18,6 +19,10 @@ import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import kotlinx.android.synthetic.main.act_login.*
+
+
+
+
 
 
 class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener
