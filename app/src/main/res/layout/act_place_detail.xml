@@ -14,7 +14,7 @@
             android:id="@+id/mapFragment"
             android:name="com.midas.secretplace.ui.frag.MapFragment"
             android:layout_width="match_parent"
-            android:layout_height="300dp" />
+            android:layout_height="0dp" />
 
         <RelativeLayout
             android:id="@+id/ly_MapSizeControll"
@@ -35,9 +35,9 @@
                 android:visibility="visible">
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/baseline_expand_more_black_18dp" />
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/baseline_map_black_18dp" />
 
             </LinearLayout>
 
@@ -51,9 +51,9 @@
 
                 <ImageView
                     android:id="@+id/iBtn_Collapse"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/baseline_expand_less_black_18dp" />
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/baseline_map_black_18dp" />
             </LinearLayout>
         </RelativeLayout>
     </FrameLayout>

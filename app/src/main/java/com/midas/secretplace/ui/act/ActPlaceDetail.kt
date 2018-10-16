@@ -18,7 +18,6 @@ import android.support.v4.content.FileProvider
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
@@ -31,8 +30,6 @@ import com.google.firebase.storage.FirebaseStorage
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
-import com.midas.secretplace.structure.ReqBase
-import com.midas.secretplace.structure.core.photo
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
@@ -99,6 +96,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         {
             if (data != null)
             {
+                progressBar.visibility = View.VISIBLE
                 val contentURI = data!!.data
                 try
                 {
@@ -132,12 +130,13 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                         if (dataSnapshot!!.exists())
                                         {
                                             setRefresh()
+                                            progressBar.visibility = View.GONE
                                         }
                                     }
 
                                     override fun onCancelled(p0: DatabaseError?)
                                     {
-
+                                        progressBar.visibility = View.GONE
                                     }
                                 })
 
@@ -155,7 +154,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         }
         else if (requestCode == REQUEST_TAKE_PHOTO)//take photo
         {
-
+            progressBar.visibility = View.VISIBLE
             try
             {
                 //val bitmap = data!!.extras!!.get("data") as Bitmap
@@ -197,12 +196,13 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                     if (dataSnapshot!!.exists())
                                     {
                                         setRefresh()
+                                        progressBar.visibility = View.GONE
                                     }
                                 }
 
                                 override fun onCancelled(p0: DatabaseError?)
                                 {
-
+                                    progressBar.visibility = View.GONE
                                 }
                             })
 

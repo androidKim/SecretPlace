@@ -134,6 +134,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         {
             if (data != null)
             {
+                progressBar.visibility = View.VISIBLE
                 val contentURI = data!!.data
                 try
                 {
@@ -167,12 +168,13 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                         if (dataSnapshot!!.exists())
                                         {
                                             setRefresh()
+                                            progressBar.visibility = View.GONE
                                         }
                                     }
 
                                     override fun onCancelled(p0: DatabaseError?)
                                     {
-
+                                        progressBar.visibility = View.GONE
                                     }
                                 })
 
@@ -190,13 +192,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         }
         else if (requestCode == REQUEST_TAKE_PHOTO)//take photo
         {
-
+            progressBar.visibility = View.VISIBLE
             try
             {
-                //val bitmap = data!!.extras!!.get("data") as Bitmap
-                //m_strImgpath = saveImage(bitmap)
-                //val contentURI = Util.getImageUri(m_Context!!, bitmap)
-
                 try
                 {
                     selectedImage = imageUri
@@ -232,12 +230,13 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                     if (dataSnapshot!!.exists())
                                     {
                                         setRefresh()
+                                        progressBar.visibility = View.GONE
                                     }
                                 }
 
                                 override fun onCancelled(p0: DatabaseError?)
                                 {
-
+                                    progressBar.visibility = View.GONE
                                 }
                             })
 
@@ -395,7 +394,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             //expand map..
             val params = mapFragment!!.getView()!!.getLayoutParams()
-            //params.height = RelativeLayout.LayoutParams.MATCH_PARENT
             params.height = 1500
             mapFragment!!.getView()!!.setLayoutParams(params)
 
@@ -413,7 +411,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             ly_MapCollapse.visibility = View.GONE
 
             val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = tv_GroupName.height
+            params.height = 0
             mapFragment!!.getView()!!.setLayoutParams(params)
 
             val horizontalParam = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
