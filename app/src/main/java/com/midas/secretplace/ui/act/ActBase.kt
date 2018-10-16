@@ -210,10 +210,10 @@ FrPlace.ifCallback, FrGroup.ifCallback
         if (!listPermissionsNeeded.isEmpty())//
         {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toTypedArray(), Constant.REQUEST_ID_MULTIPLE_PERMISSIONS)
+            bResult = false
         }
         else
         {
-
             if(mLocation.latitude <= 0 || mLocation.longitude <= 0)
             {
                 var fusedLocationProviderClient : FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -223,6 +223,11 @@ FrPlace.ifCallback, FrGroup.ifCallback
                     {
                         // Logic to handle location_info object
                         mLocation = location
+
+                    }
+                    else
+                    {
+
                     }
                 })
             }
@@ -230,7 +235,6 @@ FrPlace.ifCallback, FrGroup.ifCallback
             {
 
             }
-
             bResult = true
         }
         return bResult

@@ -48,11 +48,6 @@
             android:name=".ui.act.ActGroupDetail"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"></activity>
-        <activity
-            android:name=".ui.act.ActDirectDetail"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"></activity>
-
 
         <service
             android:exported="false"

@@ -13,7 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
@@ -260,8 +259,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     {
         if(m_IfCallback != null)
         {
-            var bCheckLocation:Boolean = m_IfCallback!!.checkLocationInfo()
 
+            var bCheckLocation:Boolean = m_IfCallback!!.checkLocationInfo()
             if(bCheckLocation)
             {
                 var locationInfo = m_IfCallback!!.getLocation()
@@ -276,7 +275,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //
     fun showPlaceInputDialog(pInfo:place)
     {
-        val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+        //val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
         //"/"+currentFirebaseUser!!.uid
 
         if(pInfo == null)
