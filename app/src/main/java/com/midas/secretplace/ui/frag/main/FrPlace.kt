@@ -13,16 +13,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.core.FirebaseDbCtrl
-import com.midas.secretplace.structure.ReqBase
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import kotlinx.android.synthetic.main.frag_place.*
+
+
 
 
 
@@ -274,6 +276,9 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //
     fun showPlaceInputDialog(pInfo:place)
     {
+        val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+        //Toast.makeText(this, "" + currentFirebaseUser!!.uid, Toast.LENGTH_SHORT).show()
+
         if(pInfo == null)
             return
 
@@ -287,6 +292,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
             var pDbRef:DatabaseReference? = null
             pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.push()//insert..
+            //pDbRef!!.child("users/"+currentFirebaseUser!!.uid)
             pDbRef!!.setValue(pInfo!!)//insert
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(dataSnapshot: DataSnapshot?)
