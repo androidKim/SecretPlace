@@ -139,7 +139,8 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         if (dataSnapshot!!.exists())//exist..
                         {
                             val pRes:user = dataSnapshot!!.getValue(user::class.java)!!
-                            pRes.user_key = dataSnapshot.key
+                            val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                            pRes.user_key = currentFirebaseUser!!.uid
                             m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key).setValue(pRes)//update..
                             m_App!!.m_SpCtrl!!.setSpUserKey(pRes.user_key!!)
                             m_App!!.m_SpCtrl!!.setSnsType(user.SNS_TYPE_GOOGLE)
@@ -184,6 +185,8 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         {
                             //first Insert..
                             var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.push()//insert..
+                            val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                            pInfo.user_key = currentFirebaseUser!!.uid
                             pDbRef!!.setValue(pInfo!!)//insert
                         }
                     }

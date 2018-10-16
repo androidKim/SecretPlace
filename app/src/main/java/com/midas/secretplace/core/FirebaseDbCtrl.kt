@@ -2,8 +2,6 @@ package com.midas.secretplace.core
 
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.Query
-import com.midas.secretplace.structure.ReqBase
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.structure.core.user
 
@@ -25,6 +23,8 @@ class FirebaseDbCtrl
     constructor()
     {
         m_FirebaseDb = FirebaseDatabase.getInstance()
+        //val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+        //"/"+currentFirebaseUser!!.uid
     }
 
     /************************* DB Setter *************************/

@@ -28,6 +28,8 @@ import kotlinx.android.synthetic.main.act_main.*
 import kotlinx.android.synthetic.main.ly_main.*
 
 
+
+
 class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
 {
     /*********************** Define ***********************/
