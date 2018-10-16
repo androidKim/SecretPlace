@@ -40,13 +40,10 @@ import com.midas.mytimeline.ui.adapter.HorizontalPlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
-
 import com.midas.secretplace.structure.core.group
-
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
-import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.ui.frag.MapFragment
 import kotlinx.android.synthetic.main.act_group_detail.*
 import java.io.ByteArrayOutputStream
@@ -405,6 +402,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             val horizontalParam = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
             horizontalParam.addRule(RelativeLayout.BELOW, R.id.ly_Top)
             ly_SwipeRefresh.layoutParams = horizontalParam
+
+            m_HorizontalAdapter!!.notifyDataSetChanged()
         })
 
         //map collapse
@@ -420,12 +419,13 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             val horizontalParam = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
             horizontalParam.addRule(RelativeLayout.BELOW, R.id.ly_Top)
             ly_SwipeRefresh.layoutParams = horizontalParam
+
+            m_HorizontalAdapter!!.notifyDataSetChanged()
         })
 
         fbtn_SaveLocation?.setOnClickListener(View.OnClickListener
         {
             var bPermissionVal:Boolean = checkPermissionLocation()
-
             if(bPermissionVal)
             {
                 seveLocationDialog()
