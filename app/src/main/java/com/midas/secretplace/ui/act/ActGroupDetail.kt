@@ -777,7 +777,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 m_bRunning = false
                 progressBar.visibility = View.GONE
 
-                if(m_Adapter!!.itemCount > 0)
+                if(m_Adapter!!.itemCount > 1)//1 : header..
                 {
                     ly_NoData.visibility = View.GONE
                 }

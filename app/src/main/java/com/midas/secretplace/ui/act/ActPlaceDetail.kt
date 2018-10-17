@@ -443,8 +443,17 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 else
                 {
                     m_bFinish = true//
+                }
+
+                if(m_Adapter!!.itemCount > 1)// 1: header..
+                {
+                    ly_NoData.visibility = View.GONE
+                }
+                else
+                {
                     ly_NoData.visibility = View.VISIBLE
                 }
+
                 m_bRunning = false
                 progressBar.visibility = View.GONE
             }

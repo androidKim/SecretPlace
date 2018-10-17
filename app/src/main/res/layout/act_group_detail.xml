@@ -126,6 +126,7 @@
         android:id="@+id/ly_NoData"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/ly_Top"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="gone">
