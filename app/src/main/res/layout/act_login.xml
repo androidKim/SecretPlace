@@ -12,7 +12,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="14dp"
-        android:background="@drawable/shape_button_bg"
         android:text="@string/str_login_google"
         android:textAllCaps="true"
         android:textColor="@color/color_white"

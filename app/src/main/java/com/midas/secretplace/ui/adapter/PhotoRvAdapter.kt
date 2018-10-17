@@ -2,6 +2,7 @@ package com.midas.secretplace.ui.adapter
 
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.support.v4.app.FragmentManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -12,8 +13,15 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.place
+
+
+
+
 
 
 class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList: ArrayList<String>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
@@ -105,26 +113,29 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
         var ly_Row = itemView?.findViewById<RelativeLayout>(R.id.ly_Row)
         var iv_Photo = itemView?.findViewById<ImageView>(R.id.iv_Photo)
         var iv_None = itemView?.findViewById<ImageView>(R.id.iv_None)
+        var iv_Fail= itemView?.findViewById<ImageView>(R.id.iv_Fail)
 
-        fun bind (pInfo: String, pContext: Context)
+        fun bind (url: String, pContext: Context)
         {
-            Glide.with(context).load(pInfo)
-                    /*
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(p0: GlideException?, p1: Any?, p2: Target<Drawable>?, p3: Boolean): Boolean {
-                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                        }
-                        override fun onResourceReady(p0: Drawable?, p1: Any?, p2: Target<Drawable>?, p3: DataSource?, p4: Boolean): Boolean {
-
-                            //do something when picture already loaded
-                            return false
-                        }
-                    })
-                    */
-                    .into(iv_Photo)
-
-            //ly_Row?.setTag(pInfo)
-            //ly_Row?.setOnClickListener(onClickGoDetail)
+            Glide.with(context)
+            .load(url)
+            .listener(object : RequestListener<Drawable>
+            {
+                override fun onLoadFailed(p0: GlideException?, p1: Any?, p2: com.bumptech.glide.request.target.Target<Drawable>?, p3: Boolean): Boolean
+                {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    iv_None!!.visibility = View.GONE
+                    iv_None!!.visibility = View.VISIBLE
+                }
+                override fun onResourceReady(p0: Drawable?, p1: Any?, p2: com.bumptech.glide.request.target.Target<Drawable>?, p3: DataSource?, p4: Boolean): Boolean
+                {
+                    //do something when picture already loaded
+                    iv_None!!.visibility = View.GONE
+                    iv_None!!.visibility = View.GONE
+                    return false
+                }
+            })
+            .into(iv_Photo)
         }
     }
     /*********************** User Function ***********************/

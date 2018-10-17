@@ -38,8 +38,8 @@
                 android:paddingRight="10dp">
 
                 <ImageView
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:background="@drawable/baseline_edit_white_18dp" />
 
             </LinearLayout>
@@ -111,7 +111,7 @@
                 android:id="@+id/horizontalRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
-                android:background="@color/colorPrimaryDark"
+                android:background="@color/color_white"
                 android:orientation="horizontal"></android.support.v7.widget.RecyclerView>
 
             <android.support.v7.widget.RecyclerView
@@ -122,6 +122,27 @@
         </RelativeLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
 
+    <LinearLayout
+        android:id="@+id/ly_NoData"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/outline_info_black_18dp" />
+
+        <TextView
+            android:id="@+id/tv_NoDataMsg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:textColor="@color/color_black" />
+    </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fbtn_SaveLocation"

@@ -58,7 +58,6 @@
         </RelativeLayout>
     </FrameLayout>
 
-
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/ly_SwipeRefresh"
         android:layout_width="match_parent"
@@ -71,6 +70,28 @@
             android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
+    <LinearLayout
+        android:id="@+id/ly_NoData"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/ly_Top"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/outline_info_black_18dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:text="@string/str_msg_14"
+            android:textColor="@color/color_black" />
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"
