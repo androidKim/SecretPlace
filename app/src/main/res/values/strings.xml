@@ -6,14 +6,23 @@
 
     <string name="str_login_google">google</string>
 
-    <string name="str_ok">Ok</string>
-    <string name="str_no">No</string>
-    <string name="str_cancel">Cancel</string>
-    <string name="str_msg_1">logout</string>
-    <string name="str_msg_2">logout?</string>
-    <string name="str_msg_3">save location?</string>
-    <string name="str_msg_4">Title</string>
-    <string name="str_msg_5">Save</string>
-    <string name="str_msg_6">add current location</string>
-    <string name="str_msg_7">please permit permission for location</string>
+    <string name="str_ok">예</string>
+    <string name="str_no">아니오</string>
+    <string name="str_cancel">취소</string>
+    <string name="str_setting">환경설정</string>
+    <string name="str_msg_1">로그아웃</string>
+    <string name="str_msg_2">로그아웃 하시겠습니까?</string>
+    <string name="str_msg_3">현재 장소를 저장하시겠습니까?</string>
+    <string name="str_msg_4">제목</string>
+    <string name="str_msg_5">저장</string>
+    <string name="str_msg_6">현재 위치 추가</string>
+    <string name="str_msg_7">권한 허용이 필요합니다.</string>
+    <string name="str_msg_8">장소명을 변경하시겠습니까?</string>
+    <string name="str_msg_9">선택하세요.</string>
+    <string name="str_msg_10">카메라</string>
+    <string name="str_msg_11">앨범</string>
+    <string name="str_msg_12">사진을 추가하시겠습니까?</string>
+    <string name="str_msg_13">내용을 변경하시겠습니까?</string>
+    <string name="str_msg_14">저장된 사진이 없습니다.\n사진을 추가해보세요.</string>
+    <string name="str_msg_15">저장된 장소가 없습니다.\n장소를 추가해보세요.</string>
 </resources>

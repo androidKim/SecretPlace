@@ -40,13 +40,10 @@ import com.midas.mytimeline.ui.adapter.HorizontalPlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
-
 import com.midas.secretplace.structure.core.group
-
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
-import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.ui.frag.MapFragment
 import kotlinx.android.synthetic.main.act_group_detail.*
 import java.io.ByteArrayOutputStream
@@ -137,6 +134,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         {
             if (data != null)
             {
+                progressBar.visibility = View.VISIBLE
                 val contentURI = data!!.data
                 try
                 {
@@ -152,12 +150,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     var storage = data.getReference().child(fileName).putFile(contentURI)
                             .addOnProgressListener { taskSnapshot ->
                                 value = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
-                                Log.v("value","value=="+value)
                             }
                             .addOnSuccessListener {
                                 taskSnapshot ->
                                 val uri = taskSnapshot.downloadUrl
-                                Log.v("Download File","File.." +uri)
 
                                 //update
                                 var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
@@ -170,12 +166,13 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                         if (dataSnapshot!!.exists())
                                         {
                                             setRefresh()
+                                            progressBar.visibility = View.GONE
                                         }
                                     }
 
                                     override fun onCancelled(p0: DatabaseError?)
                                     {
-
+                                        progressBar.visibility = View.GONE
                                     }
                                 })
 
@@ -193,13 +190,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         }
         else if (requestCode == REQUEST_TAKE_PHOTO)//take photo
         {
-
+            progressBar.visibility = View.VISIBLE
             try
             {
-                //val bitmap = data!!.extras!!.get("data") as Bitmap
-                //m_strImgpath = saveImage(bitmap)
-                //val contentURI = Util.getImageUri(m_Context!!, bitmap)
-
                 try
                 {
                     selectedImage = imageUri
@@ -218,14 +211,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 var storage = data.getReference().child(fileName).putFile(selectedImage!!)
                         .addOnProgressListener { taskSnapshot ->
                             value = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
-                            Log.v("value","value=="+value)
-
                         }
                         .addOnSuccessListener {
                             taskSnapshot ->
                             val uri = taskSnapshot.downloadUrl
-                            Log.v("Download File","File.." +uri)
-
                             //update
                             var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
                             pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
@@ -235,12 +224,13 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                     if (dataSnapshot!!.exists())
                                     {
                                         setRefresh()
+                                        progressBar.visibility = View.GONE
                                     }
                                 }
 
                                 override fun onCancelled(p0: DatabaseError?)
                                 {
-
+                                    progressBar.visibility = View.GONE
                                 }
                             })
 
@@ -380,6 +370,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun initLayout()
     {
+        ly_NoData.visibility = View.GONE
         m_LayoutInflater = LayoutInflater.from(m_Context)
 
         //event..
@@ -398,13 +389,14 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             //expand map..
             val params = mapFragment!!.getView()!!.getLayoutParams()
-            //params.height = RelativeLayout.LayoutParams.MATCH_PARENT
             params.height = 1500
             mapFragment!!.getView()!!.setLayoutParams(params)
 
             val horizontalParam = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
             horizontalParam.addRule(RelativeLayout.BELOW, R.id.ly_Top)
             ly_SwipeRefresh.layoutParams = horizontalParam
+
+            m_HorizontalAdapter!!.notifyDataSetChanged()
         })
 
         //map collapse
@@ -414,18 +406,19 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             ly_MapCollapse.visibility = View.GONE
 
             val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = tv_GroupName.height
+            params.height = 0
             mapFragment!!.getView()!!.setLayoutParams(params)
 
             val horizontalParam = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
             horizontalParam.addRule(RelativeLayout.BELOW, R.id.ly_Top)
             ly_SwipeRefresh.layoutParams = horizontalParam
+
+            m_HorizontalAdapter!!.notifyDataSetChanged()
         })
 
         fbtn_SaveLocation?.setOnClickListener(View.OnClickListener
         {
             var bPermissionVal:Boolean = checkPermissionLocation()
-
             if(bPermissionVal)
             {
                 seveLocationDialog()
@@ -448,18 +441,18 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
                     //show dialog..
                     val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
-                    pAlert.setTitle("Do you want edit name?")
-                    pAlert.setMessage("you can choice!!")
+                    pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_8))
+                    pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_9))
                     var editName: EditText? = EditText(m_Context)
                     editName!!.hint = getString(R.string.str_msg_4)
                     pAlert.setView(editName)
-                    pAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Ok",{
+                    pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_ok),{
                         dialogInterface, i ->
                         var name:String = editName.text.toString()
                         editGroupName(name)
                         pAlert.dismiss()
                     })
-                    pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "No",{
+                    pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_no),{
                         dialogInterface, i ->
                         pAlert.dismiss()
                     })
@@ -567,8 +560,17 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 m_bRunning = false
                 progressBar.visibility = View.GONE
 
-                settingMapView()
-                settingImgListView()
+                if(m_HorizontalAdapter!!.itemCount > 0)
+                {
+                    settingMapView()
+                    settingImgListView()
+                    ly_NoData.visibility = View.GONE
+                }
+                else
+                {
+                    tv_NoDataMsg.text = m_Context!!.resources.getString(R.string.str_msg_15)
+                    ly_NoData.visibility = View.VISIBLE
+                }
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -774,6 +776,16 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 }
                 m_bRunning = false
                 progressBar.visibility = View.GONE
+
+                if(m_Adapter!!.itemCount > 1)//1 : header..
+                {
+                    ly_NoData.visibility = View.GONE
+                }
+                else
+                {
+                    tv_NoDataMsg.text = m_Context!!.resources.getString(R.string.str_msg_14)
+                    ly_NoData.visibility = View.VISIBLE
+                }
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -1097,14 +1109,14 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         //show dialog..
         val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
-        pAlert.setTitle("Do you want add photo?")
-        pAlert.setMessage("you can choice!!")
-        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Gallery",{
+        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_12))
+        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_9))
+        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_msg_11),{
             dialogInterface, i ->
             checkPermissionWriteStorage();
             pAlert.dismiss();
         })
-        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Take Photo",{
+        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_msg_10),{
             dialogInterface, i ->
             checkPermissionCamera();
             pAlert.dismiss();
@@ -1117,26 +1129,23 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         //show dialog..
         val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
-        pAlert.setTitle("Do you want edit content?")
-        pAlert.setMessage("you can choice!!")
+        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_13))
+        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_9))
         var editName: EditText? = EditText(m_Context)
         editName!!.hint = getString(R.string.str_msg_4)
         pAlert.setView(editName)
-        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Ok",{
+        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_ok),{
             dialogInterface, i ->
             var name:String = editName.text.toString()
             editContentProc(name)
             pAlert.dismiss()
         })
-        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "No",{
+        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_no),{
             dialogInterface, i ->
             pAlert.dismiss()
         })
         pAlert.show()
     }
-
-
-
     /*********************** interface ***********************/
 
 }

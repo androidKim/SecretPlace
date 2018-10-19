@@ -11,11 +11,14 @@ class Constant
         val INTENT_DATA_DIRECT_OBJECT:String = "INTENT_DATA_DIRECT_OBJECT"
         val INTENT_DATA_INTERFACE:String = "INTENT_DATA_INTERFACE"
 
-
         //Permission
         val REQUEST_ID_MULTIPLE_PERMISSIONS:Int = 1000
         val PERMISSION_ACCESS_FINE_LOCATION:Int = 1001
         val PERMISSION_ACCESS_COARSE_LOCATION:Int = 1002
+
+        //ActivityForResult
+        val FOR_RESULT_IS_REFRESH:Int = 2000
+
         //Define..
     }
 }
