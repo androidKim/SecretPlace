@@ -76,7 +76,6 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         recvIntentData()
         initLayout()
     }
-
     //------------------------------------------------
     //
     @Override

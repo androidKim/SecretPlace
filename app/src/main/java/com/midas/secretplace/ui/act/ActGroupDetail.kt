@@ -497,6 +497,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun getPlaceListProc()
     {
+        m_PlaceInfo = null
         m_bRunning = true
         progressBar.visibility = View.VISIBLE
         //image list..
@@ -556,7 +557,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
 
                 }
-
                 m_bRunning = false
                 progressBar.visibility = View.GONE
 
@@ -571,6 +571,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     tv_NoDataMsg.text = m_Context!!.resources.getString(R.string.str_msg_15)
                     ly_NoData.visibility = View.VISIBLE
                 }
+
+                if(m_PlaceInfo != null)
+                    getImageListProc()
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -774,8 +777,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 {
                     m_bFinish = true//
                 }
-                m_bRunning = false
-                progressBar.visibility = View.GONE
 
                 if(m_Adapter!!.itemCount > 1)//1 : header..
                 {
@@ -786,6 +787,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     tv_NoDataMsg.text = m_Context!!.resources.getString(R.string.str_msg_14)
                     ly_NoData.visibility = View.VISIBLE
                 }
+                m_bRunning = false
+                progressBar.visibility = View.GONE
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -876,8 +879,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }
             else
             {
-                bResult = true
+
             }
+
+            bResult = true
         }
         return bResult
     }
@@ -1101,8 +1106,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
         pDbRef!!.removeValue()
-    }
 
+        setRefresh()
+    }
     //-----------------------------------------------------
     //adapter ifCallback
     override fun addPhoto()

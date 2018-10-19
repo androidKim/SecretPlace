@@ -326,7 +326,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             //m_Adapter!!.addData(null)
         //}
 
-
         if(!m_bRunning!!)
             getImageListProc()//imageList
     }
