@@ -2,6 +2,7 @@ package com.midas.secretplace.ui.frag.main
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -17,18 +18,22 @@ import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.GroupRvAdapter
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.ReqBase
 import com.midas.secretplace.structure.core.group
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
+import com.midas.secretplace.ui.act.ActGroupDetail
 import com.midas.secretplace.ui.act.ActMain
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import kotlinx.android.synthetic.main.frag_group.*
+import java.io.Serializable
 
 
 class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter.ifCallback
 {
+
     /**************************** Define ****************************/
 
     /**************************** Member ****************************/
@@ -82,6 +87,17 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
         else
         {
             throw RuntimeException(pContext!!.toString() + " must implement FragmentEvent")
+        }
+    }
+    //------------------------------------------------------------------------
+    //
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(resultCode == Constant.FOR_RESULT_IS_REFRESH)
+        {
+            setRefresh()
         }
     }
 
@@ -352,7 +368,14 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
         var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
         return bPermissionVal
     }
-
+    //----------------------------------------------------------------------
+    //listAdapter callback
+    override fun moveDetailActivity(pInfo: group)
+    {
+        var pIntent = Intent(m_Context, ActGroupDetail::class.java)
+        pIntent.putExtra(Constant.INTENT_DATA_GROUP_OBJECT, pInfo as Serializable)
+        startActivityForResult(pIntent, 0)
+    }
     /******************************** interface ********************************/
     //----------------------------------------------------------------------
     //

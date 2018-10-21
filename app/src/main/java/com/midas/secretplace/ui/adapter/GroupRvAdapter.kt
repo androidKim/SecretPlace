@@ -103,9 +103,11 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
             if(bPermission)
             {
                 val pInfo:group = view.getTag() as group
-                var pIntent = Intent(view.context, ActGroupDetail::class.java)
-                pIntent.putExtra(Constant.INTENT_DATA_GROUP_OBJECT, pInfo as Serializable)
-                view.context.startActivity(pIntent)
+                if(m_IfCallback != null)
+                {
+                    m_IfCallback!!.moveDetailActivity(pInfo!!)
+                }
+
                 return
             }
             else
@@ -166,5 +168,6 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
     {
         fun deleteGroupProc(pInfo:group)
         fun checkPermission():Boolean
+        fun moveDetailActivity(pInfo:group)
     }
 }

@@ -2,6 +2,7 @@
 package com.midas.secretplace.ui.act
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
@@ -58,6 +59,13 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
         recvIntentData()
         initLayout()
     }
+    //--------------------------------------------------------------
+    //
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    {
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     //--------------------------------------------------------------
     //
     override fun onBackPressed()

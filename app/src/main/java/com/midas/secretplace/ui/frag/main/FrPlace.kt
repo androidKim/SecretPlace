@@ -2,6 +2,7 @@ package com.midas.secretplace.ui.frag.main
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -16,16 +17,15 @@ import android.widget.EditText
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
+import com.midas.secretplace.ui.act.ActPlaceDetail
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import kotlinx.android.synthetic.main.frag_place.*
-
-
-
-
+import java.io.Serializable
 
 
 class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter.ifCallback
@@ -83,6 +83,17 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         else
         {
             throw RuntimeException(pContext!!.toString() + " must implement FragmentEvent")
+        }
+    }
+    //------------------------------------------------------------------------
+    //
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+    {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(resultCode == Constant.FOR_RESULT_IS_REFRESH)
+        {
+            setRefresh()
         }
     }
 
@@ -362,6 +373,14 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     {
         var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
         return bPermissionVal
+    }
+    //----------------------------------------------------------------------
+    //listAdapter callback
+    override fun moveDetailActivity(pInfo: place)
+    {
+        var pIntent = Intent(m_Context, ActPlaceDetail::class.java)
+        pIntent.putExtra(Constant.INTENT_DATA_PLACE_OBJECT, pInfo as Serializable)
+        startActivityForResult(pIntent, 0)
     }
 
     /******************************** interface ********************************/

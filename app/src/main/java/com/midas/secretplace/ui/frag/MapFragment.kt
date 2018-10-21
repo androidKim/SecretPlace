@@ -32,10 +32,12 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
 
         if(args!!.containsKey(Constant.INTENT_DATA_PLACE_OBJECT))
         {
+            pPlaceInfo = null
             pPlaceInfo = args!!.getSerializable(Constant.INTENT_DATA_PLACE_OBJECT) as place
         }
         else if(args!!.containsKey(Constant.INTENT_DATA_PLACE_LIST_OBJECT))
         {
+            pPlaceList = null
             pPlaceList = args!!.getSerializable(Constant.INTENT_DATA_PLACE_LIST_OBJECT) as ArrayList<place>
         }
         else
@@ -47,6 +49,7 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
         mMap!!.isMyLocationEnabled = true//현위치 옵션
         if(pPlaceInfo != null)
         {
+            mMap!!.clear()
             var nLat:Double = pPlaceInfo.lat!!.toDouble()
             var nLng:Double = pPlaceInfo.lng!!.toDouble()
             val sydney = LatLng(nLat, nLng)
@@ -55,7 +58,7 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
         }
         else if(pPlaceList != null)
         {
-
+            mMap!!.clear()
             var arrLatLng:ArrayList<LatLng> = ArrayList()
             var pLatLngInfo:LatLng? = null
 

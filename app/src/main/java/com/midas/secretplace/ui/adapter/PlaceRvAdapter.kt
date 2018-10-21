@@ -101,10 +101,10 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var 
             if(bPermission)
             {
                 val pInfo:place = view.getTag() as place
-                var pIntent = Intent(view.context, ActPlaceDetail::class.java)
-                pIntent.putExtra(Constant.INTENT_DATA_PLACE_OBJECT, pInfo as Serializable)
-                view.context.startActivity(pIntent)
-                return
+                if(m_IfCallback != null)
+                {
+                    m_IfCallback!!.moveDetailActivity(pInfo)
+                }
             }
             else
             {
@@ -164,5 +164,6 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var 
     {
         fun deleteProc(pInfo:place)
         fun checkPermission():Boolean
+        fun moveDetailActivity(pInfo:place)
     }
 }

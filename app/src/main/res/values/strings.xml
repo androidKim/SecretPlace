@@ -25,4 +25,6 @@
     <string name="str_msg_13">내용을 변경하시겠습니까?</string>
     <string name="str_msg_14">저장된 사진이 없습니다.\n사진을 추가해보세요.</string>
     <string name="str_msg_15">저장된 장소가 없습니다.\n장소를 추가해보세요.</string>
+    <string name="str_msg_16">그룹명을 변경하시겠습니까?</string>
+    <string name="str_msg_17">변경할 이름을 입력하세요.</string>
 </resources>

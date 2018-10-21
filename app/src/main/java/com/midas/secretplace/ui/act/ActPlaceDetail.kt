@@ -67,6 +67,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //var m_strImgLastSeq:String? = null
     var m_bRunning:Boolean? = false
     var m_bFinish:Boolean? = false
+    var m_bModify:Boolean? = false
     var m_arrItem:ArrayList<String>? = null
     /*********************** Controller ***********************/
     /*********************** System Function ***********************/
@@ -87,6 +88,22 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         recvIntentData()
         initLayout()
     }
+    //---------------------------------------------------------------------------------------------------
+    //
+    override fun onBackPressed()
+    {
+        if(m_bModify!!)
+        {
+            setResult(Constant.FOR_RESULT_IS_REFRESH)
+            finish()
+        }
+        else
+        {
+            super.onBackPressed()
+        }
+
+    }
+
     //---------------------------------------------------------------------------------------------------
     //
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)//Intent?  <-- null이 올수도있다
@@ -127,6 +144,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                     {
                                         if (dataSnapshot!!.exists())
                                         {
+                                            m_bModify = true
                                             setRefresh()
                                             progressBar.visibility = View.GONE
                                         }
@@ -190,6 +208,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                 {
                                     if (dataSnapshot!!.exists())
                                     {
+                                        m_bModify = true
                                         setRefresh()
                                         progressBar.visibility = View.GONE
                                     }
@@ -603,6 +622,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 if (dataSnapshot!!.exists())
                 {
                     setRefresh()
+                    m_bModify = true
                 }
             }
 
@@ -648,8 +668,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         //show dialog..
         val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create()
-        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_13))
-        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_9))
+        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_8))
+        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
         var editName: EditText? = EditText(m_Context)
         editName!!.hint = getString(R.string.str_msg_4)
         pAlert.setView(editName)

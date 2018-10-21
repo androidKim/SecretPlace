@@ -95,6 +95,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //var m_strPlaceLastSeq:String? = ""
     var m_bRunning:Boolean? = false
     var m_bFinish:Boolean? = false
+    var m_bModify:Boolean? = false//변경이력여부
     var m_arrItem:ArrayList<String>? = ArrayList()//imglist(vertical listview)
     /*********************** Controller ***********************/
     /*********************** System Function ***********************/
@@ -125,6 +126,42 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         recvIntentData()
         initLayout()
     }
+    //--------------------------------------------------------------
+    //
+    override fun onStart()
+    {
+        super.onStart();
+        if (mGoogleApiClient != null)
+        {
+            mGoogleApiClient.connect()
+        }
+    }
+    //--------------------------------------------------------------
+    //
+    override fun onStop()
+    {
+        super.onStop();
+        if (mGoogleApiClient.isConnected())
+        {
+            mGoogleApiClient.disconnect()
+        }
+    }
+
+    //---------------------------------------------------------------------------------------------------
+    //
+    override fun onBackPressed()
+    {
+        if(m_bModify!!)
+        {
+            setResult(Constant.FOR_RESULT_IS_REFRESH)
+            finish()
+        }
+        else
+        {
+            super.onBackPressed()
+        }
+    }
+
     //---------------------------------------------------------------------------------------------------
     //
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)//Intent?  <-- null이 올수도있다
@@ -165,6 +202,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                     {
                                         if (dataSnapshot!!.exists())
                                         {
+                                            m_bModify = true
                                             setRefresh()
                                             progressBar.visibility = View.GONE
                                         }
@@ -223,6 +261,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                 {
                                     if (dataSnapshot!!.exists())
                                     {
+                                        m_bModify = true
                                         setRefresh()
                                         progressBar.visibility = View.GONE
                                     }
@@ -353,6 +392,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         m_arrPlace = ArrayList<place>()//placelist
         m_arrItem = ArrayList()//img list
+
     }
     //--------------------------------------------------------------
     //
@@ -441,8 +481,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
                     //show dialog..
                     val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
-                    pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_8))
-                    pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_9))
+                    pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_16))
+                    pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
                     var editName: EditText? = EditText(m_Context)
                     editName!!.hint = getString(R.string.str_msg_4)
                     pAlert.setView(editName)
@@ -471,10 +511,14 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun setRefresh()
     {
         initValue()
-        if(m_HorizontalAdapter != null)
-            m_HorizontalAdapter!!.clearData()
-
         ly_SwipeRefresh!!.setRefreshing(false)
+
+        //place adapter
+        m_HorizontalAdapter = HorizontalPlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
+        horizontalRecyclerView!!.adapter = m_HorizontalAdapter
+        val pLayoutManager = LinearLayoutManager(m_Context, LinearLayoutManager.HORIZONTAL,false)
+        horizontalRecyclerView!!.layoutManager = pLayoutManager
+
         getPlaceListProc()
     }
 
@@ -516,20 +560,18 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
                 //m_strPlaceLastSeq = dataSnapshot!!.key
                 pInfo.place_key = dataSnapshot!!.key
-                m_HorizontalAdapter!!.addData(pInfo!!)
+                m_arrPlace!!.add(pInfo!!)
+                m_HorizontalAdapter!!.notifyDataSetChanged()
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
-                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
-
-                // A message has changed
-                //val message = dataSnapshot.getValue(Message::class.java)
+                Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot?)
             {
-                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
+                Log.e("TAG", "onChildRemoved:" + dataSnapshot!!.key)
 
                 // A message has been removed
                 //val message = dataSnapshot.getValue(Message::class.java)
@@ -537,7 +579,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
-                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
+                Log.e("TAG", "onChildMoved:" + dataSnapshot!!.key)
 
                 // A message has changed position
                 //val message = dataSnapshot.getValue(Message::class.java)
@@ -545,7 +587,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             override fun onCancelled(databaseError: DatabaseError?)
             {
-                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+                Log.e("TAG", "postMessages:onCancelled", databaseError!!.toException())
             }
         })
 
@@ -554,26 +596,39 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             {
                 if(dataSnapshot!!.exists())
                 {
+                    if(m_arrPlace!!.count() > 0)
+                    {
+                        settingImgListView()
+                        ly_NoData.visibility = View.GONE
+                    }
+                    else
+                    {
+                        initValue()
+                        tv_NoDataMsg.text = m_Context!!.resources.getString(R.string.str_msg_15)
+                        ly_NoData.visibility = View.VISIBLE
+                    }
 
-
-                }
-                m_bRunning = false
-                progressBar.visibility = View.GONE
-
-                if(m_HorizontalAdapter!!.itemCount > 0)
-                {
-                    settingMapView()
-                    settingImgListView()
-                    ly_NoData.visibility = View.GONE
+                    if(m_PlaceInfo != null)
+                    {
+                        settingMapView()
+                        getImageListProc()
+                    }
                 }
                 else
                 {
+                    initValue()
                     tv_NoDataMsg.text = m_Context!!.resources.getString(R.string.str_msg_15)
                     ly_NoData.visibility = View.VISIBLE
-                }
 
-                if(m_PlaceInfo != null)
-                    getImageListProc()
+                    //img adapter
+                    if(m_Adapter != null)
+                    {
+                        m_Adapter!!.clearData()
+                        m_Adapter!!.notifyDataSetChanged()
+                    }
+                }
+                m_bRunning = false
+                progressBar.visibility = View.GONE
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -593,6 +648,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         mArgs.putSerializable(Constant.INTENT_DATA_PLACE_LIST_OBJECT, m_arrPlace!!)
         mapFragment.arguments = mArgs
         mapFragment.setIfCallback(this)
+        mapFragment
     }
     //--------------------------------------------------------------
     //
@@ -635,6 +691,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun seveLocationDialog()
     {
+        onLocationChanged(mLocation)
         var bCheckLocation:Boolean = checkLocation()
 
         if(bCheckLocation)
@@ -666,8 +723,11 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 {
                     if (dataSnapshot!!.exists())
                     {
+                        m_bModify = true
+
                         pInfo!!.place_key = dataSnapshot!!.key
                         m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(dataSnapshot!!.key).setValue(pInfo)//update..
+                        setRefresh()
                     }
                 }
 
@@ -862,6 +922,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         if (!listPermissionsNeeded.isEmpty())//
         {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toTypedArray(), Constant.REQUEST_ID_MULTIPLE_PERMISSIONS)
+            bResult = false
         }
         else
         {
@@ -874,6 +935,11 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     {
                         // Logic to handle location_info object
                         mLocation = location
+
+                    }
+                    else
+                    {
+
                     }
                 })
             }
@@ -881,7 +947,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             {
 
             }
-
             bResult = true
         }
         return bResult
@@ -986,6 +1051,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             {
                 if (dataSnapshot!!.exists())
                 {
+                    m_bModify = true
+
                     val pInfo: group = dataSnapshot!!.getValue(group::class.java)!!
                     if(pInfo != null)
                     {
@@ -1050,7 +1117,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             {
                 if (dataSnapshot!!.exists())
                 {
-                    //setRefresh()
+                    setRefresh()
+                    m_bModify = true
                 }
             }
 
@@ -1107,6 +1175,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
         pDbRef!!.removeValue()
 
+        m_bModify = true//
         setRefresh()
     }
     //-----------------------------------------------------
@@ -1135,8 +1204,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         //show dialog..
         val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
-        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_13))
-        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_9))
+        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_8))
+        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
         var editName: EditText? = EditText(m_Context)
         editName!!.hint = getString(R.string.str_msg_4)
         pAlert.setView(editName)
