@@ -1,10 +1,14 @@
 <resources>
     <string name="google_maps_key">AIzaSyDtbMkveLaoHDA18vK7GZKFK8E7IW3Wi6M</string>
+    <string name="facebook_app_id">1698683040237300</string>
+    <string name="fb_login_protocol_scheme">fb1698683040237300</string>
+
     <string name="app_name">SecretPlace</string>
     <string name="navigation_drawer_open">Navigation Drawer Is Open</string>
     <string name="navigation_drawer_close">Navigation Drawer Is Close</string>
 
     <string name="str_login_google">google</string>
+    <string name="str_login_facebook">facebook</string>
 
     <string name="str_ok">예</string>
     <string name="str_no">아니오</string>
@@ -27,4 +31,6 @@
     <string name="str_msg_15">저장된 장소가 없습니다.\n장소를 추가해보세요.</string>
     <string name="str_msg_16">그룹명을 변경하시겠습니까?</string>
     <string name="str_msg_17">변경할 이름을 입력하세요.</string>
+    <string name="str_msg_18">그룹을 생성하시겠습니까?</string>
+    <string name="str_msg_19">삭제 하시겠습니까?</string>
 </resources>

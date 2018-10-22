@@ -141,7 +141,7 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var 
         val pInfo:place = view.getTag() as place
 
         val builder = AlertDialog.Builder(context!!)
-        builder.setMessage("Delete?")
+        builder.setMessage(context.getString(R.string.str_msg_19))
         builder.setPositiveButton(context.getString(R.string.str_ok)){dialog, which ->
             //show dialog..
             deleteInfo(pInfo)

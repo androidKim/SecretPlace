@@ -270,7 +270,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     {
         if(m_IfCallback != null)
         {
-
             var bCheckLocation:Boolean = m_IfCallback!!.checkLocationInfo()
             if(bCheckLocation)
             {
@@ -392,5 +391,4 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         fun checkLocationInfo():Boolean
         fun getLocation():Location
     }
-
 }

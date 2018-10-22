@@ -145,7 +145,7 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
         val pInfo:group = view.getTag() as group
 
         val builder = AlertDialog.Builder(m_Context!!)
-        builder.setMessage("Delete?")
+        builder.setMessage(m_Context.getString(R.string.str_msg_19))
         builder.setPositiveButton(m_Context.getString(R.string.str_ok)){dialog, which ->
             //show dialog..
             deleteGroupInfo(pInfo)

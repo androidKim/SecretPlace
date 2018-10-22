@@ -109,12 +109,12 @@ FrPlace.ifCallback, FrGroup.ifCallback
                     {
                         checkPermissionLocation()
                     }
-                    else
+                    else//거부..
                     {
                         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)
                                 || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION))
                         {
-                            checkPermissionLocation()
+                            return
                         }
                         else
                         {
@@ -223,7 +223,7 @@ FrPlace.ifCallback, FrGroup.ifCallback
                     {
                         // Logic to handle location_info object
                         mLocation = location
-
+                        bResult = true
                     }
                     else
                     {

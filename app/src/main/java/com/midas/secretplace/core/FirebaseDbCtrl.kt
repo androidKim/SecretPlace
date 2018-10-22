@@ -15,6 +15,7 @@ class FirebaseDbCtrl
         val TB_PLACE:String = "tb_place"
         val TB_IMG:String = "tb_img"
         val TB_GROUP:String = "tb_group"
+        val TB_GROUP_PLACE:String = "tb_group_place"
         val TB_COUPLE:String = "tb_couple"
     }
 

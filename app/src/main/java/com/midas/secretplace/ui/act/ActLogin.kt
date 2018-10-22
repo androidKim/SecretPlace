@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.facebook.CallbackManager
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -22,6 +23,12 @@ import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import kotlinx.android.synthetic.main.act_login.*
+import com.facebook.FacebookException
+import com.facebook.login.LoginResult
+import com.facebook.FacebookCallback
+import com.facebook.login.widget.LoginButton
+
+
 
 
 
@@ -42,6 +49,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     private var mAuth:FirebaseAuth ?= null
     /******************* Controller *******************/
     private var m_btn_GoogleLogin: SignInButton? = null
+    private var callbackManager:CallbackManager? = null//facebookcallback
 
     /******************* System Function *******************/
     //------------------------------------------------
@@ -57,21 +65,6 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         m_App!!.init(m_Context as ActLogin)
         mAuth = FirebaseAuth.getInstance()
 
-
-        m_btn_GoogleLogin = findViewById<View>(R.id.google_sign_in_button) as SignInButton
-        m_btn_GoogleLogin?.setOnClickListener(this@ActLogin)
-        // Configure Google Sign In
-        val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build()
-        // Creating and Configuring Google Api Client.
-        googleApiClient = GoogleApiClient.Builder(this@ActLogin)
-                .enableAutoManage(this@ActLogin  /* OnConnectionFailedListener */) { }
-                .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
-                .build()
-
-
         initValue()
         recvIntentData()
         initLayout()
@@ -85,11 +78,11 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         finish()
         System.exit(0)
     }
-
     //-------------------------------------------------------------
     //
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
+        callbackManager!!.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == GOOGLE_LOG_IN_RC)
@@ -109,6 +102,68 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         }
     }
     /******************* User Function *******************/
+    //------------------------------------------------
+    //
+    private fun initValue()
+    {
+
+    }
+    //------------------------------------------------
+    //
+    private fun recvIntentData()
+    {
+
+    }
+    //------------------------------------------------
+    //
+    private fun initLayout()
+    {
+        setFacebookSign()
+        setGoogleSign()
+    }
+    //------------------------------------------------
+    //
+    private fun setFacebookSign()
+    {
+        callbackManager = CallbackManager.Factory.create()
+        val loginButton:LoginButton = findViewById(R.id.facebook_sign_in_button) as LoginButton
+        loginButton.setReadPermissions("email")
+        // If using in a fragment
+        loginButton.fragment
+
+        // Callback registration
+        loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+            override fun onSuccess(loginResult: LoginResult) {
+                // App code
+            }
+
+            override fun onCancel() {
+                // App code
+            }
+
+            override fun onError(exception: FacebookException) {
+                // App code
+            }
+        })
+    }
+    //------------------------------------------------
+    //
+    private fun setGoogleSign()
+    {
+        m_btn_GoogleLogin = findViewById<View>(R.id.google_sign_in_button) as SignInButton
+        m_btn_GoogleLogin?.setOnClickListener(this@ActLogin)
+        // Configure Google Sign In
+        val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build()
+        // Creating and Configuring Google Api Client.
+        googleApiClient = GoogleApiClient.Builder(this@ActLogin)
+                .enableAutoManage(this@ActLogin  /* OnConnectionFailedListener */) { }
+                .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
+                .build()
+    }
+
     //-------------------------------------------------------------
     //
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount)
@@ -121,7 +176,6 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
                 //handleSignInResult(task)
                 progressBar.visibility = View.VISIBLE
-                setRefreshUi(true)
 
                 var snsKey:String? = acct!!.id
                 var strUserName:String? = acct!!.displayName
@@ -202,46 +256,18 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
             }
         }
     }
-
-    //------------------------------------------------
-    //
-    private fun initValue()
-    {
-
-    }
-    //------------------------------------------------
-    //
-    private fun recvIntentData()
-    {
-
-    }
-    //------------------------------------------------
-    //
-    private fun initLayout()
-    {
-
-    }
-
-
-    //-----------------------------------------------------------
-    //
-    private fun setRefreshUi(isLogin: Boolean)
-    {
-        if (isLogin)
-        {
-
-        }
-        else
-        {
-
-        }
-    }
     //-----------------------------------------------------------------------------
     //
     private fun googleLogin()
     {
         val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
         startActivityForResult(signInIntent, GOOGLE_LOG_IN_RC)
+    }
+    //-----------------------------------------------------------------------------
+    //
+    private fun facebookLogin()
+    {
+
     }
 
     /************************* listener *************************/
@@ -250,8 +276,8 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     override fun onClick(view: View?)
     {
         when (view?.id) {
-            R.id.google_sign_in_button -> {
-
+            R.id.google_sign_in_button ->
+            {
                 googleLogin()
             }
         }

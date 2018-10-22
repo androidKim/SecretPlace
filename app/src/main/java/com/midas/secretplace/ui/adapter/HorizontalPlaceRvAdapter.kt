@@ -108,7 +108,7 @@ class HorizontalPlaceRvAdapter(val context: Context, var placeList: ArrayList<pl
         {
             var pInfo:place = view.getTag() as place
             val builder = AlertDialog.Builder(context!!)
-            builder.setMessage("Delete?")
+            builder.setMessage(context.getString(R.string.str_msg_19))
             builder.setPositiveButton(context.getString(R.string.str_ok)){dialog, which ->
                 //show dialog..
                 m_IfCallback!!.deletePlaceItem(pInfo)

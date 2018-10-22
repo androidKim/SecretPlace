@@ -291,7 +291,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
             return
 
         val builder = AlertDialog.Builder(m_Context!!)
-        builder.setMessage(getString(R.string.str_msg_3))
+        builder.setMessage(getString(R.string.str_msg_18))
         var editName: EditText? = EditText(m_Context)
         editName!!.hint = getString(R.string.str_msg_4)
         builder.setView(editName)
