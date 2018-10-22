@@ -8,13 +8,18 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.facebook.AccessToken
 import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.*
@@ -23,14 +28,6 @@ import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import kotlinx.android.synthetic.main.act_login.*
-import com.facebook.FacebookException
-import com.facebook.login.LoginResult
-import com.facebook.FacebookCallback
-import com.facebook.login.widget.LoginButton
-
-
-
-
 
 
 class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, View.OnClickListener
@@ -41,6 +38,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     }
 
     /******************* Define *******************/
+    private val TAG:String = "ActLogin"
     private val GOOGLE_LOG_IN_RC = 9001
     /******************* Member *******************/
     private var m_App:MyApp? = null
@@ -72,6 +70,17 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     //------------------------------------------------
     //
     @Override
+    override fun onStart()
+    {
+        super.onStart()
+         // Check if user is signed in (non-null) and update UI accordingly.
+        //FirebaseUser currentUser = mAuth.getCurrentUser();
+        //updateUI(currentUser);
+    }
+
+    //------------------------------------------------
+    //
+    @Override
     override fun onBackPressed()
     {
         super.onBackPressed()
@@ -82,12 +91,11 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     //
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
-        callbackManager!!.onActivityResult(requestCode, resultCode, data);
+        callbackManager!!.onActivityResult(requestCode, resultCode, data)
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == GOOGLE_LOG_IN_RC)
         {
-            if (requestCode == GOOGLE_LOG_IN_RC) {
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
             if (result.isSuccess)
             {
@@ -98,7 +106,6 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
             {
                 Toast.makeText(this@ActLogin, "Some error occurred.", Toast.LENGTH_SHORT).show()
             }
-        }
         }
     }
     /******************* User Function *******************/
@@ -121,31 +128,138 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         setFacebookSign()
         setGoogleSign()
     }
+
+    /******************* facebook login *******************/
     //------------------------------------------------
     //
     private fun setFacebookSign()
     {
         callbackManager = CallbackManager.Factory.create()
-        val loginButton:LoginButton = findViewById(R.id.facebook_sign_in_button) as LoginButton
-        loginButton.setReadPermissions("email")
+        facebook_sign_in_button.setReadPermissions("email", "public_profile")
         // If using in a fragment
-        loginButton.fragment
+        facebook_sign_in_button.fragment
 
         // Callback registration
-        loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
-            override fun onSuccess(loginResult: LoginResult) {
+        facebook_sign_in_button.registerCallback(callbackManager, object : FacebookCallback<LoginResult>
+        {
+            override fun onSuccess(loginResult: LoginResult)
+            {
+                // App code
+                handleFacebookAccessToken(loginResult.getAccessToken());
+            }
+
+            override fun onCancel()
+            {
                 // App code
             }
 
-            override fun onCancel() {
-                // App code
-            }
-
-            override fun onError(exception: FacebookException) {
+            override fun onError(exception: FacebookException)
+            {
                 // App code
             }
         })
     }
+    //------------------------------------------------
+    //
+    private fun handleFacebookAccessToken(token: AccessToken)
+    {
+        Log.d(TAG, "handleFacebookAccessToken:" + token)
+        val credential = FacebookAuthProvider.getCredential(token.token)
+        mAuth!!.signInWithCredential(credential)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful)
+                    {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithCredential:success")
+                        //val user = mAuth!!.currentUser
+                        //startActivity(Intent(this@ActLogin, ActMain::class.java))
+
+
+                        //handleSignInResult(task)
+                        progressBar.visibility = View.VISIBLE
+
+                        var snsKey:String? = token!!.userId
+                        var strUserName:String? = mAuth!!.currentUser!!.displayName
+                        var strImgUrl: String? = null
+                        if(strImgUrl == null)
+                            strImgUrl = ""
+
+                        var pInfo: user = user(user.SNS_TYPE_FACEBOOK, snsKey!!, "", strUserName!!, strImgUrl)
+
+                        var pQuery:Query= m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).orderByChild("sns_key").equalTo(snsKey)
+                        pQuery.addChildEventListener(object : ChildEventListener {
+                            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                            {
+                                if (dataSnapshot!!.exists())//exist..
+                                {
+                                    val pRes:user = dataSnapshot!!.getValue(user::class.java)!!
+                                    val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                                    pRes.user_key = currentFirebaseUser!!.uid
+                                    m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key).setValue(pRes)//update..
+                                    m_App!!.m_SpCtrl!!.setSpUserKey(pRes.user_key!!)
+                                    m_App!!.m_SpCtrl!!.setSnsType(user.SNS_TYPE_GOOGLE)
+                                    m_App!!.goMain(m_Context!!)
+                                }
+                                else
+                                {
+
+                                }
+                            }
+
+                            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                            {
+                                Log.d("onChildChanged", "")
+                            }
+
+                            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+                            {
+                                Log.d("onChildRemoved", "")
+                            }
+
+                            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                            {
+                                Log.d("onChildMoved", "")
+                            }
+
+                            override fun onCancelled(databaseError: DatabaseError?)
+                            {
+                                Log.d("onCancelled", "")
+                            }
+                        })
+
+
+                        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(dataSnapshot: DataSnapshot?)
+                            {
+                                if(dataSnapshot!!.exists())
+                                {
+
+                                }
+                                else
+                                {
+                                    //first Insert..
+                                    var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.push()//insert..
+                                    val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                                    pInfo.user_key = currentFirebaseUser!!.uid
+                                    pDbRef!!.setValue(pInfo!!)//insert
+                                }
+                            }
+
+                            override fun onCancelled(p0: DatabaseError?)
+                            {
+                                Log.d("onCancelled", "")
+                            }
+                        })
+                    }
+                    else
+                    {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithCredential:failure", task.getException())
+                        Toast.makeText(this@ActLogin, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+    }
+    /******************* google login *******************/
     //------------------------------------------------
     //
     private fun setGoogleSign()
@@ -263,13 +377,6 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
         startActivityForResult(signInIntent, GOOGLE_LOG_IN_RC)
     }
-    //-----------------------------------------------------------------------------
-    //
-    private fun facebookLogin()
-    {
-
-    }
-
     /************************* listener *************************/
     //-----------------------------------------------------------------------------
     //

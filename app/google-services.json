@@ -23,6 +23,22 @@
           }
         },
         {
+          "client_id": "824079944018-3cqqi29lq0mph4jpou1i1um31348ob0n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.midas.secretplace",
+            "certificate_hash": "7d2a7520f2ace2d93a7978d2f78da8fefc554229"
+          }
+        },
+        {
+          "client_id": "824079944018-ar6thjmmsktb8hh0ts89dae6nio8rejr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.midas.secretplace",
+            "certificate_hash": "7e5689eac822bed28f0afd9e4ab04c1e303f177a"
+          }
+        },
+        {
           "client_id": "824079944018-ej8i5s4s6lqd2prs8gmffp9kva8o8foo.apps.googleusercontent.com",
           "client_type": 3
         }
