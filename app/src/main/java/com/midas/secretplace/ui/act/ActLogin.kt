@@ -12,6 +12,7 @@ import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
+import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -101,6 +102,9 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
             {
                 // Google Sign In was successful, authenticate with Firebase
                 firebaseAuthWithGoogle(result.signInAccount!!)
+
+                if (googleApiClient!!.hasConnectedApi(Auth.GOOGLE_SIGN_IN_API))
+                    googleApiClient!!.clearDefaultAccountAndReconnect()
             }
             else
             {
@@ -158,6 +162,8 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                 // App code
             }
         })
+
+        LoginManager.getInstance().logOut()
     }
     //------------------------------------------------
     //
@@ -377,6 +383,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
         startActivityForResult(signInIntent, GOOGLE_LOG_IN_RC)
     }
+
     /************************* listener *************************/
     //-----------------------------------------------------------------------------
     //

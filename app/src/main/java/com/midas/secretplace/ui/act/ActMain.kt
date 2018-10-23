@@ -41,6 +41,7 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
 
     /*********************** Controller ***********************/
     private var m_iv_Profile:ImageView? = null
+    private var m_iv_None:ImageView? = null
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
     //
@@ -138,6 +139,7 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
         //header..
         var v_Header:View? = navigation_view!!.getHeaderView(0)
         m_iv_Profile = v_Header!!.findViewById(R.id.iv_Profile)
+        m_iv_None = v_Header!!.findViewById(R.id.iv_None)
     }
     //--------------------------------------------------------------
     //
@@ -177,11 +179,23 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
         if(pInfo.img_url != null)
         {
             if(pInfo.img_url!!.length > 0)
+            {
                 Glide.with(this).load(pInfo.img_url).into(m_iv_Profile)
+                m_iv_Profile!!.visibility = View.VISIBLE
+                m_iv_None!!.visibility = View.GONE
+            }
+            else
+            {
+                m_iv_Profile!!.visibility = View.GONE
+                m_iv_None!!.visibility = View.VISIBLE
+            }
+        }
+        else
+        {
+            m_iv_Profile!!.visibility = View.GONE
+            m_iv_None!!.visibility = View.VISIBLE
         }
     }
-
-
     //--------------------------------------------------------------
     //
     fun showLogoutDialog()
