@@ -149,7 +149,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
             override fun onSuccess(loginResult: LoginResult)
             {
                 // App code
-                handleFacebookAccessToken(loginResult.getAccessToken());
+                handleFacebookAccessToken(loginResult.getAccessToken())
             }
 
             override fun onCancel()
@@ -179,14 +179,12 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         Log.d(TAG, "signInWithCredential:success")
                         //val user = mAuth!!.currentUser
                         //startActivity(Intent(this@ActLogin, ActMain::class.java))
-
-
                         //handleSignInResult(task)
                         progressBar.visibility = View.VISIBLE
 
                         var snsKey:String? = token!!.userId
                         var strUserName:String? = mAuth!!.currentUser!!.displayName
-                        var strImgUrl: String? = null
+                        var strImgUrl: String? = "https://graph.facebook.com/" + token!!.userId + "/picture?type=large"
                         if(strImgUrl == null)
                             strImgUrl = ""
 
@@ -200,7 +198,11 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                 {
                                     val pRes:user = dataSnapshot!!.getValue(user::class.java)!!
                                     val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                                    var strUserName:String? = mAuth!!.currentUser!!.displayName
+                                    var strImgUrl: String? = "https://graph.facebook.com/" + token!!.userId + "/picture?type=large"
                                     pRes.user_key = currentFirebaseUser!!.uid
+                                    pRes.name = strUserName
+                                    pRes.img_url = strImgUrl
                                     m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key).setValue(pRes)//update..
                                     m_App!!.m_SpCtrl!!.setSpUserKey(pRes.user_key!!)
                                     m_App!!.m_SpCtrl!!.setSnsType(user.SNS_TYPE_GOOGLE)
@@ -246,7 +248,11 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                     //first Insert..
                                     var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.push()//insert..
                                     val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                                    var strUserName:String? = mAuth!!.currentUser!!.displayName
+                                    var strImgUrl: String? = "https://graph.facebook.com/" + token!!.userId + "/picture?type=large"
                                     pInfo.user_key = currentFirebaseUser!!.uid
+                                    pInfo.name = strUserName
+                                    pInfo.img_url = strImgUrl
                                     pDbRef!!.setValue(pInfo!!)//insert
                                 }
                             }
@@ -359,7 +365,11 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                             //first Insert..
                             var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.push()//insert..
                             val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                            var strUserName:String? = acct!!.displayName
+                            var strImgUrl: String? = acct!!.photoUrl.toString()
                             pInfo.user_key = currentFirebaseUser!!.uid
+                            pInfo.name = strUserName
+                            pInfo.img_url = strImgUrl
                             pDbRef!!.setValue(pInfo!!)//insert
                         }
                     }

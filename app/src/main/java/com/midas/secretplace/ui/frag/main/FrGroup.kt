@@ -16,13 +16,10 @@ import android.view.ViewGroup
 import android.widget.EditText
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.GroupRvAdapter
-import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
-import com.midas.secretplace.structure.ReqBase
 import com.midas.secretplace.structure.core.group
-import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActGroupDetail
 import com.midas.secretplace.ui.act.ActMain
@@ -210,7 +207,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
                         val pInfo:group = dataSnapshot!!.getValue(group::class.java)!!
                         m_strSeq = dataSnapshot!!.key
                         pInfo.group_key = dataSnapshot!!.key
-                        m_Adapter!!.addData(pInfo!!)
+                        //m_Adapter!!.addData(pInfo!!)
                     }
                 }
                 else
@@ -250,10 +247,20 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
         })
 
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(p0: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
             {
-                if(!p0!!.exists())
+                if(dataSnapshot!!.exists())
+                {
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        val pInfo:group = it!!.getValue(group::class.java)!!
+                        m_Adapter!!.addData(pInfo)
+                    }
+                }
+                else
+                {
                     m_bPagingFinish = true
+                }
 
                 m_bRunning = false
                 progressBar.visibility = View.GONE
@@ -309,6 +316,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
                         m_strSeq = dataSnapshot!!.key
                         pInfo!!.group_key = dataSnapshot!!.key
                         m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!.child(dataSnapshot!!.key).setValue(pInfo)//update..
+                        m_Adapter!!.addData(pInfo!!)
                     }
                 }
 

@@ -196,8 +196,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         }
         */
         pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
-
-
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
@@ -209,7 +207,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                         val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
                         //m_strPlaceLastSeq = dataSnapshot!!.key
                         pInfo.place_key = dataSnapshot!!.key
-                        m_Adapter!!.addData(pInfo!!)
+
                     //}
                 }
                 else
@@ -249,10 +247,21 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         })
 
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(p0: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
             {
-                if(!p0!!.exists())
+                if(dataSnapshot!!.exists())
+                {
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        val pInfo:place = it!!.getValue(place::class.java)!!
+                        m_Adapter!!.addData(pInfo)
+                    }
+                }
+                else
+                {
                     m_bPagingFinish = true
+                }
+
 
                 m_bRunning = false
                 progressBar.visibility = View.GONE
@@ -310,6 +319,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                         //m_strPlaceLastSeq = dataSnapshot!!.key
                         pInfo!!.place_key = dataSnapshot!!.key
                         m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(dataSnapshot!!.key)!!.setValue(pInfo)//update..
+                        m_Adapter!!.addData(pInfo!!)
                     }
                 }
 
