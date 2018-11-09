@@ -15,9 +15,6 @@ import com.midas.secretplace.ui.act.ActLogin
 import com.midas.secretplace.ui.act.ActMain
 
 
-
-
-
 class MyApp:MultiDexApplication()
 {
     var m_Context: Context? = null
@@ -111,4 +108,6 @@ class MyApp:MultiDexApplication()
     {
         pView.removeAllViews()
     }
+
+
 }

@@ -4,10 +4,13 @@ package com.midas.secretplace.ui.act
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -33,6 +36,8 @@ import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.custom.dlg_terms_agree
 import kotlinx.android.synthetic.main.act_login.*
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 
 
 class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, View.OnClickListener
@@ -148,7 +153,29 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     {
         setFacebookSign()
         setGoogleSign()
+        getHashKey()
     }
+
+    //-----------------------------------------------
+    //
+    fun getHashKey()
+    {
+        try {
+            val info = packageManager.getPackageInfo(
+                    "com.midas.secretplace",
+                    PackageManager.GET_SIGNATURES)
+            for (signature in info.signatures) {
+                val md = MessageDigest.getInstance("SHA")
+                md.update(signature.toByteArray())
+                Log.e("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT))
+            }
+        } catch (e: PackageManager.NameNotFoundException) {
+
+        } catch (e: NoSuchAlgorithmException) {
+
+        }
+    }
+
     //----------------------------------------------------------
     //  showing dialog
     fun showTermsAgreeDialog(userInfo:user, fbToken: AccessToken?, acct:GoogleSignInAccount?)
@@ -170,31 +197,36 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
             }
 
+            termsDetailClickListener {
+                val url = "http://www.google.com"
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            }
+
             confirmClickListener {
                 if(m_bCheck)
                 {
                     //join..
                     if(userInfo.sns_type.equals(user.SNS_TYPE_FACEBOOK))
                     {
-                        var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.push()//insert..
+                        var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!
                         val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
                         var strUserName:String? = mAuth!!.currentUser!!.displayName
                         var strImgUrl: String? = "https://graph.facebook.com/" + fbToken!!.userId + "/picture?type=large"
                         userInfo.user_key = currentFirebaseUser!!.uid
                         userInfo.name = strUserName
                         userInfo.img_url = strImgUrl
-                        pDbRef!!.setValue(userInfo!!)//insert
+                        pDbRef!!.child(userInfo.user_key).setValue(userInfo!!)//insert
                     }
                     else if(userInfo.sns_type.equals(user.SNS_TYPE_GOOGLE))
                     {
-                        var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.push()//insert..
+                        var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!
                         val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
                         var strUserName:String? = acct!!.displayName
                         var strImgUrl: String? = acct!!.photoUrl.toString()
                         userInfo.user_key = currentFirebaseUser!!.uid
                         userInfo.name = strUserName
                         userInfo.img_url = strImgUrl
-                        pDbRef!!.setValue(userInfo!!)//insert
+                        pDbRef!!.child(userInfo.user_key).setValue(userInfo!!)//insert
                     }
                 }
                 else

@@ -36,6 +36,10 @@ class dlg_terms_agree(context: Context):BaseDialogHelper()
     }
 
 
+    private val tv_Detail: TextView by lazy {
+        dialogView.findViewById<TextView>(R.id.tv_Detail)
+    }
+
 
     private val btn_Comfirm: Button by lazy {
         dialogView.findViewById<Button>(R.id.btn_Confirm)
@@ -53,6 +57,10 @@ class dlg_terms_agree(context: Context):BaseDialogHelper()
                 setClickListenerAgree(func)
             }
 
+    fun termsDetailClickListener(func: (() -> Unit)? = null) =
+            with(tv_Detail) {
+                setClickListenerTermsDetail(func)
+            }
 
     fun confirmClickListener(func: (() -> Unit)? = null) =
             with(btn_Comfirm) {
@@ -84,6 +92,12 @@ class dlg_terms_agree(context: Context):BaseDialogHelper()
                         iv_CheckBox.background = resources.getDrawable(R.drawable.outline_check_box_outline_blank_black_24, null)
                     }
                 }
+
+            }
+
+    private fun View.setClickListenerTermsDetail(func: (() -> Unit)?) =
+            setOnClickListener {
+                func?.invoke()
 
             }
 
