@@ -3,24 +3,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="20dp"
-    android:layout_marginTop="50dp"
-    android:layout_marginRight="20dp"
-    android:layout_marginBottom="50dp"
+    android:layout_gravity="center"
+    android:layout_marginLeft="40dp"
+    android:layout_marginRight="40dp"
     android:background="@color/color_white"
     android:gravity="center"
+    android:orientation="vertical"
     tools:context=".ui.act.ActLogin">
+
+
+    <ImageButton
+        android:id="@+id/iBtn_Close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/baseline_close_black_24" />
 
     <RelativeLayout
         android:id="@+id/ly_TermsAgree"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:clickable="true"
         android:padding="10dp">
 
         <ImageView
             android:id="@+id/iv_CheckBox"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginRight="5dp"
             android:background="@drawable/outline_check_box_outline_blank_black_24" />
@@ -32,8 +43,34 @@
             android:layout_toRightOf="@+id/iv_CheckBox"
             android:text="@string/str_msg_20"
             android:textColor="@color/color_black"
-            android:textSize="15dp"
+            android:textSize="25dp"
             tools:text="개인정보 취급방침" />
     </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/tv_Detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:padding="10dp"
+        android:text="@string/str_msg_22"
+        android:textSize="20dp"
+        tools:text="자세히 보기" />
+
+
+    <Button
+        android:id="@+id/btn_Confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/colorPrimary"
+        android:padding="5dp"
+        android:text="@string/str_msg_21"
+        android:textColor="@color/color_white"
+        android:textSize="20dp"
+        tools:text="확인" />
+
 
 </LinearLayout>

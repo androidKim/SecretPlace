@@ -37,6 +37,18 @@ import kotlinx.android.synthetic.main.act_login.*
 
 class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, View.OnClickListener
 {
+    //extention functions..
+    inline fun Activity.showwTermsAgreeDialog(func: dlg_terms_agree.() -> Unit): AlertDialog =
+            dlg_terms_agree(this).apply {
+                func()
+            }.create()
+
+    inline fun Fragment.showwTermsAgreeDialog(func: dlg_terms_agree.() -> Unit): AlertDialog =
+            dlg_terms_agree(this.context!!).apply {
+                func()
+            }.create()
+
+    //callback function..
     override fun onConnectionFailed(connectionResult: ConnectionResult)
     {
 
@@ -53,6 +65,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     /******************* Controller *******************/
     private var m_btn_GoogleLogin: SignInButton? = null
     private var callbackManager:CallbackManager? = null//facebookcallback
+    private var m_TermsAgreeDialog: AlertDialog? = null
 
     /******************* System Function *******************/
     //------------------------------------------------
@@ -135,47 +148,68 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     {
         setFacebookSign()
         setGoogleSign()
-
-
-        //testcode..
-        showDialog()
     }
-
-
-    /*
-        * test dialog
-       */
-    inline fun Activity.showNotesAlertDialog(func: dlg_terms_agree.() -> Unit): AlertDialog =
-            dlg_terms_agree(this).apply {
-                func()
-            }.create()
-
-    inline fun Fragment.showNotesAlertDialog(func: dlg_terms_agree.() -> Unit): AlertDialog =
-            dlg_terms_agree(this.context!!).apply {
-                func()
-            }.create()
-
+    //----------------------------------------------------------
     //  showing dialog
-    private var notesDialog: AlertDialog? = null
-    fun showDialog() {
-        if (notesDialog == null)
+    fun showTermsAgreeDialog(userInfo:user, fbToken: AccessToken?, acct:GoogleSignInAccount?)
+    {
+        progressBar.visibility = View.GONE
+
         ////////////////////////////////////////////////////////////////
         //  making Alert dialog - admire beauty of kotlin
         ////////////////////////////////////////////////////////////////
-            notesDialog = showNotesAlertDialog {
+        m_TermsAgreeDialog = showwTermsAgreeDialog {
 
-                cancelable = false
+            cancelable = false
+            closeIconClickListener {
+                m_bCheck = false
+                LoginManager.getInstance().logOut()
+            }
 
-                closeIconClickListener {
+            agreeClickListener{
+
+            }
+
+            confirmClickListener {
+                if(m_bCheck)
+                {
+                    //join..
+                    if(userInfo.sns_type.equals(user.SNS_TYPE_FACEBOOK))
+                    {
+                        var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.push()//insert..
+                        val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                        var strUserName:String? = mAuth!!.currentUser!!.displayName
+                        var strImgUrl: String? = "https://graph.facebook.com/" + fbToken!!.userId + "/picture?type=large"
+                        userInfo.user_key = currentFirebaseUser!!.uid
+                        userInfo.name = strUserName
+                        userInfo.img_url = strImgUrl
+                        pDbRef!!.setValue(userInfo!!)//insert
+                    }
+                    else if(userInfo.sns_type.equals(user.SNS_TYPE_GOOGLE))
+                    {
+                        var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.push()//insert..
+                        val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                        var strUserName:String? = acct!!.displayName
+                        var strImgUrl: String? = acct!!.photoUrl.toString()
+                        userInfo.user_key = currentFirebaseUser!!.uid
+                        userInfo.name = strUserName
+                        userInfo.img_url = strImgUrl
+                        pDbRef!!.setValue(userInfo!!)//insert
+                    }
+                }
+                else
+                {
 
                 }
             }
-        //  and showing
-        notesDialog?.show()
-    }
+        }
 
+        //  and showing
+        m_TermsAgreeDialog?.show()
+
+    }
     /******************* facebook login *******************/
-    //------------------------------------------------
+    //------------------------------------------------------------------
     //
     private fun setFacebookSign()
     {
@@ -206,7 +240,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
         LoginManager.getInstance().logOut()
     }
-    //------------------------------------------------
+    //----------------------------------------------------------------
     //
     private fun handleFacebookAccessToken(token: AccessToken)
     {
@@ -286,15 +320,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                 }
                                 else
                                 {
-                                    //first Insert..
-                                    var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.push()//insert..
-                                    val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
-                                    var strUserName:String? = mAuth!!.currentUser!!.displayName
-                                    var strImgUrl: String? = "https://graph.facebook.com/" + token!!.userId + "/picture?type=large"
-                                    pInfo.user_key = currentFirebaseUser!!.uid
-                                    pInfo.name = strUserName
-                                    pInfo.img_url = strImgUrl
-                                    pDbRef!!.setValue(pInfo!!)//insert
+                                    showTermsAgreeDialog(pInfo!!, token!!, null)
                                 }
                             }
 
@@ -403,15 +429,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         }
                         else
                         {
-                            //first Insert..
-                            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.push()//insert..
-                            val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
-                            var strUserName:String? = acct!!.displayName
-                            var strImgUrl: String? = acct!!.photoUrl.toString()
-                            pInfo.user_key = currentFirebaseUser!!.uid
-                            pInfo.name = strUserName
-                            pInfo.img_url = strImgUrl
-                            pDbRef!!.setValue(pInfo!!)//insert
+                            showTermsAgreeDialog(pInfo!!, null, acct!!)
                         }
                     }
 

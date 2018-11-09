@@ -34,4 +34,7 @@
     <string name="str_msg_18">그룹을 생성하시겠습니까?</string>
     <string name="str_msg_19">삭제 하시겠습니까?</string>
     <string name="str_msg_20">개인정보 취급방침</string>
+    <string name="str_msg_21">확인</string>
+    <string name="str_msg_22">자세히 보기</string>
+    <string name="str_msg_23">동의에 체크해 주세요.</string>
 </resources>
