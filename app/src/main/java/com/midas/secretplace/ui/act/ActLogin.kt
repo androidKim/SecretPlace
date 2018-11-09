@@ -1,9 +1,12 @@
 package com.midas.secretplace.ui.act
 
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
@@ -28,6 +31,7 @@ import com.midas.secretplace.R
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
+import com.midas.secretplace.ui.custom.dlg_terms_agree
 import kotlinx.android.synthetic.main.act_login.*
 
 
@@ -131,6 +135,43 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     {
         setFacebookSign()
         setGoogleSign()
+
+
+        //testcode..
+        showDialog()
+    }
+
+
+    /*
+        * test dialog
+       */
+    inline fun Activity.showNotesAlertDialog(func: dlg_terms_agree.() -> Unit): AlertDialog =
+            dlg_terms_agree(this).apply {
+                func()
+            }.create()
+
+    inline fun Fragment.showNotesAlertDialog(func: dlg_terms_agree.() -> Unit): AlertDialog =
+            dlg_terms_agree(this.context!!).apply {
+                func()
+            }.create()
+
+    //  showing dialog
+    private var notesDialog: AlertDialog? = null
+    fun showDialog() {
+        if (notesDialog == null)
+        ////////////////////////////////////////////////////////////////
+        //  making Alert dialog - admire beauty of kotlin
+        ////////////////////////////////////////////////////////////////
+            notesDialog = showNotesAlertDialog {
+
+                cancelable = false
+
+                closeIconClickListener {
+
+                }
+            }
+        //  and showing
+        notesDialog?.show()
     }
 
     /******************* facebook login *******************/
