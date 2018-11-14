@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.view.MenuItem
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.Glide
@@ -31,6 +32,8 @@ import kotlinx.android.synthetic.main.ly_main.*
 
 
 
+
+
 class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
 {
     /*********************** Define ***********************/
@@ -39,6 +42,8 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
     var m_App: MyApp? = null
     var m_Context: Context? = null
 
+    private val mScaleGestureDetector: ScaleGestureDetector? = null
+    private val mScaleFactor = 1.0f
     /*********************** Controller ***********************/
     private var m_iv_Profile:ImageView? = null
     private var m_iv_None:ImageView? = null
