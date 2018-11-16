@@ -45,7 +45,7 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.4.0'
 
     implementation 'com.facebook.android:facebook-login:[4,5)'
-
+    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
 
 
 }

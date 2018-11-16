@@ -45,7 +45,7 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
     private val mScaleGestureDetector: ScaleGestureDetector? = null
     private val mScaleFactor = 1.0f
     /*********************** Controller ***********************/
-    private var m_iv_Profile:ImageView? = null
+    private var m_iv_Profile: ImageView? = null
     private var m_iv_None:ImageView? = null
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
