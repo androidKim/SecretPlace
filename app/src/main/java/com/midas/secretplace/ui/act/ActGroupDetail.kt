@@ -2,12 +2,13 @@
 package com.midas.secretplace.ui.act
 
 import android.Manifest
-import android.app.AlertDialog
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.location.Location
 import android.location.LocationManager
 import android.media.MediaScannerConnection
@@ -20,6 +21,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -30,6 +32,10 @@ import android.view.View
 import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
@@ -44,8 +50,10 @@ import com.midas.secretplace.structure.core.group
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
+import com.midas.secretplace.ui.custom.dlg_photo_view
 import com.midas.secretplace.ui.frag.MapFragment
 import kotlinx.android.synthetic.main.act_group_detail.*
+import kotlinx.android.synthetic.main.dlg_photo_view.view.*
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -56,6 +64,12 @@ import kotlin.collections.ArrayList
 
 class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,HorizontalPlaceRvAdapter.ifCallback,PhotoRvAdapter.ifCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, MapFragment.ifCallback
 {
+    //extention functions..
+    inline fun Activity.showPhotoViewDialog(func: dlg_photo_view.() -> Unit): AlertDialog =
+            dlg_photo_view(this).apply {
+                func()
+            }.create()
+
     /*********************** Define ***********************/
     //-------------------------------------------------------------
     //
@@ -98,6 +112,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_bModify:Boolean? = false//변경이력여부
     var m_arrItem:ArrayList<String>? = ArrayList()//imglist(vertical listview)
     /*********************** Controller ***********************/
+    var m_PhotoViewDialog: AlertDialog? = null
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
     //
@@ -1128,6 +1143,55 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }
         })
     }
+    //----------------------------------------------------------
+    //  showing dialog
+    fun showPhotoViewDialog(url:String)
+    {
+        m_PhotoViewDialog = showPhotoViewDialog {
+            cancelable = true
+
+
+            Glide.with(applicationContext)
+                    .load(url)
+                    .listener(object : RequestListener<Drawable>
+                    {
+                        override fun onLoadFailed(p0: GlideException?, p1: Any?, p2: com.bumptech.glide.request.target.Target<Drawable>?, p3: Boolean): Boolean
+                        {
+                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                            dialogView!!.iv_DlgNone!!.visibility = View.GONE
+                            dialogView!!.iv_DlgNone!!.visibility = View.VISIBLE
+                        }
+                        override fun onResourceReady(p0: Drawable?, p1: Any?, p2: com.bumptech.glide.request.target.Target<Drawable>?, p3: DataSource?, p4: Boolean): Boolean
+                        {
+                            //do something when picture already loaded
+                            dialogView!!.iv_DlgNone!!.visibility = View.GONE
+                            dialogView!!.iv_DlgNone!!.visibility = View.GONE
+
+
+                            if(p0 != null)
+                                dialogView!!.iv_DlgNone!!.tag = url
+
+                            return false
+                        }
+                    })
+                    .into(dialogView!!.iv_DlgPhoto)
+
+
+
+
+            onCancelListener {
+                m_PhotoViewDialog!!.dismiss()
+            }
+
+
+            closeIconClickListener {
+                m_PhotoViewDialog!!.dismiss()
+            }
+        }
+        //  and showing
+        m_PhotoViewDialog?.show()
+    }
+
     /************************* listener *************************/
     //--------------------------------------------------------------------
     //
@@ -1179,7 +1243,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         setRefresh()
     }
     //-----------------------------------------------------
-    //adapter ifCallback
+    //photo view adapter ifCallback
     override fun addPhoto()
     {
         //show dialog..
@@ -1199,7 +1263,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         pAlert.show()
     }
     //-----------------------------------------------------
-    //adapter ifCallback
+    //photo view adapter ifCallback
     override fun editContent()
     {
         //show dialog..
@@ -1221,6 +1285,12 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         })
         pAlert.show()
     }
+    //-----------------------------------------------------
+    //photo view adapter ifCallback
+    override fun showPhotoDialog(url: String) {
+        showPhotoViewDialog(url)
+    }
+
     /*********************** interface ***********************/
 
 }

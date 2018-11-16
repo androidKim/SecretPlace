@@ -22,8 +22,6 @@ import com.midas.secretplace.structure.core.place
 
 
 
-
-
 class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList: ArrayList<String>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>()
 {
@@ -88,6 +86,7 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
         var tv_Name = itemView?.findViewById<TextView>(R.id.tv_Name)
         var ly_AddPhoto = itemView?.findViewById<LinearLayout>(R.id.ly_AddPhoto)
         var ly_EditContent = itemView?.findViewById<LinearLayout>(R.id.ly_EditContent)
+        var iv_Photo = itemView?.findViewById<ImageView>(R.id.iv_Photo)
 
         fun bind (pInfo: String, pContext: Context)
         {
@@ -132,10 +131,28 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
                     //do something when picture already loaded
                     iv_None!!.visibility = View.GONE
                     iv_None!!.visibility = View.GONE
+
+
+                    if(p0 != null)
+                        iv_Photo!!.tag = url
+
                     return false
                 }
             })
             .into(iv_Photo)
+
+
+
+            iv_Photo!!.setOnClickListener({
+                if(m_IfCallback != null)
+                {
+                    var url:String = iv_Photo!!.tag as String
+                    m_IfCallback.showPhotoDialog(url)
+                }
+
+            })
+
+
         }
     }
     /*********************** User Function ***********************/
@@ -220,5 +237,6 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
     {
         fun addPhoto()
         fun editContent()
+        fun showPhotoDialog(url:String)
     }
 }

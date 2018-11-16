@@ -10,7 +10,6 @@ abstract  class BaseDialogHelper
 {
     abstract val dialogView: View
     abstract val builder: AlertDialog.Builder
-
     //  required bools
     open var cancelable: Boolean = true
     open var isBackGroundTransparent: Boolean = true
@@ -37,4 +36,5 @@ abstract  class BaseDialogHelper
             builder.setOnCancelListener {
                 func()
             }
+
 }
