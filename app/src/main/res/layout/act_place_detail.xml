@@ -5,58 +5,89 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+
+    <RelativeLayout
         android:id="@+id/ly_Top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/mapFragment"
-            android:name="com.midas.secretplace.ui.frag.MapFragment"
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/ly_Map"
             android:layout_width="match_parent"
-            android:layout_height="0dp" />
+            android:layout_height="wrap_content">
+
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/mapFragment"
+                android:name="com.midas.secretplace.ui.frag.MapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="150dp" />
+
+            <ImageButton
+                android:id="@+id/iBtn_MapZoom"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/baseline_zoom_out_map_black_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+        </android.support.constraint.ConstraintLayout>
 
         <RelativeLayout
-            android:id="@+id/ly_MapSizeControll"
+            android:id="@+id/ly_Title"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_below="@+id/ly_Top"
-            android:layout_gravity="bottom"
-            android:background="@color/color_white"
-            android:gravity="center">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ly_Map"
+            android:padding="5dp">
 
 
             <LinearLayout
-                android:id="@+id/ly_MapExpand"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:id="@+id/ly_AddPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:padding="10dp">
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:background="@drawable/baseline_map_black_18dp" />
-
+                    android:background="@drawable/outline_add_photo_alternate_black_18dp" />
             </LinearLayout>
+
 
             <LinearLayout
-                android:id="@+id/ly_MapCollapse"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:id="@+id/ly_EditContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/ly_AddPhoto"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:padding="10dp">
 
                 <ImageView
-                    android:id="@+id/iBtn_Collapse"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:background="@drawable/baseline_map_black_18dp" />
+                    android:background="@drawable/baseline_edit_black_18dp" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/ly_EditContent"
+                android:padding="10dp"
+                android:textColor="@color/color_black"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                tools:text="Title" />
+
         </RelativeLayout>
-    </FrameLayout>
+
+
+    </RelativeLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/ly_SwipeRefresh"

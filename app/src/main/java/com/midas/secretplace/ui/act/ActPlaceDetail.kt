@@ -4,7 +4,6 @@ package com.midas.secretplace.ui.act
 import android.Manifest
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -27,7 +26,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
-import android.widget.RelativeLayout
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -282,10 +280,20 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         m_LayoutInflater = LayoutInflater.from(m_Context)
 
-        //event..
-        ly_SwipeRefresh.setOnRefreshListener(this)
+        //listener..
+        ly_SwipeRefresh.setOnRefreshListener(this)//refresh..
+        //addPhoto..
+        ly_AddPhoto.setOnClickListener(View.OnClickListener {
+            addPhoto()
+        })
+
+        //modify name.
+        ly_EditContent.setOnClickListener(View.OnClickListener {
+            editContent()
+        })
 
         //map expand
+        /*
         ly_MapExpand.setOnClickListener(View.OnClickListener {
             ly_MapExpand.visibility = View.GONE
             ly_MapCollapse.visibility = View.VISIBLE
@@ -306,6 +314,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             params.height = 0
             mapFragment!!.getView()!!.setLayoutParams(params)
         })
+        */
 
         settingView()
     }
@@ -322,6 +331,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo!!)
         mapFragment.arguments = mArgs
 
+        //setTitle..
+        tv_Title.text = m_PlaceInfo!!.name
 
         //getPlaceInfoProc(m_PlaceInfo!!.seq!!)
         settingPlaceView()
@@ -332,8 +343,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         //if(m_Adapter == null)
         //{
-            m_arrItem!!.add(0, "header")//setHeader
-
             m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
             recyclerView.adapter = m_Adapter
             recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))//set recyclerview grid Item spacing
@@ -486,14 +495,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     m_bFinish = true//
                 }
 
-                if(m_Adapter!!.itemCount > 1)// 1: header..
-                {
+                if(m_Adapter!!.itemCount > 0)//
                     ly_NoData.visibility = View.GONE
-                }
                 else
-                {
                     ly_NoData.visibility = View.VISIBLE
-                }
 
                 m_bRunning = false
                 progressBar.visibility = View.GONE
@@ -656,6 +661,50 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         })
     }
 
+    //-----------------------------------------------------
+    //photo  adapter ifCallback
+    fun addPhoto()
+    {
+        //show dialog..
+        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create()
+        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_12))
+        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_9))
+        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_msg_11),{
+            dialogInterface, i ->
+            checkPermissionWriteStorage();
+            pAlert.dismiss();
+        })
+        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_msg_10),{
+            dialogInterface, i ->
+            checkPermissionCamera();
+            pAlert.dismiss();
+        })
+        pAlert.show()
+    }
+    //-----------------------------------------------------
+    //photo adapter ifCallback
+    fun editContent()
+    {
+        //show dialog..
+        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create()
+        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_8))
+        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
+        var editName: EditText? = EditText(m_Context)
+        editName!!.hint = getString(R.string.str_msg_4)
+        pAlert.setView(editName)
+        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_ok),{
+            dialogInterface, i ->
+            var name:String = editName.text.toString()
+            editContentProc(name)
+            pAlert.dismiss()
+        })
+        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_no),{
+            dialogInterface, i ->
+            pAlert.dismiss()
+        })
+        pAlert.show()
+    }
+
     //----------------------------------------------------------
     //  showing dialog
     fun showPhotoViewDialog(url: String)
@@ -708,49 +757,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun onRefresh()
     {
         setRefresh()
-    }
-    //-----------------------------------------------------
-    //photo  adapter ifCallback
-    override fun addPhoto()
-    {
-        //show dialog..
-        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create()
-        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_12))
-        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_9))
-        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_msg_11),{
-            dialogInterface, i ->
-            checkPermissionWriteStorage();
-            pAlert.dismiss();
-        })
-        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_msg_10),{
-            dialogInterface, i ->
-            checkPermissionCamera();
-            pAlert.dismiss();
-        })
-        pAlert.show()
-    }
-    //-----------------------------------------------------
-    //photo adapter ifCallback
-    override fun editContent()
-    {
-        //show dialog..
-        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create()
-        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_8))
-        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
-        var editName: EditText? = EditText(m_Context)
-        editName!!.hint = getString(R.string.str_msg_4)
-        pAlert.setView(editName)
-        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_ok),{
-            dialogInterface, i ->
-            var name:String = editName.text.toString()
-            editContentProc(name)
-            pAlert.dismiss()
-        })
-        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_no),{
-            dialogInterface, i ->
-            pAlert.dismiss()
-        })
-        pAlert.show()
     }
     //-----------------------------------------------------
     //photo adapter ifCallback
