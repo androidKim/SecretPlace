@@ -25,6 +25,8 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.animation.TranslateAnimation
+import android.widget.AbsListView
 import android.widget.EditText
 import android.widget.Toast
 import com.bumptech.glide.Glide
@@ -48,12 +50,12 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.Serializable
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback
-{
+class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback{
     //extention functions..
     inline fun Activity.showPhotoViewDialog(func: dlg_photo_view.() -> Unit): AlertDialog =
             dlg_photo_view(this).apply {
@@ -83,12 +85,13 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_Adapter: PhotoRvAdapter? = null
     var selectedImage: Uri? = null
     var imageUri: Uri? = null
-    var m_strImgpath:String ?= null
+    var m_strImgpath:String = ""
     //var m_strImgLastSeq:String? = null
-    var m_bRunning:Boolean? = false
-    var m_bFinish:Boolean? = false
-    var m_bModify:Boolean? = false
-    var m_arrItem:ArrayList<String>? = null
+    var m_bRunning:Boolean = false
+    var m_bFinish:Boolean = false
+    var m_bModify:Boolean = false
+    var m_bScrollTouch:Boolean = false
+    var m_arrItem:ArrayList<String> = ArrayList<String>()
     /*********************** Controller ***********************/
     var m_PhotoViewDialog:AlertDialog? = null
     /*********************** System Function ***********************/
@@ -282,6 +285,13 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         //listener..
         ly_SwipeRefresh.setOnRefreshListener(this)//refresh..
+
+
+        //map dialog
+        iBtn_MapZoom.setOnClickListener(View.OnClickListener {
+            goMapDetail()
+        })
+
         //addPhoto..
         ly_AddPhoto.setOnClickListener(View.OnClickListener {
             addPhoto()
@@ -363,11 +373,48 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     val totalItemCount = pLayoutManager.itemCount
                     val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
 
-                    if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//더보기..
+                    if(m_bScrollTouch)
+                    {
+                        m_bScrollTouch = false
+                        if (dy > 0) {
+                            // Scrolling up
+                            if(ly_Top.visibility == View.VISIBLE)
+                                slideUp()
+                        } else {
+                            // Scrolling down
+                            if(ly_Top.visibility == View.GONE)
+                                slideDown()
+
+                        }
+                    }
+
+
+                    /*
+                    if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//최하단
                     {
                         // Call your API to load more items
                         //if(!m_bFinish!!)
                             //getImageListProc()
+                    }
+                    */
+                }
+
+                override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+
+                    if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {//손을 떼었지만 움직이는중
+                        // Do something
+                        m_bScrollTouch = false
+                    } else if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {//터치되어있는중
+                        // Do something
+                        if(!m_bScrollTouch)
+                            m_bScrollTouch = true
+                    } else if(newState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE){//정지된상태
+                        m_bScrollTouch = false
+                    }
+                    else {
+                        // Do something
+                        m_bScrollTouch = false
                     }
                 }
             })
@@ -524,6 +571,18 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         getPlaceInfoProc(m_PlaceInfo!!.place_key!!)
     }
     //-------------------------------------------------------------
+    ///
+    fun slideUp(){
+        ly_Top.visibility = View.GONE
+        ly_Top.animate().translationY(-500F).withLayer()
+    }
+    //-------------------------------------------------------------
+    //
+    fun slideDown(){
+        ly_Top.visibility = View.VISIBLE
+        ly_Top.animate().translationY(500F).withLayer()
+    }
+    //-------------------------------------------------------------
     //
     private fun checkPermissionWriteStorage()
     {
@@ -660,7 +719,14 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }
         })
     }
-
+    //-----------------------------------------------------
+    //show map dialog
+    fun goMapDetail()
+    {
+        var pIntent = Intent(m_Context, ActMapDetail::class.java)
+        pIntent.putExtra(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo as Serializable)
+        startActivityForResult(pIntent, 0)
+    }
     //-----------------------------------------------------
     //photo  adapter ifCallback
     fun addPhoto()
@@ -687,7 +753,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         //show dialog..
         val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create()
-        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_8))
+        pAlert.setTitle("["+m_PlaceInfo!!.name +"] "+m_Context!!.resources.getString(R.string.str_msg_8))
         pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
         var editName: EditText? = EditText(m_Context)
         editName!!.hint = getString(R.string.str_msg_4)
