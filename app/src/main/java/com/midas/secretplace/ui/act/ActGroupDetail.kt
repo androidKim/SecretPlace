@@ -545,9 +545,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         if(m_Adapter != null)
             m_Adapter!!.clearData()
 
-        m_arrItem!!.add(0, "header")//setHeader
-        m_Adapter!!.addList(m_arrItem!!)
-        m_Adapter!!.setPlaceInfo(m_PlaceInfo!!)
+        //m_arrItem!!.add(0, "header")//setHeader
+        //m_Adapter!!.addList(m_arrItem!!)
+        //m_Adapter!!.setPlaceInfo(m_PlaceInfo!!)
 
         ly_SwipeRefresh!!.setRefreshing(false)
         getImageListProc()
@@ -672,7 +672,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         if(m_PlaceInfo == null)
             return
 
-        m_arrItem!!.add(0, "header")//setHeader
+        //m_arrItem!!.add(0, "header")//setHeader
         m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
         recyclerView.adapter = m_Adapter
 
@@ -1244,7 +1244,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     }
     //-----------------------------------------------------
     //photo view adapter ifCallback
-    override fun addPhoto()
+    fun addPhoto()
     {
         //show dialog..
         val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
@@ -1264,7 +1264,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     }
     //-----------------------------------------------------
     //photo view adapter ifCallback
-    override fun editContent()
+    fun editContent()
     {
         //show dialog..
         val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()

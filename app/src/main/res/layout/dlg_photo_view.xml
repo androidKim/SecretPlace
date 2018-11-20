@@ -5,32 +5,38 @@
     android:layout_height="match_parent"
     android:background="@color/color_white"
     android:gravity="center"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="20dp"
     android:orientation="vertical">
 
-
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-        <ImageButton
-            android:id="@+id/iBtn_Close"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_margin="10dp"
-            android:background="@drawable/baseline_close_black_24" />
-
-        <com.github.chrisbanes.photoview.PhotoView
-            android:id="@+id/iv_DlgPhoto"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/iBtn_Close" />
+            android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/iv_DlgNone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
+            <ImageButton
+                android:id="@+id/iBtn_Close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/baseline_close_black_24" />
 
-    </RelativeLayout>
+            <com.github.chrisbanes.photoview.PhotoView
+                android:id="@+id/iv_DlgPhoto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/iBtn_Close"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY" />
+
+            <ImageView
+                android:id="@+id/iv_DlgNone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true" />
+        </RelativeLayout>
+    </ScrollView>
 </LinearLayout>

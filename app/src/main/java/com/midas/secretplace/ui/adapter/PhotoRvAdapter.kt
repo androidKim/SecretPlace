@@ -1,6 +1,5 @@
 package com.midas.secretplace.ui.adapter
 
-
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.support.v4.app.FragmentManager
@@ -9,9 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -19,25 +16,24 @@ import com.bumptech.glide.request.RequestListener
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.place
 
-
-
-
 class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList: ArrayList<String>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>()
 {
-
     /*********************** System Function ***********************/
     //-----------------------------------------------------------
     //
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder
     {
+        /*
         if (viewType == TYPE_HEADER)
         {
             val view = LayoutInflater.from(context).inflate(R.layout.ly_place_detail_header, parent, false)
             val holder:HeaderHolder = HeaderHolder(view)
             return holder
         }
-        else if (viewType == TYPE_ITEM)
+        else
+        */
+        if (viewType == TYPE_ITEM)
         {
             val view = LayoutInflater.from(context).inflate(R.layout.row_photo, parent, false)
             val holder:Holder = Holder(view)
@@ -56,6 +52,7 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int)
     {
         val mObject = photoList[position]
+        /*
         if (holder is HeaderHolder)
         {
             holder?.bind(photoList[position], context)
@@ -64,12 +61,16 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
         {
             holder?.bind(photoList[position], context)
         }
+        */
+        if (holder is Holder)
+            holder?.bind(photoList[position], context)
     }
 
     //-----------------------------------------------------------
     //
     override fun getItemViewType(position: Int): Int
     {
+        /*
         return if(photoList[position].equals("header"))
         {
             TYPE_HEADER
@@ -78,9 +79,12 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
         {
             TYPE_ITEM
         }
+        */
+        return TYPE_ITEM
     }
     //-----------------------------------------------------------
     //Header..
+    /*
     inner class HeaderHolder(itemView:View?) : RecyclerView.ViewHolder(itemView)
     {
         var tv_Name = itemView?.findViewById<TextView>(R.id.tv_Name)
@@ -104,6 +108,7 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
             })
         }
     }
+    */
 
     //-----------------------------------------------------------
     //
@@ -141,8 +146,6 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
             })
             .into(iv_Photo)
 
-
-
             iv_Photo!!.setOnClickListener({
                 if(m_IfCallback != null)
                 {
@@ -160,8 +163,8 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
     //
     companion object
     {
-        private const val TYPE_HEADER = 0
-        private const val TYPE_ITEM = 1
+        //private const val TYPE_HEADER = 0
+        private const val TYPE_ITEM = 0
     }
     //-----------------------------------------------------------
     //
@@ -235,8 +238,6 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
     //
     interface ifCallback
     {
-        fun addPhoto()
-        fun editContent()
         fun showPhotoDialog(url:String)
     }
 }
