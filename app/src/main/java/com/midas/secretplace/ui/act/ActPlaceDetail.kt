@@ -25,7 +25,6 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.animation.TranslateAnimation
 import android.widget.AbsListView
 import android.widget.EditText
 import android.widget.Toast
@@ -46,11 +45,7 @@ import com.midas.secretplace.ui.custom.dlg_photo_view
 import com.midas.secretplace.ui.frag.MapFragment
 import kotlinx.android.synthetic.main.act_place_detail.*
 import kotlinx.android.synthetic.main.dlg_photo_view.view.*
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.Serializable
+import java.io.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -332,6 +327,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun settingView()
     {
+        disableRefresh()
+
         ly_NoData.visibility = View.GONE
 
         //map..
@@ -347,6 +344,21 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //getPlaceInfoProc(m_PlaceInfo!!.seq!!)
         settingPlaceView()
     }
+    //--------------------------------------------------------------
+    //
+    fun enableRefresh()
+    {
+        ly_SwipeRefresh.isRefreshing = false
+        ly_SwipeRefresh.isEnabled = true
+    }
+    //--------------------------------------------------------------
+    //
+    fun disableRefresh()
+    {
+        ly_SwipeRefresh.isRefreshing = false
+        ly_SwipeRefresh.isEnabled = false
+    }
+
     //--------------------------------------------------------------
     //
     fun settingPlaceView()
@@ -376,15 +388,15 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     if(m_bScrollTouch)
                     {
                         m_bScrollTouch = false
+
                         if (dy > 0) {
                             // Scrolling up
-                            if(ly_Top.visibility == View.VISIBLE)
                                 slideUp()
                         } else {
                             // Scrolling down
-                            if(ly_Top.visibility == View.GONE)
-                                slideDown()
 
+
+                                slideDown()
                         }
                     }
 
@@ -407,10 +419,12 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                         m_bScrollTouch = false
                     } else if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {//터치되어있는중
                         // Do something
-                        if(!m_bScrollTouch)
-                            m_bScrollTouch = true
+                        m_bScrollTouch = true
+                        disableRefresh()
+
                     } else if(newState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE){//정지된상태
                         m_bScrollTouch = false
+                        enableRefresh()
                     }
                     else {
                         // Do something
@@ -567,20 +581,24 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(-20))//init
 
-        ly_SwipeRefresh!!.setRefreshing(false)
+        ly_SwipeRefresh.isRefreshing = false
+        ly_SwipeRefresh.isEnabled = false
+
         getPlaceInfoProc(m_PlaceInfo!!.place_key!!)
     }
     //-------------------------------------------------------------
     ///
     fun slideUp(){
-        ly_Top.visibility = View.GONE
-        ly_Top.animate().translationY(-500F).withLayer()
+        if (ly_Top.visibility == View.VISIBLE) {
+            ly_Top.visibility = View.GONE
+        }
     }
     //-------------------------------------------------------------
     //
     fun slideDown(){
-        ly_Top.visibility = View.VISIBLE
-        ly_Top.animate().translationY(500F).withLayer()
+        if (ly_Top.visibility == View.GONE) {
+            ly_Top.visibility = View.VISIBLE
+        }
     }
     //-------------------------------------------------------------
     //
