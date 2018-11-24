@@ -17,6 +17,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
+import android.support.v4.view.ViewCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -25,10 +26,12 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.AbsListView
 import android.widget.EditText
 import android.widget.Toast
 import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -75,6 +78,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     /*********************** Member ***********************/
     var m_App: MyApp? = null
     var m_Context: Context? = null
+    var m_RequestManager:RequestManager? = null
     var m_PlaceInfo:place? = place()
     var m_LayoutInflater:LayoutInflater? = null
     var m_Adapter: PhotoRvAdapter? = null
@@ -99,6 +103,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         super.onCreate(savedInstanceState)
         setContentView(R.layout.act_place_detail)
         m_Context = this
+        m_RequestManager = Glide.with(this)
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context as ActPlaceDetail)
@@ -327,8 +332,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun settingView()
     {
-        disableRefresh()
-
         ly_NoData.visibility = View.GONE
 
         //map..
@@ -346,26 +349,11 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     }
     //--------------------------------------------------------------
     //
-    fun enableRefresh()
-    {
-        ly_SwipeRefresh.isRefreshing = false
-        ly_SwipeRefresh.isEnabled = true
-    }
-    //--------------------------------------------------------------
-    //
-    fun disableRefresh()
-    {
-        ly_SwipeRefresh.isRefreshing = false
-        ly_SwipeRefresh.isEnabled = false
-    }
-
-    //--------------------------------------------------------------
-    //
     fun settingPlaceView()
     {
         //if(m_Adapter == null)
         //{
-            m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
+            m_Adapter = PhotoRvAdapter(m_Context!!, m_RequestManager!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
             recyclerView.adapter = m_Adapter
             recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))//set recyclerview grid Item spacing
             var nSpanCnt = 1
@@ -385,20 +373,24 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     val totalItemCount = pLayoutManager.itemCount
                     val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
 
-                    if(m_bScrollTouch)
+                    if(firstVisible == 0)
                     {
-                        m_bScrollTouch = false
 
-                        if (dy > 0) {
-                            // Scrolling up
-                                slideUp()
-                        } else {
-                            // Scrolling down
+                    }
+                    else
+                    {
+                        if(m_bScrollTouch)
+                        {
+                            if (dy > 0)
+                                slideUp()    // Scrolling up
+                            else
+                                slideDown()// Scrolling down
 
 
-                                slideDown()
+                            m_bScrollTouch = false
                         }
                     }
+
 
 
                     /*
@@ -416,15 +408,13 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
                     if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {//손을 떼었지만 움직이는중
                         // Do something
-                        m_bScrollTouch = false
+                        m_bScrollTouch = true
                     } else if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {//터치되어있는중
                         // Do something
                         m_bScrollTouch = true
-                        disableRefresh()
 
                     } else if(newState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE){//정지된상태
                         m_bScrollTouch = false
-                        enableRefresh()
                     }
                     else {
                         // Do something
@@ -582,23 +572,60 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(-20))//init
 
         ly_SwipeRefresh.isRefreshing = false
-        ly_SwipeRefresh.isEnabled = false
-
         getPlaceInfoProc(m_PlaceInfo!!.place_key!!)
     }
     //-------------------------------------------------------------
     ///
     fun slideUp(){
-        if (ly_Top.visibility == View.VISIBLE) {
-            ly_Top.visibility = View.GONE
-        }
+
+        //ly_Top.visibility = View.GONE
+
+        /*
+        val objectAnimator = ObjectAnimator.ofFloat(ly_Top, "translationY", 0F)
+        objectAnimator.duration = 1000
+        objectAnimator.start()
+        */
+
+        ViewCompat.animate(ly_Top)
+                .translationX(0f)
+                .translationY(-ly_Top.height.toFloat())
+                .setDuration(1000)
+                .setInterpolator(AccelerateDecelerateInterpolator())
+                .setStartDelay(50)
+                .setListener(null)
+
+        ViewCompat.animate(ly_SwipeRefresh)
+                .translationX(0f)
+                .translationY(-ly_Top.height.toFloat())
+                .setDuration(1000)
+                .setInterpolator(AccelerateDecelerateInterpolator())
+                .setStartDelay(50)
+                .setListener(null)
     }
     //-------------------------------------------------------------
     //
     fun slideDown(){
-        if (ly_Top.visibility == View.GONE) {
-            ly_Top.visibility = View.VISIBLE
-        }
+
+        //ly_Top.visibility = View.VISIBLE
+
+        //val objectAnimator = ObjectAnimator.ofFloat(ly_Top, "translationY", ly_Top.height.toFloat())
+        //objectAnimator.duration = 1000
+        //objectAnimator.start()
+        ViewCompat.animate(ly_Top)
+                .translationX(0f)
+                .translationY(0f)
+                .setDuration(1000)
+                .setInterpolator(AccelerateDecelerateInterpolator())
+                .setStartDelay(50)
+                .setListener(null)
+
+        ViewCompat.animate(ly_SwipeRefresh)
+                .translationX(0f)
+                .translationY(0f)
+                .setDuration(1000)
+                .setInterpolator(AccelerateDecelerateInterpolator())
+                .setStartDelay(50)
+                .setListener(null)
     }
     //-------------------------------------------------------------
     //

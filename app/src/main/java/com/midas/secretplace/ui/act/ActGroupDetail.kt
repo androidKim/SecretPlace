@@ -33,6 +33,7 @@ import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.Toast
 import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -97,6 +98,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
     var m_App: MyApp? = null
     var m_Context: Context? = null
+    var m_RequestManager: RequestManager? = null
     var m_GroupInfo:group? = group()
     var m_arrPlace:ArrayList<place>? = ArrayList()//group의 place list(horizontal listview)
     var m_LayoutInflater:LayoutInflater? = null
@@ -123,6 +125,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         super.onCreate(savedInstanceState)
         setContentView(R.layout.act_group_detail)
         m_Context = this
+        m_RequestManager = Glide.with(this)
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context as ActGroupDetail)
@@ -673,7 +676,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             return
 
         //m_arrItem!!.add(0, "header")//setHeader
-        m_Adapter = PhotoRvAdapter(m_Context!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
+        m_Adapter = PhotoRvAdapter(m_Context!!, m_RequestManager!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
         recyclerView.adapter = m_Adapter
 
         var nSpanCnt = 1

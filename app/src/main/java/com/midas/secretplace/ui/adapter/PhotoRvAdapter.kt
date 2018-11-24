@@ -9,14 +9,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
-import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.place
 
-class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList: ArrayList<String>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
+class PhotoRvAdapter(val context: Context, var m_RequestManager:RequestManager, var m_PlaceInfo: place, var photoList: ArrayList<String>, var m_IfCallback:ifCallback, var m_FrManager: FragmentManager) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>()
 {
     /*********************** System Function ***********************/
@@ -121,7 +121,7 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
 
         fun bind (url: String, pContext: Context)
         {
-            Glide.with(context)
+            m_RequestManager
             .load(url)
             .listener(object : RequestListener<Drawable>
             {
@@ -136,28 +136,27 @@ class PhotoRvAdapter(val context: Context, var m_PlaceInfo: place, var photoList
                     //do something when picture already loaded
                     iv_None!!.visibility = View.GONE
                     iv_None!!.visibility = View.GONE
-
-
-                    if(p0 != null)
-                        iv_Photo!!.tag = url
-
                     return false
                 }
             })
             .into(iv_Photo)
 
-            iv_Photo!!.setOnClickListener({
+            if(url != null)
+                itemView!!.tag = url
+
+            itemView!!.setOnClickListener({
                 if(m_IfCallback != null)
                 {
-                    var url:String = iv_Photo!!.tag as String
+                    var url:String = itemView!!.tag as String
                     m_IfCallback.showPhotoDialog(url)
                 }
 
             })
-
-
         }
+
+
     }
+
     /*********************** User Function ***********************/
     //-----------------------------------------------------------
     //
