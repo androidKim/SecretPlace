@@ -45,7 +45,6 @@ import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.ui.custom.dlg_photo_view
-import com.midas.secretplace.ui.frag.MapFragment
 import kotlinx.android.synthetic.main.act_place_detail.*
 import kotlinx.android.synthetic.main.dlg_photo_view.view.*
 import java.io.*
@@ -64,7 +63,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             dlg_photo_view(this.context!!).apply {
                 func()
             }.create()
-
 
     /*********************** Define ***********************/
     //-------------------------------------------------------------
@@ -288,7 +286,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
 
         //map dialog
-        iBtn_MapZoom.setOnClickListener(View.OnClickListener {
+        ly_ShowMap.setOnClickListener(View.OnClickListener {
             goMapDetail()
         })
 
@@ -335,12 +333,13 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         ly_NoData.visibility = View.GONE
 
         //map..
+        /*
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
         mapFragment!!.getMapAsync(mapFragment)
         val mArgs = Bundle()
         mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo!!)
         mapFragment.arguments = mArgs
-
+        */
         //setTitle..
         tv_Title.text = m_PlaceInfo!!.name
 
@@ -381,17 +380,16 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     {
                         if(m_bScrollTouch)
                         {
+                            /*
                             if (dy > 0)
                                 slideUp()    // Scrolling up
                             else
                                 slideDown()// Scrolling down
-
+                            */
 
                             m_bScrollTouch = false
                         }
                     }
-
-
 
                     /*
                     if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//최하단
@@ -575,25 +573,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         getPlaceInfoProc(m_PlaceInfo!!.place_key!!)
     }
     //-------------------------------------------------------------
-    ///
+    //
     fun slideUp(){
-
-        //ly_Top.visibility = View.GONE
-
-        /*
-        val objectAnimator = ObjectAnimator.ofFloat(ly_Top, "translationY", 0F)
-        objectAnimator.duration = 1000
-        objectAnimator.start()
-        */
-
-        ViewCompat.animate(ly_Top)
-                .translationX(0f)
-                .translationY(-ly_Top.height.toFloat())
-                .setDuration(1000)
-                .setInterpolator(AccelerateDecelerateInterpolator())
-                .setStartDelay(50)
-                .setListener(null)
-
         ViewCompat.animate(ly_SwipeRefresh)
                 .translationX(0f)
                 .translationY(-ly_Top.height.toFloat())
@@ -605,21 +586,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //-------------------------------------------------------------
     //
     fun slideDown(){
-
-        //ly_Top.visibility = View.VISIBLE
-
-        //val objectAnimator = ObjectAnimator.ofFloat(ly_Top, "translationY", ly_Top.height.toFloat())
-        //objectAnimator.duration = 1000
-        //objectAnimator.start()
         ViewCompat.animate(ly_Top)
-                .translationX(0f)
-                .translationY(0f)
-                .setDuration(1000)
-                .setInterpolator(AccelerateDecelerateInterpolator())
-                .setStartDelay(50)
-                .setListener(null)
-
-        ViewCompat.animate(ly_SwipeRefresh)
                 .translationX(0f)
                 .translationY(0f)
                 .setDuration(1000)
