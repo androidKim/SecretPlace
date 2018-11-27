@@ -7,9 +7,10 @@
     android:background="@color/color_white">
 
     <android.support.v7.widget.CardView
+        android:background="@color/cardview_light_background"
+        style="@style/CardViewStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardElevation="1dp">
+        android:layout_height="wrap_content">
 
         <RelativeLayout
             android:id="@+id/ly_Row"

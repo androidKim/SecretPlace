@@ -5,7 +5,7 @@
     android:id="@+id/ly_Base"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.act.ActPlaceDetail">
+    tools:context=".ui.act.ActGroupPlaceDetail">
 
 
     <RelativeLayout
