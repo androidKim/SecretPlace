@@ -127,14 +127,14 @@ class PhotoRvAdapter(val context: Context, var m_RequestManager:RequestManager, 
             {
                 override fun onLoadFailed(p0: GlideException?, p1: Any?, p2: com.bumptech.glide.request.target.Target<Drawable>?, p3: Boolean): Boolean
                 {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                     iv_None!!.visibility = View.GONE
-                    iv_None!!.visibility = View.VISIBLE
+                    iv_Fail!!.visibility = View.VISIBLE
+                    return false
                 }
                 override fun onResourceReady(p0: Drawable?, p1: Any?, p2: com.bumptech.glide.request.target.Target<Drawable>?, p3: DataSource?, p4: Boolean): Boolean
                 {
                     //do something when picture already loaded
-                    iv_None!!.visibility = View.GONE
+                    iv_Fail!!.visibility = View.GONE
                     iv_None!!.visibility = View.GONE
                     return false
                 }

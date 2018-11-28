@@ -133,72 +133,76 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM)//select gallery
         {
-            if (data != null)
-            {
+            if (data != null) {
                 progressBar.visibility = View.VISIBLE
+                tv_Progress.visibility = View.VISIBLE
                 val contentURI = data!!.data
-                try
-                {
+                try {
+                    val imageReference = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
                     val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, contentURI)
+
+                    //메모리데이터 업로드 방식
+                    val baos = ByteArrayOutputStream()
+                    bitmap!!.compress(Bitmap.CompressFormat.JPEG, 15, baos)//압축 0~100사이 품질 조절가능
                     m_strImgpath = saveImage(bitmap)
-                    //iv_Attach!!.setImageBitmap(bitmap)
+                    val byteArr: ByteArray = baos.toByteArray()
+                    var timestamp: Long = System.currentTimeMillis()
+                    var fileName: String = String.format("%s_%s", timestamp, "img")
 
-                    val data = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
-                    var value = 0.0
-
-                    var timestamp:Long = System.currentTimeMillis()
-                    var fileName:String = String.format("%s_%s",timestamp, "img")
-                    var storage = data.getReference().child(fileName).putFile(contentURI)
-                            .addOnProgressListener { taskSnapshot ->
-                                value = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
-                            }
-                            .addOnSuccessListener {
-                                taskSnapshot ->
-                                val uri = taskSnapshot.downloadUrl
+                    val fileRef = imageReference!!.reference.child(fileName)
+                    fileRef.putBytes(byteArr)
+                            .addOnSuccessListener { taskSnapshot ->
+                                //val uri = taskSnapshot.downloadUrl
 
                                 //update
-                                var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
+                                var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
                                 pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
 
                                 //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
                                 pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                    override fun onDataChange(dataSnapshot: DataSnapshot?)
-                                    {
-                                        if (dataSnapshot!!.exists())
-                                        {
+                                    override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                                        if (dataSnapshot!!.exists()) {
                                             m_bModify = true
                                             setRefresh()
                                             progressBar.visibility = View.GONE
+                                            tv_Progress.visibility = View.GONE
                                         }
                                     }
 
-                                    override fun onCancelled(p0: DatabaseError?)
-                                    {
+                                    override fun onCancelled(p0: DatabaseError?) {
                                         progressBar.visibility = View.GONE
+                                        tv_Progress.visibility = View.GONE
                                     }
                                 })
-
                             }
-                            .addOnFailureListener{
-                                exception -> exception.printStackTrace()
+                            .addOnFailureListener { exception ->
+                                Toast.makeText(this, exception.message, Toast.LENGTH_LONG).show()
                             }
+                            .addOnProgressListener { taskSnapshot ->
+                                // progress percentage
+                                val progress = 100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
 
-                }
-                catch (e: IOException)
-                {
+                                // percentage in progress dialog
+                                val intProgress = progress.toInt()
+                                tv_Progress.text = "Uploaded " + intProgress + "%..."
+                            }
+                            .addOnPausedListener { System.out.println("Upload is paused!") }
+                } catch (e: IOException) {
                     e.printStackTrace()
                 }
+            }
+            else
+            {
+                Toast.makeText(this, "No File!", Toast.LENGTH_LONG).show()
             }
         }
         else if (requestCode == REQUEST_TAKE_PHOTO)//take photo
         {
             progressBar.visibility = View.VISIBLE
+            tv_Progress.visibility = View.VISIBLE
+
             try
             {
-                //val bitmap = data!!.extras!!.get("data") as Bitmap
-                //m_strImgpath = saveImage(bitmap)
-                //val contentURI = Util.getImageUri(m_Context!!, bitmap)
-
                 try
                 {
                     selectedImage = imageUri
@@ -208,48 +212,55 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show()
                 }
 
+                val imageReference = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
+                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, selectedImage)
+                //메모리데이터 업로드 방식
+                val baos = ByteArrayOutputStream()
+                bitmap!!.compress(Bitmap.CompressFormat.JPEG, 15, baos)//압축 0~100사이 품질 조절가능
+                m_strImgpath = saveImage(bitmap)
+                val byteArr: ByteArray = baos.toByteArray()
+                var timestamp: Long = System.currentTimeMillis()
+                var fileName: String = String.format("%s_%s", timestamp, "img")
 
-                val data = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
-                var value = 0.0
-
-                var timestamp:Long = System.currentTimeMillis()
-                var fileName:String = String.format("%s_%s",timestamp, "img")
-                var storage = data.getReference().child(fileName).putFile(selectedImage!!)
-                        .addOnProgressListener { taskSnapshot ->
-                            value = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
-                        }
-                        .addOnSuccessListener {
-                            taskSnapshot ->
-                            val uri = taskSnapshot.downloadUrl
+                val fileRef = imageReference!!.reference.child(fileName)
+                fileRef.putBytes(byteArr)
+                        .addOnSuccessListener { taskSnapshot ->
+                            //val uri = taskSnapshot.downloadUrl
 
                             //update
-                            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
+                            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
                             pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
+
+                            //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
                             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(dataSnapshot: DataSnapshot?)
-                                {
-                                    if (dataSnapshot!!.exists())
-                                    {
+                                override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                                    if (dataSnapshot!!.exists()) {
                                         m_bModify = true
                                         setRefresh()
                                         progressBar.visibility = View.GONE
+                                        tv_Progress.visibility = View.GONE
                                     }
                                 }
 
-                                override fun onCancelled(p0: DatabaseError?)
-                                {
+                                override fun onCancelled(p0: DatabaseError?) {
                                     progressBar.visibility = View.GONE
+                                    tv_Progress.visibility = View.GONE
                                 }
                             })
-
                         }
-                        .addOnFailureListener{
-                            exception -> exception.printStackTrace()
+                        .addOnFailureListener { exception ->
+                            Toast.makeText(this, exception.message, Toast.LENGTH_LONG).show()
                         }
+                        .addOnProgressListener { taskSnapshot ->
+                            // progress percentage
+                            val progress = 100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
 
-            }
-            catch (e: IOException)
-            {
+                            // percentage in progress dialog
+                            val intProgress = progress.toInt()
+                            tv_Progress.text = "Uploaded " + intProgress + "%..."
+                        }
+                        .addOnPausedListener { System.out.println("Upload is paused!") }
+            } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
@@ -299,31 +310,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         ly_EditContent.setOnClickListener(View.OnClickListener {
             editContent()
         })
-
-        //map expand
-        /*
-        ly_MapExpand.setOnClickListener(View.OnClickListener {
-            ly_MapExpand.visibility = View.GONE
-            ly_MapCollapse.visibility = View.VISIBLE
-
-            //expand map..
-            val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = RelativeLayout.LayoutParams.MATCH_PARENT
-            mapFragment!!.getView()!!.setLayoutParams(params)
-        })
-
-        //map collapse
-        ly_MapCollapse.setOnClickListener(View.OnClickListener {
-
-            ly_MapExpand.visibility = View.VISIBLE
-            ly_MapCollapse.visibility = View.GONE
-
-            val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = 0
-            mapFragment!!.getView()!!.setLayoutParams(params)
-        })
-        */
-
         settingView()
     }
     //--------------------------------------------------------------
@@ -331,17 +317,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun settingView()
     {
         ly_NoData.visibility = View.GONE
-
-        //map..
-        /*
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
-        mapFragment!!.getMapAsync(mapFragment)
-        val mArgs = Bundle()
-        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo!!)
-        mapFragment.arguments = mArgs
-        */
-
-        //getPlaceInfoProc(m_PlaceInfo!!.seq!!)
         settingPlaceView()
     }
     //--------------------------------------------------------------

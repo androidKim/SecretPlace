@@ -124,6 +124,18 @@
             android:textColor="@color/color_black" />
     </LinearLayout>
 
+
+    <TextView
+        android:id="@+id/tv_Progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/progressBar"
+        android:layout_centerInParent="true"
+        android:textColor="@color/color_black"
+        android:textSize="13dp"
+        android:visibility="gone"
+        tools:text="60%.." />
+
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
