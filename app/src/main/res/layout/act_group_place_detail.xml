@@ -5,7 +5,7 @@
     android:id="@+id/ly_Base"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.act.ActPlaceDetail">
+    tools:context=".ui.act.ActGroupPlaceDetail">
 
 
     <RelativeLayout
@@ -53,11 +53,11 @@
             </LinearLayout>
 
             <TextView
+                android:layout_toLeftOf="@+id/ly_ShowMap"
                 android:id="@+id/tv_Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/ly_ShowMap"
                 android:layout_toRightOf="@+id/ly_EditContent"
                 android:ellipsize="end"
                 android:maxLines="1"
@@ -88,12 +88,12 @@
     </RelativeLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
         android:id="@+id/ly_SwipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/ly_Top"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp">
+        android:layout_below="@+id/ly_Top">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
@@ -124,6 +124,7 @@
             android:textColor="@color/color_black" />
     </LinearLayout>
 
+
     <TextView
         android:id="@+id/tv_Progress"
         android:layout_width="wrap_content"
@@ -142,6 +143,5 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="gone" />
-
 
 </RelativeLayout>

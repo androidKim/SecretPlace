@@ -149,7 +149,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         */
 
         val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
-        m_RecyclerView!!.layoutManager = pLayoutManager
         m_RecyclerView!!.setHasFixedSize(true)
 
         m_RecyclerView!!.layoutManager = pLayoutManager

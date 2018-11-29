@@ -52,7 +52,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback{
+class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback{
     //extention functions..
     inline fun Activity.showPhotoViewDialog(func: dlg_photo_view.() -> Unit): AlertDialog =
             dlg_photo_view(this).apply {
@@ -99,12 +99,12 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         setTheme(R.style.AppTheme)
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.act_place_detail)
+        setContentView(R.layout.act_group_place_detail)
         m_Context = this
         m_RequestManager = Glide.with(this)
         m_App = MyApp()
         if(m_App!!.m_binit == false)
-            m_App!!.init(m_Context as ActPlaceDetail)
+            m_App!!.init(m_Context as ActGroupPlaceDetail)
 
         initValue()
         recvIntentData()
@@ -310,6 +310,31 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         ly_EditContent.setOnClickListener(View.OnClickListener {
             editContent()
         })
+
+        //map expand
+        /*
+        ly_MapExpand.setOnClickListener(View.OnClickListener {
+            ly_MapExpand.visibility = View.GONE
+            ly_MapCollapse.visibility = View.VISIBLE
+
+            //expand map..
+            val params = mapFragment!!.getView()!!.getLayoutParams()
+            params.height = RelativeLayout.LayoutParams.MATCH_PARENT
+            mapFragment!!.getView()!!.setLayoutParams(params)
+        })
+
+        //map collapse
+        ly_MapCollapse.setOnClickListener(View.OnClickListener {
+
+            ly_MapExpand.visibility = View.VISIBLE
+            ly_MapCollapse.visibility = View.GONE
+
+            val params = mapFragment!!.getView()!!.getLayoutParams()
+            params.height = 0
+            mapFragment!!.getView()!!.setLayoutParams(params)
+        })
+        */
+
         settingView()
     }
     //--------------------------------------------------------------
@@ -317,6 +342,17 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun settingView()
     {
         ly_NoData.visibility = View.GONE
+
+        //map..
+        /*
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
+        mapFragment!!.getMapAsync(mapFragment)
+        val mArgs = Bundle()
+        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo!!)
+        mapFragment.arguments = mArgs
+        */
+
+        //getPlaceInfoProc(m_PlaceInfo!!.seq!!)
         settingPlaceView()
     }
     //--------------------------------------------------------------
@@ -406,7 +442,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun getPlaceInfoProc(seq:String)
     {
         //place Object
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq)//where
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.child(seq)//where
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
         {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -690,7 +726,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         m_PlaceInfo!!.name = strName
 
         var pDbRef: DatabaseReference? = null
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_PlaceInfo!!.place_key)
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE).child(m_PlaceInfo!!.place_key)
         pDbRef!!.setValue(m_PlaceInfo!!)
 
         pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -722,7 +758,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun addPhoto()
     {
         //show dialog..
-        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create()
+        val pAlert = AlertDialog.Builder(this@ActGroupPlaceDetail).create()
         pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_12))
         pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_9))
         pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_msg_11),{
@@ -742,7 +778,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun editContent()
     {
         //show dialog..
-        val pAlert = AlertDialog.Builder(this@ActPlaceDetail).create()
+        val pAlert = AlertDialog.Builder(this@ActGroupPlaceDetail).create()
         pAlert.setTitle("["+m_PlaceInfo!!.name +"] "+m_Context!!.resources.getString(R.string.str_msg_8))
         pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
         var editName: EditText? = EditText(m_Context)

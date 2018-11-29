@@ -44,6 +44,7 @@ import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.HorizontalPlaceRvAdapter
+import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
@@ -51,19 +52,22 @@ import com.midas.secretplace.structure.core.group
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
+import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.ui.custom.dlg_photo_view
 import com.midas.secretplace.ui.frag.MapFragment
+import com.midas.secretplace.ui.frag.main.FrPlace
 import kotlinx.android.synthetic.main.act_group_detail.*
 import kotlinx.android.synthetic.main.dlg_photo_view.view.*
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.Serializable
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,HorizontalPlaceRvAdapter.ifCallback,PhotoRvAdapter.ifCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, MapFragment.ifCallback
+class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PlaceRvAdapter.ifCallback , GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener
 {
     //extention functions..
     inline fun Activity.showPhotoViewDialog(func: dlg_photo_view.() -> Unit): AlertDialog =
@@ -102,19 +106,14 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_GroupInfo:group? = group()
     var m_arrPlace:ArrayList<place>? = ArrayList()//group의 place list(horizontal listview)
     var m_LayoutInflater:LayoutInflater? = null
-    var m_HorizontalAdapter:HorizontalPlaceRvAdapter? = null
-    var m_Adapter: PhotoRvAdapter? = null
+    var m_PlaceAdapter:PlaceRvAdapter? = null
     var selectedImage: Uri? = null
-    var imageUri: Uri? = null
-    var m_PlaceInfo:place? = null
-    var m_strImgpath:String ?= null
     //var m_strPlaceLastSeq:String? = ""
     var m_bRunning:Boolean? = false
     var m_bFinish:Boolean? = false
     var m_bModify:Boolean? = false//변경이력여부
-    var m_arrItem:ArrayList<String>? = ArrayList()//imglist(vertical listview)
     /*********************** Controller ***********************/
-    var m_PhotoViewDialog: AlertDialog? = null
+
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
     //
@@ -179,128 +178,15 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             super.onBackPressed()
         }
     }
-
     //---------------------------------------------------------------------------------------------------
     //
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)//Intent?  <-- null이 올수도있다
     {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM)//select gallery
+
+        if(resultCode == Constant.FOR_RESULT_IS_REFRESH)
         {
-            if (data != null)
-            {
-                progressBar.visibility = View.VISIBLE
-                val contentURI = data!!.data
-                try
-                {
-                    val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, contentURI)
-                    m_strImgpath = saveImage(bitmap)
-                    //iv_Attach!!.setImageBitmap(bitmap)
-
-                    val data = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
-                    var value = 0.0
-
-                    var timestamp:Long = System.currentTimeMillis()
-                    var fileName:String = String.format("%s_%s",timestamp, "img")
-                    var storage = data.getReference().child(fileName).putFile(contentURI)
-                            .addOnProgressListener { taskSnapshot ->
-                                value = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
-                            }
-                            .addOnSuccessListener {
-                                taskSnapshot ->
-                                val uri = taskSnapshot.downloadUrl
-
-                                //update
-                                var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
-                                pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
-
-                                //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
-                                pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                    override fun onDataChange(dataSnapshot: DataSnapshot?)
-                                    {
-                                        if (dataSnapshot!!.exists())
-                                        {
-                                            m_bModify = true
-                                            setRefresh()
-                                            progressBar.visibility = View.GONE
-                                        }
-                                    }
-
-                                    override fun onCancelled(p0: DatabaseError?)
-                                    {
-                                        progressBar.visibility = View.GONE
-                                    }
-                                })
-
-                            }
-                            .addOnFailureListener{
-                                exception -> exception.printStackTrace()
-                            }
-
-                }
-                catch (e: IOException)
-                {
-                    e.printStackTrace()
-                }
-            }
-        }
-        else if (requestCode == REQUEST_TAKE_PHOTO)//take photo
-        {
-            progressBar.visibility = View.VISIBLE
-            try
-            {
-                try
-                {
-                    selectedImage = imageUri
-                }
-                catch (e: Exception)
-                {
-                    Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show()
-                }
-
-
-                val data = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
-                var value = 0.0
-
-                var timestamp:Long = System.currentTimeMillis()
-                var fileName:String = String.format("%s_%s",timestamp, "img")
-                var storage = data.getReference().child(fileName).putFile(selectedImage!!)
-                        .addOnProgressListener { taskSnapshot ->
-                            value = (100.0 * taskSnapshot.bytesTransferred) / taskSnapshot.totalByteCount
-                        }
-                        .addOnSuccessListener {
-                            taskSnapshot ->
-                            val uri = taskSnapshot.downloadUrl
-                            //update
-                            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
-                            pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
-                            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(dataSnapshot: DataSnapshot?)
-                                {
-                                    if (dataSnapshot!!.exists())
-                                    {
-                                        m_bModify = true
-                                        setRefresh()
-                                        progressBar.visibility = View.GONE
-                                    }
-                                }
-
-                                override fun onCancelled(p0: DatabaseError?)
-                                {
-                                    progressBar.visibility = View.GONE
-                                }
-                            })
-
-                        }
-                        .addOnFailureListener{
-                            exception -> exception.printStackTrace()
-                        }
-
-            }
-            catch (e: IOException)
-            {
-                e.printStackTrace()
-            }
+            setRefresh()
         }
     }
 
@@ -409,8 +295,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun initValue()
     {
         m_arrPlace = ArrayList<place>()//placelist
-        m_arrItem = ArrayList()//img list
-
     }
     //--------------------------------------------------------------
     //
@@ -429,50 +313,21 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun initLayout()
     {
         ly_NoData.visibility = View.GONE
-        m_LayoutInflater = LayoutInflater.from(m_Context)
 
+        m_LayoutInflater = LayoutInflater.from(m_Context)
         //event..
         ly_SwipeRefresh.setOnRefreshListener(this)
 
-        //horizontal rv
-        m_HorizontalAdapter = HorizontalPlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
-        horizontalRecyclerView!!.adapter = m_HorizontalAdapter
-        val pLayoutManager = LinearLayoutManager(m_Context, LinearLayoutManager.HORIZONTAL,false)
-        horizontalRecyclerView!!.layoutManager = pLayoutManager
+        m_PlaceAdapter = PlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
+        recyclerView!!.adapter = m_PlaceAdapter
 
-        //map expand
-        ly_MapExpand.setOnClickListener(View.OnClickListener {
-            ly_MapExpand.visibility = View.GONE
-            ly_MapCollapse.visibility = View.VISIBLE
+        recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
 
-            //expand map..
-            val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = 1500
-            mapFragment!!.getView()!!.setLayoutParams(params)
+        var nSpanCnt = 2
+        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
+        recyclerView!!.setHasFixedSize(true)
 
-            val horizontalParam = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
-            horizontalParam.addRule(RelativeLayout.BELOW, R.id.ly_Top)
-            ly_SwipeRefresh.layoutParams = horizontalParam
-
-            m_HorizontalAdapter!!.notifyDataSetChanged()
-        })
-
-        //map collapse
-        ly_MapCollapse.setOnClickListener(View.OnClickListener {
-
-            ly_MapExpand.visibility = View.VISIBLE
-            ly_MapCollapse.visibility = View.GONE
-
-            val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = 0
-            mapFragment!!.getView()!!.setLayoutParams(params)
-
-            val horizontalParam = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
-            horizontalParam.addRule(RelativeLayout.BELOW, R.id.ly_Top)
-            ly_SwipeRefresh.layoutParams = horizontalParam
-
-            m_HorizontalAdapter!!.notifyDataSetChanged()
-        })
+        recyclerView!!.layoutManager = pLayoutManager
 
         fbtn_SaveLocation?.setOnClickListener(View.OnClickListener
         {
@@ -496,10 +351,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 //group명변경
                 ly_EditGroupName.setOnClickListener(View.OnClickListener
                 {
-
                     //show dialog..
                     val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
-                    pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_16))
+                    pAlert.setTitle("["+m_GroupInfo!!.name+"]"+m_Context!!.resources.getString(R.string.str_msg_16))
                     pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
                     var editName: EditText? = EditText(m_Context)
                     editName!!.hint = getString(R.string.str_msg_4)
@@ -531,35 +385,21 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         initValue()
         ly_SwipeRefresh!!.setRefreshing(false)
 
-        //place adapter
-        m_HorizontalAdapter = HorizontalPlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
-        horizontalRecyclerView!!.adapter = m_HorizontalAdapter
-        val pLayoutManager = LinearLayoutManager(m_Context, LinearLayoutManager.HORIZONTAL,false)
-        horizontalRecyclerView!!.layoutManager = pLayoutManager
+        m_PlaceAdapter = PlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
+        recyclerView!!.adapter = m_PlaceAdapter
+
+        var nSpanCnt = 2
+        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
+        recyclerView!!.setHasFixedSize(true)
+
+        recyclerView!!.layoutManager = pLayoutManager
 
         getPlaceListProc()
-    }
-
-    //-------------------------------------------------------------
-    //
-    fun setRefreshImgList()
-    {
-        initValue()
-        if(m_Adapter != null)
-            m_Adapter!!.clearData()
-
-        //m_arrItem!!.add(0, "header")//setHeader
-        //m_Adapter!!.addList(m_arrItem!!)
-        //m_Adapter!!.setPlaceInfo(m_PlaceInfo!!)
-
-        ly_SwipeRefresh!!.setRefreshing(false)
-        getImageListProc()
     }
     //-------------------------------------------------------------
     //
     fun getPlaceListProc()
     {
-        m_PlaceInfo = null
         m_bRunning = true
         progressBar.visibility = View.VISIBLE
         //image list..
@@ -571,15 +411,11 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             {
                 // A new message has been added
                 // onChildAdded() will be called for each node at the first time
-
                 val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                if(m_PlaceInfo == null)
-                    m_PlaceInfo = pInfo
-
                 //m_strPlaceLastSeq = dataSnapshot!!.key
                 pInfo.place_key = dataSnapshot!!.key
                 m_arrPlace!!.add(pInfo!!)
-                m_HorizontalAdapter!!.notifyDataSetChanged()
+                m_PlaceAdapter!!.notifyDataSetChanged()
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -616,35 +452,25 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 {
                     if(m_arrPlace!!.count() > 0)
                     {
-                        settingImgListView()
-                        ly_NoData.visibility = View.GONE
+
                     }
                     else
                     {
                         initValue()
-                        tv_NoDataMsg.text = m_Context!!.resources.getString(R.string.str_msg_15)
-                        ly_NoData.visibility = View.VISIBLE
-                    }
-
-                    if(m_PlaceInfo != null)
-                    {
-                        settingMapView()
-                        getImageListProc()
                     }
                 }
                 else
                 {
                     initValue()
-                    tv_NoDataMsg.text = m_Context!!.resources.getString(R.string.str_msg_15)
+                }
+
+
+
+                if(m_PlaceAdapter!!.itemCount > 0)//
+                    ly_NoData.visibility = View.GONE
+                else
                     ly_NoData.visibility = View.VISIBLE
 
-                    //img adapter
-                    if(m_Adapter != null)
-                    {
-                        m_Adapter!!.clearData()
-                        m_Adapter!!.notifyDataSetChanged()
-                    }
-                }
                 m_bRunning = false
                 progressBar.visibility = View.GONE
             }
@@ -652,56 +478,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             override fun onCancelled(p0: DatabaseError?)
             {
 
-            }
-        })
-    }
-    //-------------------------------------------------------------
-    //
-    fun settingMapView()
-    {
-        //map..
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
-        mapFragment!!.getMapAsync(mapFragment)
-        val mArgs = Bundle()
-        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_LIST_OBJECT, m_arrPlace!!)
-        mapFragment.arguments = mArgs
-        mapFragment.setIfCallback(this)
-        mapFragment
-    }
-    //--------------------------------------------------------------
-    //
-    fun settingImgListView()
-    {
-        if(m_PlaceInfo == null)
-            return
-
-        //m_arrItem!!.add(0, "header")//setHeader
-        m_Adapter = PhotoRvAdapter(m_Context!!, m_RequestManager!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
-        recyclerView.adapter = m_Adapter
-
-        var nSpanCnt = 1
-        /*
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode.
-            nSpanCnt = 4
-        */
-
-        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
-        recyclerView!!.layoutManager = pLayoutManager
-        recyclerView!!.setHasFixedSize(true)
-        recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
-        {
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
-            {
-                val visibleItemCount = pLayoutManager.childCount
-                val totalItemCount = pLayoutManager.itemCount
-                val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
-
-                if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//더보기..
-                {
-                    // Call your API to load more items
-                    //if(!m_bFinish!!)
-                    //getImageListProc()
-                }
             }
         })
     }
@@ -766,155 +542,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         val dialog: android.support.v7.app.AlertDialog = builder.create()
         dialog.show()
-    }
-
-
-    //-------------------------------------------------------------
-    //
-    fun getImageListProc()
-    {
-        m_bRunning = true
-        progressBar.visibility = View.VISIBLE
-        //image list..
-        var pQuery:Query?= null
-
-        //if(m_strImgLastSeq != null)
-        //pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child("place_key").startAt(m_PlaceInfo!!.place_key).limitToFirst(ReqBase.ITEM_COUNT)
-        //else
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").orderByKey()//.limitToFirst(ReqBase.ITEM_COUNT)
-
-        pQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                // A new message has been added
-                // onChildAdded() will be called for each node at the first time
-            }
-
-            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
-
-                // A message has changed
-                //val message = dataSnapshot.getValue(Message::class.java)
-            }
-
-            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
-            {
-                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
-
-                // A message has been removed
-                //val message = dataSnapshot.getValue(Message::class.java)
-            }
-
-            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
-
-                // A message has changed position
-                //val message = dataSnapshot.getValue(Message::class.java)
-            }
-
-            override fun onCancelled(databaseError: DatabaseError?)
-            {
-                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
-            }
-        })
-
-        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
-            {
-                if(dataSnapshot!!.exists())
-                {
-                    val children = dataSnapshot!!.children
-                    children.forEach {
-
-                        //if(m_strImgLastSeq != null)
-                        //{
-                        //if(!m_strImgLastSeq.equals(it!!.key))
-                        //{
-                        //m_strImgLastSeq = it!!.key
-
-                        var strUrl:String = it.getValue(String::class.java)!!
-                        m_Adapter!!.addItem(strUrl)
-                        //}
-                        //else//not add same key..
-                        //{
-                        //m_bFinish = true//get lastitem detect
-                        //}
-                        //}
-                        //else
-                        //{
-                        //m_strImgLastSeq = it!!.key
-
-                        //var strUrl:String = it.getValue(String::class.java)!!
-                        //m_Adapter!!.addItem(strUrl)
-                        //}
-                    }
-                }
-                else
-                {
-                    m_bFinish = true//
-                }
-
-                if(m_Adapter!!.itemCount > 1)//1 : header..
-                {
-                    ly_NoData.visibility = View.GONE
-                }
-                else
-                {
-                    tv_NoDataMsg.text = m_Context!!.resources.getString(R.string.str_msg_14)
-                    ly_NoData.visibility = View.VISIBLE
-                }
-                m_bRunning = false
-                progressBar.visibility = View.GONE
-            }
-
-            override fun onCancelled(p0: DatabaseError?)
-            {
-
-            }
-        })
-    }
-    //-------------------------------------------------------------
-    //
-    private fun checkPermissionWriteStorage()
-    {
-        val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
-        if (permission != PackageManager.PERMISSION_GRANTED)
-        {
-            permissionWriteStorege()
-        }
-        else
-        {
-            selectImageInAlbum()
-        }
-    }
-    //-------------------------------------------------------------
-    //
-    private fun checkPermissionCamera()
-    {
-        val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-        if(permission != PackageManager.PERMISSION_GRANTED)
-        {
-            permissionCamerra()
-        }
-        else
-        {
-            takePhoto()
-        }
-    }
-    //-------------------------------------------------------------
-    //
-    private fun permissionWriteStorege()
-    {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_SELECT_IMAGE_IN_ALBUM)
-    }
-    //-------------------------------------------------------------
-    //
-    private fun permissionCamerra()
-    {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_TAKE_PHOTO)
     }
     //--------------------------------------------------------------
     //
@@ -1026,35 +653,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     */
     //-------------------------------------------------------------
     //
-    fun selectImageInAlbum()
-    {
-        val pIntent = Intent(Intent.ACTION_GET_CONTENT)
-        pIntent.type = "image/*"
-        if (pIntent.resolveActivity(packageManager) != null)
-        {
-            startActivityForResult(pIntent, REQUEST_SELECT_IMAGE_IN_ALBUM)
-        }
-    }
-    //-------------------------------------------------------------
-    //
-    fun takePhoto()
-    {
-        val pIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-
-        var timestamp:Long = System.currentTimeMillis()
-        var fileName:String = String.format("%s_%s",timestamp, "img")
-        val photo = File((Environment.getExternalStorageDirectory()).toString() + IMAGE_DIRECTORY, fileName)
-
-        pIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(m_Context!!, "com.midas.secretplace.fileprovider", photo))
-        imageUri = FileProvider.getUriForFile(m_Context!!, "com.midas.secretplace.fileprovider", photo)
-
-        if (pIntent.resolveActivity(packageManager) != null)
-        {
-            startActivityForResult(pIntent, REQUEST_TAKE_PHOTO)
-        }
-    }
-    //-------------------------------------------------------------
-    //
     fun editGroupName(strName:String)
     {
         m_GroupInfo!!.name = strName
@@ -1119,82 +717,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         }
         return ""
     }
-    //-------------------------------------------------------------
-    //
-    fun editContentProc(strName:String)
-    {
-        //update
-        m_PlaceInfo!!.name = strName
-
-        var pDbRef: DatabaseReference? = null
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE).child(m_PlaceInfo!!.place_key)
-        pDbRef!!.setValue(m_PlaceInfo!!)
-
-        pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
-            {
-                if (dataSnapshot!!.exists())
-                {
-                    setRefresh()
-                    m_bModify = true
-                }
-            }
-
-            override fun onCancelled(p0: DatabaseError?)
-            {
-
-            }
-        })
-    }
-    //----------------------------------------------------------
-    //  showing dialog
-    fun showPhotoViewDialog(url:String)
-    {
-        m_PhotoViewDialog = showPhotoViewDialog {
-            cancelable = true
-
-
-            Glide.with(applicationContext)
-                    .load(url)
-                    .listener(object : RequestListener<Drawable>
-                    {
-                        override fun onLoadFailed(p0: GlideException?, p1: Any?, p2: com.bumptech.glide.request.target.Target<Drawable>?, p3: Boolean): Boolean
-                        {
-                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                            dialogView!!.iv_DlgNone!!.visibility = View.GONE
-                            dialogView!!.iv_DlgNone!!.visibility = View.VISIBLE
-                        }
-                        override fun onResourceReady(p0: Drawable?, p1: Any?, p2: com.bumptech.glide.request.target.Target<Drawable>?, p3: DataSource?, p4: Boolean): Boolean
-                        {
-                            //do something when picture already loaded
-                            dialogView!!.iv_DlgNone!!.visibility = View.GONE
-                            dialogView!!.iv_DlgNone!!.visibility = View.GONE
-
-
-                            if(p0 != null)
-                                dialogView!!.iv_DlgNone!!.tag = url
-
-                            return false
-                        }
-                    })
-                    .into(dialogView!!.iv_DlgPhoto)
-
-
-
-
-            onCancelListener {
-                m_PhotoViewDialog!!.dismiss()
-            }
-
-
-            closeIconClickListener {
-                m_PhotoViewDialog!!.dismiss()
-            }
-        }
-        //  and showing
-        m_PhotoViewDialog?.show()
-    }
-
     /************************* listener *************************/
     //--------------------------------------------------------------------
     //
@@ -1224,17 +746,13 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         setRefresh()
     }
     //-----------------------------------------------------
-    //horizontal place adapter ifCallback
-    override fun selectPlaceItem(pInfo: place)
-    {
-        m_PlaceInfo = pInfo
-
-        //refresh img list..
-        setRefreshImgList()
+    //listAdapter callback
+    override fun checkPermission(): Boolean {
+        return true
     }
-    //-----------------------------------------------------
-    //horizontal place adapter ifCallback
-    override fun deletePlaceItem(pInfo: place)
+    //----------------------------------------------------------------------
+    //listAdapter callback
+    override fun deleteProc(pInfo: place)
     {
         var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.child(pInfo.place_key)//where
         pDbRef!!.removeValue()
@@ -1242,58 +760,16 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
         pDbRef!!.removeValue()
 
-        m_bModify = true//
         setRefresh()
     }
-    //-----------------------------------------------------
-    //photo view adapter ifCallback
-    fun addPhoto()
+    //----------------------------------------------------------------------
+    //listAdapter callback
+    override fun moveDetailActivity(pInfo: place)
     {
-        //show dialog..
-        val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
-        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_12))
-        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_9))
-        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_msg_11),{
-            dialogInterface, i ->
-            checkPermissionWriteStorage();
-            pAlert.dismiss();
-        })
-        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_msg_10),{
-            dialogInterface, i ->
-            checkPermissionCamera();
-            pAlert.dismiss();
-        })
-        pAlert.show()
+        var pIntent = Intent(m_Context, ActGroupPlaceDetail::class.java)
+        pIntent.putExtra(Constant.INTENT_DATA_PLACE_OBJECT, pInfo as Serializable)
+        startActivityForResult(pIntent, 0)
     }
-    //-----------------------------------------------------
-    //photo view adapter ifCallback
-    fun editContent()
-    {
-        //show dialog..
-        val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
-        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_8))
-        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
-        var editName: EditText? = EditText(m_Context)
-        editName!!.hint = getString(R.string.str_msg_4)
-        pAlert.setView(editName)
-        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_ok),{
-            dialogInterface, i ->
-            var name:String = editName.text.toString()
-            editContentProc(name)
-            pAlert.dismiss()
-        })
-        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_no),{
-            dialogInterface, i ->
-            pAlert.dismiss()
-        })
-        pAlert.show()
-    }
-    //-----------------------------------------------------
-    //photo view adapter ifCallback
-    override fun showPhotoDialog(url: String) {
-        showPhotoViewDialog(url)
-    }
-
     /*********************** interface ***********************/
 
 }
