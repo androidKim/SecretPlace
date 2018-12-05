@@ -198,7 +198,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
             }
 
             termsDetailClickListener {
-                val url = "http://13.125.225.201:8080/terms"
+                val url = "http://54.180.109.122:8081/terms"
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
             }
 
