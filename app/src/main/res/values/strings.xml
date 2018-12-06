@@ -1,7 +1,9 @@
 <resources>
     <string name="google_maps_key">AIzaSyDtbMkveLaoHDA18vK7GZKFK8E7IW3Wi6M</string>
-    <string name="facebook_app_id">1698683040237300</string>
-    <string name="fb_login_protocol_scheme">fb1698683040237300</string>
+    <string name="facebook_app_id" translatable="false">1698683040237300</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb1698683040237300</string>
+    <string name="twitter_consumer_key" translatable="false">1Gqkat9htRhTfHP31DG64F1LK</string>
+    <string name="twitter_consumer_secret" translatable="false">desMpaNzISR5xtGXAADUFm2xeckH1fWGQLFn1XHmqPHIIzlEox</string>
 
     <string name="app_name">SecretPlace</string>
     <string name="navigation_drawer_open">Navigation Drawer Is Open</string>
