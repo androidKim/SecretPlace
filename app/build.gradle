@@ -8,7 +8,7 @@ android {
         applicationId "com.midas.secretplace"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 1
+        versionCode 2
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -45,6 +45,9 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.4.0'
 
     implementation 'com.facebook.android:facebook-login:[4,5)'
+    implementation('com.twitter.sdk.android:twitter:3.1.1@aar') {
+        transitive = true
+    }
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
 
 
