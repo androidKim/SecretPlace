@@ -83,7 +83,6 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        mAuth = FirebaseAuth.getInstance()
         var twitterConfig = TwitterConfig.Builder(this)
                 .logger(DefaultLogger(Log.DEBUG))
                 .twitterAuthConfig(TwitterAuthConfig(resources.getString(R.string.twitter_consumer_key), resources.getString(R.string.twitter_consumer_secret)))
@@ -95,6 +94,8 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         m_Context = this
         m_App = MyApp()
         m_App!!.init(m_Context as ActLogin)
+        mAuth = FirebaseAuth.getInstance()
+
         initValue()
         recvIntentData()
         initLayout()
@@ -126,30 +127,26 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
         super.onActivityResult(requestCode, resultCode, data)
 
+        twitter_sign_in_button!!.onActivityResult(requestCode, resultCode, data)//twitter
 
-            twitter_sign_in_button!!.onActivityResult(requestCode, resultCode, data)
+        callbackManager!!.onActivityResult(requestCode, resultCode, data)//facebobok
 
-        /*
-            callbackManager!!.onActivityResult(requestCode, resultCode, data)//facebobok
-
-            if (requestCode == GOOGLE_LOG_IN_RC)
+        if (requestCode == GOOGLE_LOG_IN_RC)
+        {
+            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+            if (result.isSuccess)
             {
-                val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-                if (result.isSuccess)
-                {
-                    // Google Sign In was successful, authenticate with Firebase
-                    firebaseAuthWithGoogle(result.signInAccount!!)
+                // Google Sign In was successful, authenticate with Firebase
+                firebaseAuthWithGoogle(result.signInAccount!!)
 
-                    if (googleApiClient!!.hasConnectedApi(Auth.GOOGLE_SIGN_IN_API))
-                        googleApiClient!!.clearDefaultAccountAndReconnect()
-                }
-                else
-                {
-                    Toast.makeText(this@ActLogin, "Some error occurred.", Toast.LENGTH_SHORT).show()
-                }
+                if (googleApiClient!!.hasConnectedApi(Auth.GOOGLE_SIGN_IN_API))
+                    googleApiClient!!.clearDefaultAccountAndReconnect()
             }
-            */
-
+            else
+            {
+                Toast.makeText(this@ActLogin, "Some error occurred.", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
     /******************* User Function *******************/
     //------------------------------------------------
@@ -168,6 +165,8 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     //
     private fun initLayout()
     {
+        LoginManager.getInstance().logOut()
+
         setTwitterSign()
         setFacebookSign()
         setGoogleSign()
@@ -288,10 +287,10 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     //
     private fun handleTwitterSession(session: TwitterSession) {
         Log.d(TAG, "handleTwitterSession:" + session)
-        val credential: AuthCredential = TwitterAuthProvider.getCredential(
-            session.authToken.token,
-            session.authToken.secret)
 
+        var credential:AuthCredential  = TwitterAuthProvider.getCredential(
+                session.authToken.token,
+                session.authToken.secret)
 
         mAuth!!.signInWithCredential(credential)
                 .addOnCompleteListener(this) { task ->
@@ -410,8 +409,6 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                 // App code
             }
         })
-
-        LoginManager.getInstance().logOut()
     }
     //----------------------------------------------------------------
     //
