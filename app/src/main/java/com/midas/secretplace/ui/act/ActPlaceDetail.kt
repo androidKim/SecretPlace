@@ -43,7 +43,6 @@ import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
-import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.ui.custom.dlg_photo_view
 import kotlinx.android.synthetic.main.act_place_detail.*
 import kotlinx.android.synthetic.main.dlg_photo_view.view.*
@@ -262,6 +261,35 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                         .addOnPausedListener { System.out.println("Upload is paused!") }
             } catch (e: IOException) {
                 e.printStackTrace()
+            }
+        }
+    }
+    //--------------------------------------------------------------
+    //permission checking callback
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+
+        if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED)//거부
+        {
+            Toast.makeText(m_Context, m_Context!!.resources.getString(R.string.str_msg_24), Toast.LENGTH_LONG).show()
+            return
+        }
+        else //허용
+        {
+            when(requestCode)
+            {
+                Constant.PERMISSION_WRITE_EXTERNAL_STORAGE ->
+                {
+                    selectImageInAlbum()
+                    return
+                }
+                Constant.PERMISSION_CAMERA ->
+                {
+                    takePhoto()
+                    return
+                }
             }
         }
     }
@@ -573,7 +601,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 .setListener(null)
     }
     //-------------------------------------------------------------
-    //
+    //저장소
     private fun checkPermissionWriteStorage()
     {
         val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -588,7 +616,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         }
     }
     //-------------------------------------------------------------
-    //
+    //카메라
     private fun checkPermissionCamera()
     {
         val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -605,13 +633,13 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     private fun permissionWriteStorege()
     {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_SELECT_IMAGE_IN_ALBUM)
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), Constant.PERMISSION_WRITE_EXTERNAL_STORAGE )
     }
     //-------------------------------------------------------------
     //
     private fun permissionCamerra()
     {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_TAKE_PHOTO)
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), Constant.PERMISSION_CAMERA)
     }
     //-------------------------------------------------------------
     //add local image filename
@@ -727,13 +755,13 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_9))
         pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_msg_11),{
             dialogInterface, i ->
-            checkPermissionWriteStorage();
-            pAlert.dismiss();
+            checkPermissionWriteStorage()
+            pAlert.dismiss()
         })
         pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_msg_10),{
             dialogInterface, i ->
-            checkPermissionCamera();
-            pAlert.dismiss();
+            checkPermissionCamera()
+            pAlert.dismiss()
         })
         pAlert.show()
     }

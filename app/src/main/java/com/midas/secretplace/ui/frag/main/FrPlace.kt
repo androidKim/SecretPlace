@@ -117,7 +117,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             if(m_IfCallback != null)
             {
                 var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
-
                 if(bPermissionVal)
                 {
                     seveLocationDialog()
