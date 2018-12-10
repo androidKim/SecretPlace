@@ -26,10 +26,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.firebase.auth.FacebookAuthProvider
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.TwitterAuthProvider
+import com.google.firebase.auth.*
+
 import com.google.firebase.database.*
 import com.midas.secretplace.R
 import com.midas.secretplace.core.FirebaseDbCtrl
@@ -37,10 +35,10 @@ import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.custom.dlg_terms_agree
 import com.twitter.sdk.android.core.*
+
 import kotlinx.android.synthetic.main.act_login.*
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import java.util.*
 
 
 class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, View.OnClickListener
@@ -85,6 +83,12 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+        var twitterConfig = TwitterConfig.Builder(this)
+                .logger(DefaultLogger(Log.DEBUG))
+                .twitterAuthConfig(TwitterAuthConfig(resources.getString(R.string.twitter_consumer_key), resources.getString(R.string.twitter_consumer_secret)))
+                .debug(false)
+                .build()
+        Twitter.initialize(twitterConfig)
         setContentView(R.layout.act_login)
 
         m_Context = this
@@ -123,7 +127,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
         super.onActivityResult(requestCode, resultCode, data)
 
-        //twitter_sign_in_button!!.onActivityResult(requestCode, resultCode, data)
+        twitter_sign_in_button!!.onActivityResult(requestCode, resultCode, data)//twitter
 
         callbackManager!!.onActivityResult(requestCode, resultCode, data)//facebobok
 
@@ -143,7 +147,6 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                 Toast.makeText(this@ActLogin, "Some error occurred.", Toast.LENGTH_SHORT).show()
             }
         }
-
     }
     /******************* User Function *******************/
     //------------------------------------------------
@@ -162,6 +165,8 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     //
     private fun initLayout()
     {
+        LoginManager.getInstance().logOut()
+
         setTwitterSign()
         setFacebookSign()
         setGoogleSign()
@@ -190,7 +195,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
     //----------------------------------------------------------
     //  showing dialog
-    fun showTermsAgreeDialog(userInfo:user, twSession:TwitterSession?, fbToken: AccessToken?, acct:GoogleSignInAccount?)
+    fun showTermsAgreeDialog(userInfo:user, twSession: TwitterSession?, fbToken: AccessToken?, acct:GoogleSignInAccount?)
     {
         progressBar.visibility = View.GONE
 
@@ -282,14 +287,14 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     //
     private fun handleTwitterSession(session: TwitterSession) {
         Log.d(TAG, "handleTwitterSession:" + session)
-        val credential = TwitterAuthProvider.getCredential(
+
+        var credential:AuthCredential  = TwitterAuthProvider.getCredential(
                 session.authToken.token,
                 session.authToken.secret)
 
         mAuth!!.signInWithCredential(credential)
                 .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful)
-                    {
+                    if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success")
                         //val user = mAuth!!.currentUser
@@ -367,9 +372,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                 Log.d("onCancelled", "")
                             }
                         })
-                    }
-                    else
-                    {
+                    } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException())
                         Toast.makeText(this@ActLogin, "Authentication failed.", Toast.LENGTH_SHORT).show()
@@ -406,8 +409,6 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                 // App code
             }
         })
-
-        LoginManager.getInstance().logOut()
     }
     //----------------------------------------------------------------
     //
