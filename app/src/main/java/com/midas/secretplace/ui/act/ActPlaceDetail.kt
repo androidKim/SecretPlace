@@ -44,6 +44,7 @@ import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
 import com.midas.secretplace.ui.custom.dlg_photo_view
+import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_place_detail.*
 import kotlinx.android.synthetic.main.dlg_photo_view.view.*
 import java.io.*
@@ -81,7 +82,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_Adapter: PhotoRvAdapter? = null
     var selectedImage: Uri? = null
     var imageUri: Uri? = null
-    var m_strImgpath:String = ""
     //var m_strImgLastSeq:String? = null
     var m_bRunning:Boolean = false
     var m_bFinish:Boolean = false
@@ -143,7 +143,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     //메모리데이터 업로드 방식
                     val baos = ByteArrayOutputStream()
                     bitmap!!.compress(Bitmap.CompressFormat.JPEG, 15, baos)//압축 0~100사이 품질 조절가능
-                    m_strImgpath = saveImage(bitmap)
+                    saveImage(bitmap)//scplace폴더에 저장
                     val byteArr: ByteArray = baos.toByteArray()
                     var timestamp: Long = System.currentTimeMillis()
                     var fileName: String = String.format("%s_%s", timestamp, "img")
@@ -213,10 +213,14 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
                 val imageReference = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
                 val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, selectedImage)
+                var path = saveImage(bitmap)//scplace폴더에 저장
+                //var path = Util.getRealPathFromURI(m_Context!!, selectedImage!!)
+                val bitmapRotate:Bitmap = Util.getRotateBitmap(path, bitmap)//카메라 이미지 회전이슈 방지..
                 //메모리데이터 업로드 방식
                 val baos = ByteArrayOutputStream()
-                bitmap!!.compress(Bitmap.CompressFormat.JPEG, 15, baos)//압축 0~100사이 품질 조절가능
-                m_strImgpath = saveImage(bitmap)
+                bitmapRotate!!.compress(Bitmap.CompressFormat.JPEG, 15, baos)//압축 0~100사이 품질 조절가능
+
+
                 val byteArr: ByteArray = baos.toByteArray()
                 var timestamp: Long = System.currentTimeMillis()
                 var fileName: String = String.format("%s_%s", timestamp, "img")
