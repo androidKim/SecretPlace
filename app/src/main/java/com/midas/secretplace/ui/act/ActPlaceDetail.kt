@@ -43,9 +43,10 @@ import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
+import com.midas.secretplace.ui.custom.dlg_photo_filter
 import com.midas.secretplace.ui.custom.dlg_photo_view
-import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_place_detail.*
+import kotlinx.android.synthetic.main.dlg_photo_filter.view.*
 import kotlinx.android.synthetic.main.dlg_photo_view.view.*
 import java.io.*
 import java.util.*
@@ -53,7 +54,9 @@ import kotlin.collections.ArrayList
 
 
 class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback{
-    //extention functions..
+    /*********************** extention fun ***********************/
+    //----------------------------------------------------------
+    //pinchToZoom
     inline fun Activity.showPhotoViewDialog(func: dlg_photo_view.() -> Unit): AlertDialog =
             dlg_photo_view(this).apply {
                 func()
@@ -61,6 +64,18 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
     inline fun Fragment.showPhotoViewDialog(func: dlg_photo_view.() -> Unit): AlertDialog =
             dlg_photo_view(this.context!!).apply {
+                func()
+            }.create()
+
+    //----------------------------------------------------------
+    //filter
+    inline fun Activity.showPhotoFilterDialog(func: dlg_photo_filter.() -> Unit): AlertDialog =
+            dlg_photo_filter(this).apply {
+                func()
+            }.create()
+
+    inline fun Fragment.showPhotoFilterDialog(func: dlg_photo_filter.() -> Unit): AlertDialog =
+            dlg_photo_filter(this.context!!).apply {
                 func()
             }.create()
 
@@ -90,6 +105,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_arrItem:ArrayList<String> = ArrayList<String>()
     /*********************** Controller ***********************/
     var m_PhotoViewDialog:AlertDialog? = null
+    var m_PhotoFilterDialog:AlertDialog? = null
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
     //
@@ -143,6 +159,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     //메모리데이터 업로드 방식
                     val baos = ByteArrayOutputStream()
                     bitmap!!.compress(Bitmap.CompressFormat.JPEG, 15, baos)//압축 0~100사이 품질 조절가능
+
+                    showPhotoFilterDialog(bitmap!!)
+
+                    /*
                     saveImage(bitmap)//scplace폴더에 저장
                     val byteArr: ByteArray = baos.toByteArray()
                     var timestamp: Long = System.currentTimeMillis()
@@ -186,6 +206,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                 tv_Progress.text = "Uploaded " + intProgress + "%..."
                             }
                             .addOnPausedListener { System.out.println("Upload is paused!") }
+                            */
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
@@ -194,6 +215,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             {
                 Toast.makeText(this, "No File!", Toast.LENGTH_LONG).show()
             }
+
         }
         else if (requestCode == REQUEST_TAKE_PHOTO)//take photo
         {
@@ -213,7 +235,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
                 val imageReference = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
                 val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, selectedImage)
+                showPhotoFilterDialog(bitmap!!)
+                /*
                 var path = saveImage(bitmap)//scplace폴더에 저장
+                //var tempBitmap:Bitmap = Util.getBitmapFromPath(path)
                 //var path = Util.getRealPathFromURI(m_Context!!, selectedImage!!)
                 val bitmapRotate:Bitmap = Util.getRotateBitmap(path, bitmap)//카메라 이미지 회전이슈 방지..
                 //메모리데이터 업로드 방식
@@ -263,6 +288,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                             tv_Progress.text = "Uploaded " + intProgress + "%..."
                         }
                         .addOnPausedListener { System.out.println("Upload is paused!") }
+                        */
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -273,7 +299,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
 
         if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED)//거부
         {
@@ -834,6 +859,32 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //  and showing
         m_PhotoViewDialog?.show()
     }
+
+    //----------------------------------------------------------
+    //  showing dialog
+    fun showPhotoFilterDialog(bitmap:Bitmap)
+    {
+        m_PhotoFilterDialog = showPhotoFilterDialog {
+            cancelable = true
+
+
+        var stream:ByteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        Glide.with(applicationContext)
+            .asBitmap()
+            .load(stream.toByteArray())
+            .into(dialogView!!.iv_Photo)
+
+            //iv_DlgPhoto!!.setImageDrawable(drawable!!)
+            closeIconClickListener {
+                m_PhotoFilterDialog!!.dismiss()
+            }
+
+        }
+        //  and showing
+        m_PhotoFilterDialog?.show()
+    }
+
 
 
     /************************* listener *************************/

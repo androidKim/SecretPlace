@@ -1,28 +1,21 @@
 package com.midas.secretplace.util
 
 import android.content.Context
-import android.util.DisplayMetrics
-import android.provider.MediaStore
 import android.graphics.Bitmap
-import android.net.Uri
-import android.os.Environment
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.nio.file.Files.delete
-import java.nio.file.Files.exists
-import android.widget.Toast
-import android.os.Environment.MEDIA_MOUNTED_READ_ONLY
-import com.midas.secretplace.R.string.app_name
-import android.os.Environment.getExternalStorageDirectory
-import android.os.Environment.MEDIA_MOUNTED
-import com.midas.secretplace.R
-import android.R.attr.bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
-import com.bumptech.glide.load.resource.bitmap.TransformationUtils.rotateImage
-import android.text.TextUtils
-import java.io.FileOutputStream
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.DisplayMetrics
+import android.widget.Toast
+import com.midas.secretplace.R
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.IOException
+
+
 
 
 class Util
@@ -89,24 +82,65 @@ class Util
 
 
         /****************************** Bitmap ******************************/
+        fun getBitmapFromPath(filePath:String):Bitmap
+        {
+            val imgFile = File(filePath)
+            if (imgFile.exists())
+            {
+                val myBitmap:Bitmap = BitmapFactory.decodeFile(imgFile.absolutePath)
+                //Drawable d = new BitmapDrawable(getResources(), myBitmap);
+                return  myBitmap
+            }
+            else
+                return null!!
+        }
+
         //-----------------------------------------------------------------
         //samsung device ..etc rotation issue 방지
         fun getRotateBitmap(photoPath:String, bitmap:Bitmap):Bitmap
         {
-            val ei = ExifInterface(photoPath)
-            val orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
 
-            var rotatedBitmap: Bitmap? = null
-            when (orientation) {
-                ExifInterface.ORIENTATION_UNDEFINED ->rotatedBitmap = rotateImage(bitmap!!, 0)
-                ExifInterface.ORIENTATION_ROTATE_90 -> rotatedBitmap = rotateImage(bitmap!!, 90)
-                ExifInterface.ORIENTATION_ROTATE_180 -> rotatedBitmap = rotateImage(bitmap!!, 180)
-                ExifInterface.ORIENTATION_ROTATE_270 -> rotatedBitmap = rotateImage(bitmap!!, 270)
-                ExifInterface.ORIENTATION_NORMAL -> rotatedBitmap = bitmap
-                else -> rotatedBitmap = bitmap
+            val exif = ExifInterface(photoPath)
+            val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+
+            try {
+                val matrix = Matrix()
+                when (orientation) {
+                    ExifInterface.ORIENTATION_NORMAL -> return bitmap
+                    ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.setScale(-1f, 1f)
+                    ExifInterface.ORIENTATION_ROTATE_180 -> matrix.setRotate(180f)
+                    ExifInterface.ORIENTATION_FLIP_VERTICAL -> {
+                        matrix.setRotate(180f)
+                        matrix.postScale(-1f, 1f)
+                    }
+                    ExifInterface.ORIENTATION_TRANSPOSE -> {
+                        matrix.setRotate(90f)
+                        matrix.postScale(-1f, 1f)
+                    }
+                    ExifInterface.ORIENTATION_ROTATE_90 -> matrix.setRotate(90f)
+                    ExifInterface.ORIENTATION_TRANSVERSE -> {
+                        matrix.setRotate(-90f)
+                        matrix.postScale(-1f, 1f)
+                    }
+                    ExifInterface.ORIENTATION_ROTATE_270 -> matrix.setRotate(-90f)
+                    else -> return bitmap
+                }
+                try
+                {
+                    val bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+                    bitmap.recycle()
+                    return bmRotated
+                } catch (e: OutOfMemoryError) {
+                    e.printStackTrace()
+                    return null!!
+                }
+
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return null!!
             }
 
-            return rotatedBitmap!!
+            return bitmap!!
         }
         //-----------------------------------------------------------------
         //
