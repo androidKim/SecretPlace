@@ -97,7 +97,7 @@ class Util
 
         //-----------------------------------------------------------------
         //samsung device ..etc rotation issue 방지
-        fun getRotateBitmap(photoPath:String, bitmap:Bitmap):Bitmap
+        fun getRotatePathBitmap(photoPath:String, bitmap:Bitmap):Bitmap
         {
 
             val exif = ExifInterface(photoPath)
@@ -142,6 +142,32 @@ class Util
 
             return bitmap!!
         }
+        //-----------------------------------------------------------------
+        //
+        fun getRotateBitmap(bitmap:Bitmap):Bitmap
+        {
+            try {
+                val matrix = Matrix()
+                matrix.setRotate(90f)
+
+                try
+                {
+                    val bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+                    bitmap.recycle()
+                    return bmRotated
+                } catch (e: OutOfMemoryError) {
+                    e.printStackTrace()
+                    return null!!
+                }
+
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return null!!
+            }
+
+            return bitmap!!
+        }
+
         //-----------------------------------------------------------------
         //
         fun rotateImage(source: Bitmap, angle: Float): Bitmap

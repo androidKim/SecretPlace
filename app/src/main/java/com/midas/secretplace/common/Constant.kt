@@ -4,6 +4,9 @@ class Constant
 {
     companion object
     {
+        //URL
+        val FIRE_STORE_URL = "gs://secretplace-29d5e.appspot.com"
+
         //Intent
         val INTENT_DATA_PLACE_OBJECT:String = "INTENT_DATA_PLACE_OBJECT"
         val INTENT_DATA_GROUP_OBJECT:String = "INTENT_DATA_GROUP_OBJECT"

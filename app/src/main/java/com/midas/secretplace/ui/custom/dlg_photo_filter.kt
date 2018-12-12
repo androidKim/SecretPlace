@@ -5,7 +5,8 @@ import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageButton
-import com.github.chrisbanes.photoview.PhotoView
+import android.widget.ImageView
+import android.widget.ProgressBar
 import com.midas.secretplace.R
 
 /*
@@ -33,12 +34,18 @@ class dlg_photo_filter(context: Context):BaseDialogHelper()
         dialogView.findViewById<ImageButton>(R.id.iBtn_Send)
     }
 
-    private val iv_Photo: PhotoView by lazy {
-        dialogView.findViewById<PhotoView>(R.id.iv_Photo)
+    private val iv_Photo: ImageView by lazy {
+        dialogView.findViewById<ImageView>(R.id.iv_Photo)
     }
 
 
-    //...
+    private val progressBar: ProgressBar by lazy {
+        dialogView.findViewById<ProgressBar>(R.id.progressBar)
+    }
+
+
+    //----------------------------------------------------------
+    //close..
     fun closeIconClickListener(func: (() -> Unit)? = null) =
             with(iBtn_Close) {
                 setClickListenerClose(func)
@@ -46,6 +53,34 @@ class dlg_photo_filter(context: Context):BaseDialogHelper()
 
     //  view click listener as extension function....
     private fun View.setClickListenerClose(func: (() -> Unit)?) =
+            setOnClickListener {
+                func?.invoke()
+            }
+
+
+    //----------------------------------------------------------
+    //rotate..
+    fun rotateIconClickListener(func: (() -> Unit)? = null) =
+            with(iBtn_Rotate) {
+                setClickListenerRotate(func)
+            }
+
+    //  view click listener as extension function....
+    private fun View.setClickListenerRotate(func: (() -> Unit)?) =
+            setOnClickListener {
+                func?.invoke()
+            }
+
+
+    //----------------------------------------------------------
+    //send..
+    fun sendIconClickListener(func: (() -> Unit)? = null) =
+            with(iBtn_Send) {
+                setClickListenerSend(func)
+            }
+
+    //  view click listener as extension function....
+    private fun View.setClickListenerSend(func: (() -> Unit)?) =
             setOnClickListener {
                 func?.invoke()
             }

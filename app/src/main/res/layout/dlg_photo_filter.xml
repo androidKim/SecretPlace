@@ -31,25 +31,34 @@
                 android:adjustViewBounds="true" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/iv_Photo"
-                android:orientation="horizontal">
+                android:layout_alignParentRight="true"
+                android:orientation="horizontal"
+                android:padding="10dp">
 
                 <ImageButton
                     android:id="@+id/iBtn_Rotate"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginRight="10dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginRight="20dp"
                     android:background="@drawable/baseline_rotate_90_degrees_ccw_black_48" />
 
                 <ImageButton
                     android:id="@+id/iBtn_Send"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:background="@drawable/baseline_send_black_48" />
             </LinearLayout>
 
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="gone" />
         </RelativeLayout>
     </ScrollView>
 </LinearLayout>
