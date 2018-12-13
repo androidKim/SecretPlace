@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 class SharedPreferenceCtrl
 {
     /************************* Defeine *************************/
+    private val SP_THEME = "SP_THEME"
     private val SP_USER_KEY = "SP_USER_KEY"
     private val SP_USER_SNS_TYPE = "SP_USER_SNS_TYPE"
 
@@ -19,7 +20,6 @@ class SharedPreferenceCtrl
     public fun init(pContext:Context)
     {
         preference = pContext.getSharedPreferences("prefs", Context.MODE_PRIVATE)
-
     }
     //---------------------------------------------------------
     //
@@ -29,7 +29,6 @@ class SharedPreferenceCtrl
         editor.clear()
         editor.commit()
     }
-
     //---------------------------------------------------------
     //
     private fun setStrSaveData(key: String, value: String)
@@ -43,11 +42,25 @@ class SharedPreferenceCtrl
     private fun getStrLoadData(key:String) : String?
     {
         var strResult:String ?= null
-        strResult = preference.getString(key, "");
+        strResult = preference.getString(key, "")
         return strResult
     }
-
     /************************* User Function *************************/
+    //---------------------------------------------------------
+    //
+    fun setSpTheme(value:String)
+    {
+        if(value == null)
+            return
+
+        setStrSaveData(SP_THEME, value)
+    }
+    fun getSpTheme():String?
+    {
+        var strResult:String?=null
+        strResult = getStrLoadData(SP_THEME)
+        return strResult
+    }
     //---------------------------------------------------------
     //
     fun setSpUserKey(value:String)

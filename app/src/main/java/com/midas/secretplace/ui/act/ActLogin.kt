@@ -27,7 +27,6 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.firebase.auth.*
-
 import com.google.firebase.database.*
 import com.midas.secretplace.R
 import com.midas.secretplace.core.FirebaseDbCtrl
@@ -35,7 +34,6 @@ import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.custom.dlg_terms_agree
 import com.twitter.sdk.android.core.*
-
 import kotlinx.android.synthetic.main.act_login.*
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -83,12 +81,15 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.AppTheme)
+
         var twitterConfig = TwitterConfig.Builder(this)
                 .logger(DefaultLogger(Log.DEBUG))
                 .twitterAuthConfig(TwitterAuthConfig(resources.getString(R.string.twitter_consumer_key), resources.getString(R.string.twitter_consumer_secret)))
                 .debug(false)
                 .build()
         Twitter.initialize(twitterConfig)
+
         setContentView(R.layout.act_login)
 
         m_Context = this

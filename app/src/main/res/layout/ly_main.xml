@@ -12,6 +12,8 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
+
+
     <android.support.v4.view.ViewPager
         android:layout_below="@+id/toolbar"
         android:id="@+id/viewPager"
@@ -27,4 +29,16 @@
             android:padding="13dp"/>
 
     </android.support.v4.view.ViewPager>
+    <Button
+        android:id="@+id/btn_Default"
+        android:text="default"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:layout_toRightOf="@+id/btn_Default"
+        android:id="@+id/btn_pink"
+        android:text="pink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </RelativeLayout>

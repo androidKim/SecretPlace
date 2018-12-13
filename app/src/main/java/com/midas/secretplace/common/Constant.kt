@@ -24,6 +24,10 @@ class Constant
         //ActivityForResult
         val FOR_RESULT_IS_REFRESH:Int = 2000
 
+        //theme
+        val THEME_PINK:String = "THEME_PINK"
+        val THEME_BLUE:String = "THEME_BLUE"
+
         //Define..
     }
 }

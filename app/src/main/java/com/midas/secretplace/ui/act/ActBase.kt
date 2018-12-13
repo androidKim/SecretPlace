@@ -19,7 +19,6 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnSuccessListener
-import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.ui.frag.main.FrGroup
 import com.midas.secretplace.ui.frag.main.FrPlace
@@ -49,11 +48,7 @@ FrPlace.ifCallback, FrGroup.ifCallback
     //
     override fun onCreate(savedInstanceState: Bundle?)
     {
-        setTheme(R.style.AppTheme)
-
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.act_main)
-
         MultiDex.install(this)
 
         mGoogleApiClient = GoogleApiClient.Builder(this)

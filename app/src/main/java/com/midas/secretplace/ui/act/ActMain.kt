@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import com.midas.secretplace.service.MyJobService
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
@@ -52,10 +53,15 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
     //
     override fun onCreate(savedInstanceState: Bundle?)
     {
-        setTheme(R.style.AppTheme)
+
+
+
+        //Util.setTheme(m_Context!!, m_App!!.m_SpCtrl!!.getSpTheme()!!)
 
         super.onCreate(savedInstanceState)
+        setTheme(R.style.AppThemePink)
         setContentView(R.layout.act_main)
+
         m_Context = this
         m_App = MyApp()
         if(m_App!!.m_binit == false)
@@ -111,9 +117,34 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
             viewPager.adapter = adapter
         }
 
+        //
+        btn_Default.setOnClickListener(View.OnClickListener {
+            setThemeBlue()
+        })
+
+        btn_pink.setOnClickListener(View.OnClickListener {
+            setThemePink()
+        })
+
         settingDrawerView()
         settingView()
     }
+    //--------------------------------------------------------------
+    //
+    fun setThemeBlue()
+    {
+        m_App!!.m_SpCtrl!!.setSpTheme(Constant.THEME_BLUE)
+        m_App!!.goMain(m_Context!!)
+    }
+    //--------------------------------------------------------------
+    //
+    fun setThemePink()
+    {
+        m_App!!.m_SpCtrl!!.setSpTheme(Constant.THEME_PINK)
+        m_App!!.goMain(m_Context!!)
+    }
+
+
     //--------------------------------------------------------------
     //
     fun setJobDispatcher()

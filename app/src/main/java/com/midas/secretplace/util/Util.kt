@@ -1,6 +1,7 @@
 package com.midas.secretplace.util
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -11,11 +12,10 @@ import android.provider.MediaStore
 import android.util.DisplayMetrics
 import android.widget.Toast
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
-
-
 
 
 class Util
@@ -177,6 +177,21 @@ class Util
             return Bitmap.createBitmap(source, 0, 0, source.width, source.height,
                     matrix, true)
         }
+
+        //-----------------------------------------------------------------
+        //
+        fun setTheme(context:Context, strTheme:String): Resources.Theme
+        {
+            val theme = context!!.theme
+
+            when (strTheme) {
+                Constant.THEME_BLUE -> theme.applyStyle(R.style.AppThemePink, true)
+                Constant.THEME_PINK -> theme.applyStyle(R.style.AppThemePink, true)
+                else -> theme.applyStyle(R.style.AppThemePink, true)
+            }
+            return theme
+        }
+
     }
 
     fun Int.dpToPx(displayMetrics: DisplayMetrics): Int = (this * displayMetrics.density).toInt()

@@ -117,7 +117,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun onCreate(savedInstanceState: Bundle?)
     {
         setTheme(R.style.AppTheme)
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.act_place_detail)
         m_Context = this
