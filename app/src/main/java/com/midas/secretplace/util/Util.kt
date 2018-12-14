@@ -185,9 +185,9 @@ class Util
             val theme = context!!.theme
 
             when (strTheme) {
-                Constant.THEME_BLUE -> theme.applyStyle(R.style.AppThemePink, true)
+                Constant.THEME_BLUE -> theme.applyStyle(R.style.AppThemeBlue, true)
                 Constant.THEME_PINK -> theme.applyStyle(R.style.AppThemePink, true)
-                else -> theme.applyStyle(R.style.AppThemePink, true)
+                else -> theme.applyStyle(R.style.AppTheme, true)
             }
             return theme
         }

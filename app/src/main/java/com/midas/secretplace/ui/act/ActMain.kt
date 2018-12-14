@@ -3,8 +3,10 @@ package com.midas.secretplace.ui.act
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
@@ -27,6 +29,7 @@ import com.midas.secretplace.service.MyJobService
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.MainPagerAdapter
+import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_main.*
 import kotlinx.android.synthetic.main.ly_main.*
 
@@ -53,19 +56,15 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
     //
     override fun onCreate(savedInstanceState: Bundle?)
     {
-
-
-
-        //Util.setTheme(m_Context!!, m_App!!.m_SpCtrl!!.getSpTheme()!!)
-
         super.onCreate(savedInstanceState)
-        setTheme(R.style.AppThemePink)
-        setContentView(R.layout.act_main)
 
         m_Context = this
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context as ActMain)
+
+        Util.setTheme(m_Context!!, m_App!!.m_SpCtrl!!.getSpTheme()!!)
+        setContentView(R.layout.act_main)
 
         initValue()
         recvIntentData()
@@ -117,34 +116,9 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
             viewPager.adapter = adapter
         }
 
-        //
-        btn_Default.setOnClickListener(View.OnClickListener {
-            setThemeBlue()
-        })
-
-        btn_pink.setOnClickListener(View.OnClickListener {
-            setThemePink()
-        })
-
         settingDrawerView()
         settingView()
     }
-    //--------------------------------------------------------------
-    //
-    fun setThemeBlue()
-    {
-        m_App!!.m_SpCtrl!!.setSpTheme(Constant.THEME_BLUE)
-        m_App!!.goMain(m_Context!!)
-    }
-    //--------------------------------------------------------------
-    //
-    fun setThemePink()
-    {
-        m_App!!.m_SpCtrl!!.setSpTheme(Constant.THEME_PINK)
-        m_App!!.goMain(m_Context!!)
-    }
-
-
     //--------------------------------------------------------------
     //
     fun setJobDispatcher()
@@ -157,7 +131,17 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
                 .build()
         dispatcher.mustSchedule(job)
     }
-
+    //--------------------------------------------------------------
+    //
+    fun setToolbarBackgroundColor(strTheme:String)
+    {
+        when(strTheme)
+        {
+            Constant.THEME_PINK -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkPink))
+            Constant.THEME_BLUE -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkBlue))
+            else -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+        }
+    }
     //--------------------------------------------------------------
     //
     fun settingDrawerView()
@@ -165,6 +149,9 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.setDisplayUseLogoEnabled(true)
+
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        setToolbarBackgroundColor(strTheme!!)
 
         val toggle = ActionBarDrawerToggle(this,drawer_layout,toolbar,R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
