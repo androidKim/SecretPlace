@@ -9,6 +9,7 @@ import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.frag.MapFragment
+import com.midas.secretplace.util.Util
 
 class ActMapDetail : AppCompatActivity()
 {
@@ -24,10 +25,11 @@ class ActMapDetail : AppCompatActivity()
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.act_map_detail)
         m_Context = this
         m_App = MyApp()
         m_App!!.init(m_Context as ActMapDetail)
+        Util.setTheme(m_Context!!, m_App!!.m_SpCtrl!!.getSpTheme()!!)
+        setContentView(R.layout.act_map_detail)
 
         initValue()
         recvIntentData()

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--
     <group android:checkableBehavior="single">
 
 
@@ -20,7 +21,7 @@
             android:icon="@drawable/ic_launcher_background"/>
 
     </group>
-
+-->
     <item
         android:id="@+id/other_options"
         android:title="@string/str_setting">
@@ -29,12 +30,12 @@
             <item
                 android:id="@+id/theme"
                 android:title="@string/str_msg_25"
-                android:icon="@drawable/baseline_exit_to_app_black_18dp"/>
+                android:icon="@drawable/baseline_view_comfy_black_48"/>
 
             <item
                 android:id="@+id/logout"
                 android:title="@string/str_msg_1"
-                android:icon="@drawable/baseline_exit_to_app_black_18dp"/>
+                android:icon="@drawable/baseline_exit_to_app_black_48"/>
         </menu>
     </item>
 </menu>

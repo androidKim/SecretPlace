@@ -26,8 +26,24 @@ class Constant
 
         //theme
         val THEME_PINK:String = "THEME_PINK"
+        val THEME_RED:String = "THEME_RED"
+        val THEME_PUPLE:String = "THEME_PUPLE"
+        val THEME_DEEPPUPLE:String = "THEME_DEEPPUPLE"
+        val THEME_INDIGO:String = "THEME_INDIGO"
         val THEME_BLUE:String = "THEME_BLUE"
-
+        val THEME_LIGHTBLUE:String = "THEME_LIGHTBLUE"
+        val THEME_CYAN:String = "THEME_CYAN"
+        val THEME_TEAL:String = "THEME_TEAL"
+        val THEME_GREEN:String = "THEME_GREEN"
+        val THEME_LIGHTGREEN:String = "THEME_LIGHTGREEN"
+        val THEME_LIME:String = "THEME_LIME"
+        val THEME_YELLOW:String = "THEME_YELLOW"
+        val THEME_AMBER:String = "THEME_AMBER"
+        val THEME_ORANGE:String = "THEME_ORANGE"
+        val THEME_DEEPORANGE:String = "THEME_DEEPORANGE"
+        val THEME_BROWN:String = "THEME_BROWN"
+        val THEME_GRAY:String = "THEME_GRAY"
+        val THEME_BLUEGRAY:String = "THEME_BLUEGRAY"
         //Define..
     }
 }

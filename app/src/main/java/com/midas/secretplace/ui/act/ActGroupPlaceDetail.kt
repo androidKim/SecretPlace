@@ -117,15 +117,14 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
     //
     override fun onCreate(savedInstanceState: Bundle?)
     {
-        setTheme(R.style.AppTheme)
-
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.act_group_place_detail)
         m_Context = this
         m_RequestManager = Glide.with(this)
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context as ActGroupPlaceDetail)
+        Util.setTheme(m_Context!!, m_App!!.m_SpCtrl!!.getSpTheme()!!)
+        setContentView(R.layout.act_group_place_detail)
 
         initValue()
         recvIntentData()

@@ -81,8 +81,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        setTheme(R.style.AppTheme)
-
+        //twitter config & init..
         var twitterConfig = TwitterConfig.Builder(this)
                 .logger(DefaultLogger(Log.DEBUG))
                 .twitterAuthConfig(TwitterAuthConfig(resources.getString(R.string.twitter_consumer_key), resources.getString(R.string.twitter_consumer_secret)))
@@ -90,11 +89,12 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                 .build()
         Twitter.initialize(twitterConfig)
 
-        setContentView(R.layout.act_login)
-
         m_Context = this
         m_App = MyApp()
         m_App!!.init(m_Context as ActLogin)
+        setTheme(R.style.AppTheme)
+        setContentView(R.layout.act_login)
+
         mAuth = FirebaseAuth.getInstance()
 
         initValue()

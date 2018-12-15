@@ -183,10 +183,26 @@ class Util
         fun setTheme(context:Context, strTheme:String): Resources.Theme
         {
             val theme = context!!.theme
-
             when (strTheme) {
-                Constant.THEME_BLUE -> theme.applyStyle(R.style.AppThemeBlue, true)
                 Constant.THEME_PINK -> theme.applyStyle(R.style.AppThemePink, true)
+                Constant.THEME_RED -> theme.applyStyle(R.style.AppThemeRed, true)
+                Constant.THEME_PUPLE -> theme.applyStyle(R.style.AppThemePuple, true)
+                Constant.THEME_DEEPPUPLE -> theme.applyStyle(R.style.AppThemeDeepPuple, true)
+                Constant.THEME_INDIGO-> theme.applyStyle(R.style.AppThemeIndigo, true)
+                Constant.THEME_BLUE-> theme.applyStyle(R.style.AppThemeBlue, true)
+                Constant.THEME_LIGHTBLUE-> theme.applyStyle(R.style.AppThemeLightBlue, true)
+                Constant.THEME_CYAN-> theme.applyStyle(R.style.AppThemeCyan, true)
+                Constant.THEME_TEAL-> theme.applyStyle(R.style.AppThemeTeal, true)
+                Constant.THEME_GREEN-> theme.applyStyle(R.style.AppThemeGreen, true)
+                Constant.THEME_LIGHTGREEN-> theme.applyStyle(R.style.AppThemeLightGreen, true)
+                Constant.THEME_LIME-> theme.applyStyle(R.style.AppThemeLime, true)
+                Constant.THEME_YELLOW-> theme.applyStyle(R.style.AppThemeYello, true)
+                Constant.THEME_AMBER-> theme.applyStyle(R.style.AppThemeAmber, true)
+                Constant.THEME_ORANGE-> theme.applyStyle(R.style.AppThemeOrange, true)
+                Constant.THEME_DEEPORANGE-> theme.applyStyle(R.style.AppThemeDeepOrange, true)
+                Constant.THEME_BROWN-> theme.applyStyle(R.style.AppThemeBrown, true)
+                Constant.THEME_GRAY-> theme.applyStyle(R.style.AppThemeGray, true)
+                Constant.THEME_BLUEGRAY-> theme.applyStyle(R.style.AppThemeBlueGray, true)
                 else -> theme.applyStyle(R.style.AppTheme, true)
             }
             return theme
