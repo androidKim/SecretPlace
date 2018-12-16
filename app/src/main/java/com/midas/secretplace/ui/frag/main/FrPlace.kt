@@ -14,7 +14,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
@@ -353,6 +355,88 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
         getPlaceListProc("")
     }
+    //----------------------------------------------------------------------
+    //storage image delete
+    fun storageDeleteItemProc(placeKey:String)
+    {
+        val storageRef = FirebaseStorage.getInstance(Constant.FIRE_STORE_URL)
+
+        var pQuery:Query? = null
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(placeKey).child("img_list")//where
+        pQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
+
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            {
+                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
+
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
+
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError?)
+            {
+                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+            }
+        })
+
+        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        val fileNm:String = it!!.getValue(String::class.java)!!
+                        // Create a reference to the file to delete
+                        var desertRef = storageRef.reference.child("1544662317750_img")//test..
+                        // Delete the file
+                        desertRef.delete().addOnSuccessListener {
+                            // File deleted successfully
+                            Toast.makeText(m_Context!!, "Success", Toast.LENGTH_LONG).show()
+                        }.addOnFailureListener {
+                            // Uh-oh, an error occurred!
+                            Toast.makeText(m_Context!!, "Fail", Toast.LENGTH_LONG).show()
+                        }
+
+
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+
+    }
+
 
     /******************************** Listener ********************************/
     //----------------------------------------------------------------------
@@ -366,12 +450,14 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //listAdapter callback
     override fun deleteProc(pInfo: place)
     {
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
-        pDbRef!!.removeValue()
+        //var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
+        //pDbRef!!.removeValue()
 
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
-        pDbRef!!.removeValue()
+        //pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
+        //pDbRef!!.removeValue()
 
+        //file remove
+        storageDeleteItemProc(pInfo.place_key!!)
         setRefresh()
     }
     //----------------------------------------------------------------------
