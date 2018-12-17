@@ -353,6 +353,196 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
         getPlaceListProc("")
     }
 
+    //----------------------------------------------------------------------
+    //
+    /*
+    fun deleteGroupPlaceList(pInfo:group)
+    {
+        var pQuery:Query? = null
+        if(!m_strSeq.equals(""))
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP).child(m_strSeq).orderByChild("group_key").equalTo(pInfo.group_key)//.limitToFirst(ReqBase.ITEM_COUNT)
+        else
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP).orderByChild("group_key").equalTo(pInfo.group_key)//.limitToFirst(ReqBase.ITEM_COUNT)
+
+
+        pQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+                    if(!m_strSeq.equals(dataSnapshot!!.key))
+                    {
+                        val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                        m_strSeq = dataSnapshot!!.key
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
+
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            {
+                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
+
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
+
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError?)
+            {
+                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+            }
+        })
+
+        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        var fileNm:String = it!!.getValue(String::class.java)!!
+
+                        //split ?
+                        var arrTemp:List<String> = fileNm.split("?")
+                        fileNm = arrTemp.get(0)
+                        //split "/"  get lastItem is FileName
+                        arrTemp = fileNm.split("/")
+                        fileNm = arrTemp.get(arrTemp.size - 1)
+
+                        // Create a reference to the file to delete
+                        var desertRef = storageRef.reference.child(fileNm)//test..
+                        // Delete the file
+                        desertRef.delete().addOnSuccessListener {
+                            // File deleted successfully
+
+                        }.addOnFailureListener {
+                            // Uh-oh, an error occurred!
+
+                        }
+
+
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+
+    }
+    */
+    //----------------------------------------------------------------------
+    //storage image delete
+    /*
+    fun storageDeleteItemProc(placeKey:String)
+    {
+        val storageRef = FirebaseStorage.getInstance(Constant.FIRE_STORE_URL)
+
+        var pQuery:Query? = null
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(placeKey).child("img_list")//where
+        pQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
+
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            {
+                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
+
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
+
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError?)
+            {
+                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+            }
+        })
+
+        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        var fileNm:String = it!!.getValue(String::class.java)!!
+
+                        //split ?
+                        var arrTemp:List<String> = fileNm.split("?")
+                        fileNm = arrTemp.get(0)
+                        //split "/"  get lastItem is FileName
+                        arrTemp = fileNm.split("/")
+                        fileNm = arrTemp.get(arrTemp.size - 1)
+
+                        // Create a reference to the file to delete
+                        var desertRef = storageRef.reference.child(fileNm)//test..
+                        // Delete the file
+                        desertRef.delete().addOnSuccessListener {
+                            // File deleted successfully
+
+                        }.addOnFailureListener {
+                            // Uh-oh, an error occurred!
+
+                        }
+
+
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+
+    }
+    */
+
     /******************************** Listener ********************************/
     //----------------------------------------------------------------------
     //
@@ -365,9 +555,25 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
     //listAdapter callback
     override fun deleteGroupProc(pInfo: group)
     {
+
+        //group data remove
         var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!.child(pInfo.group_key)//where
         pDbRef!!.removeValue()
+
+        /*
+        //place data remove
+        deleteGroupPlaceList(pInfo)
+
+        //file storage remove
+        storageDeleteItemProc(pInfo.place_key!!)
+
+        //file data remove
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
+        pDbRef!!.removeValue()
+
+
         setRefresh()
+        */
     }
     //----------------------------------------------------------------------
     //listAdapter callback

@@ -14,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.Toast
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
@@ -28,6 +27,7 @@ import com.midas.secretplace.ui.act.ActPlaceDetail
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import kotlinx.android.synthetic.main.frag_place.*
 import java.io.Serializable
+import java.util.*
 
 
 class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter.ifCallback
@@ -408,16 +408,24 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 {
                     val children = dataSnapshot!!.children
                     children.forEach {
-                        val fileNm:String = it!!.getValue(String::class.java)!!
+                        var fileNm:String = it!!.getValue(String::class.java)!!
+
+                        //split ?
+                        var arrTemp:List<String> = fileNm.split("?")
+                        fileNm = arrTemp.get(0)
+                        //split "/"  get lastItem is FileName
+                        arrTemp = fileNm.split("/")
+                        fileNm = arrTemp.get(arrTemp.size - 1)
+
                         // Create a reference to the file to delete
-                        var desertRef = storageRef.reference.child("1544662317750_img")//test..
+                        var desertRef = storageRef.reference.child(fileNm)//test..
                         // Delete the file
                         desertRef.delete().addOnSuccessListener {
                             // File deleted successfully
-                            Toast.makeText(m_Context!!, "Success", Toast.LENGTH_LONG).show()
+
                         }.addOnFailureListener {
                             // Uh-oh, an error occurred!
-                            Toast.makeText(m_Context!!, "Fail", Toast.LENGTH_LONG).show()
+
                         }
 
 
@@ -450,14 +458,18 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //listAdapter callback
     override fun deleteProc(pInfo: place)
     {
-        //var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
-        //pDbRef!!.removeValue()
+        //place data remove
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
+        pDbRef!!.removeValue()
 
-        //pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
-        //pDbRef!!.removeValue()
-
-        //file remove
+        //file storage remove
         storageDeleteItemProc(pInfo.place_key!!)
+
+        //file data remove
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
+        pDbRef!!.removeValue()
+
+        //refresh
         setRefresh()
     }
     //----------------------------------------------------------------------
