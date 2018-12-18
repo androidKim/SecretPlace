@@ -8,42 +8,30 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.location.Location
 import android.location.LocationManager
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import android.support.v4.content.FileProvider
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
-import android.widget.RelativeLayout
-import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.database.*
-import com.google.firebase.storage.FirebaseStorage
-import com.midas.mytimeline.ui.adapter.HorizontalPlaceRvAdapter
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
@@ -51,18 +39,11 @@ import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.group
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
-import com.midas.secretplace.ui.adapter.PhotoRvAdapter
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.ui.custom.dlg_photo_view
-import com.midas.secretplace.ui.frag.MapFragment
-import com.midas.secretplace.ui.frag.main.FrPlace
+import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_group_detail.*
-import kotlinx.android.synthetic.main.dlg_photo_view.view.*
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.Serializable
+import java.io.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -119,15 +100,15 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     override fun onCreate(savedInstanceState: Bundle?)
     {
-        setTheme(R.style.AppTheme)
-
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.act_group_detail)
         m_Context = this
         m_RequestManager = Glide.with(this)
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context as ActGroupDetail)
+
+        Util.setTheme(m_Context!!, m_App!!.m_SpCtrl!!.getSpTheme()!!)
+        setContentView(R.layout.act_group_detail)
 
         mGoogleApiClient = GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)

@@ -1,8 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#C62828</color>
-    <color name="colorPrimaryDark">#B71C1C</color>
-    <color name="colorAccent">#7D95B3</color>
+    <color name="colorPrimary">#82b1ff</color>
+    <color name="colorPrimaryDark">#4d82cb</color>
+    <color name="colorAccent">#82b1ff</color>
+
+    <color name="colorPrimaryPink">#ff80ab</color>
+    <color name="colorPrimaryDarkPink">#c94f7c</color>
+    <color name="colorAccentPink">#ff80ab</color>
+
+    <color name="colorPrimaryRed">#ff8a80</color>
+    <color name="colorPrimaryDarkRed">#c85a54</color>
+    <color name="colorAccentRed">#ff8a80</color>
+
+    <color name="colorPrimaryPuple">#ea80fc</color>
+    <color name="colorPrimaryDarkPuple">#b64fc8</color>
+    <color name="colorAccentPuple">#ea80fc</color>
+
+    <color name="colorPrimaryDeepPuple">#b388ff</color>
+    <color name="colorPrimaryDarkDeepPuple">#805acb</color>
+    <color name="colorAccentDeepPuple">#b388ff</color>
+
+    <color name="colorPrimaryIndigo">#8c9eff</color>
+    <color name="colorPrimaryDarkIndigo">#5870cb</color>
+    <color name="colorAccentIndigo">#8c9eff</color>
+
+    <color name="colorPrimaryBlue">#82b1ff</color>
+    <color name="colorPrimaryDarkBlue">#4d82cb</color>
+    <color name="colorAccentBlue">#82b1ff</color>
+
+    <color name="colorPrimaryLightBlue">#80d8ff</color>
+    <color name="colorPrimaryDarkLightBlue">#49a7cc</color>
+    <color name="colorAccentLightBlue">#80d8ff</color>
+
+    <color name="colorPrimaryCyan">#84ffff</color>
+    <color name="colorPrimaryDarkCyan">#4bcbcc</color>
+    <color name="colorAccentCyan">#84ffff</color>
+
+    <color name="colorPrimaryTeal">#a7ffeb</color>
+    <color name="colorPrimaryDarkTeal">#75ccb9</color>
+    <color name="colorAccentTeal">#a7ffeb</color>
+
+    <color name="colorPrimaryGreen">#b9f6ca</color>
+    <color name="colorPrimaryDarkGreen">#88c399</color>
+    <color name="colorAccentGreen">#b9f6ca</color>
+
+    <color name="colorPrimaryLightGreen">#ccff90</color>
+    <color name="colorPrimaryDarkLightGreen">#99cc60</color>
+    <color name="colorAccentLightGreen">#ccff90</color>
+
+    <color name="colorPrimaryLime">#f4ff81</color>
+    <color name="colorPrimaryDarkLime">#bfcc50</color>
+    <color name="colorAccentLime">#f4ff81</color>
+
+    <color name="colorPrimaryYellow">#ffff8d</color>
+    <color name="colorPrimaryDarkYellow">#cacc5d</color>
+    <color name="colorAccentYellow">#ffff8d</color>
+
+    <color name="colorPrimaryAmber">#ffe57f</color>
+    <color name="colorPrimaryDarkAmber">#cab350</color>
+    <color name="colorAccentAmber">#ffe57f</color>
+
+    <color name="colorPrimaryOrange">#ffd180</color>
+    <color name="colorPrimaryDarkOrange">#caa052</color>
+    <color name="colorAccentOrange">#ffd180</color>
+
+    <color name="colorPrimaryDeepOrange">#ff9e80</color>
+    <color name="colorPrimaryDarkDeepOrange">#c96f53</color>
+    <color name="colorAccentDeepOrange">#ff9e80</color>
+
+    <color name="colorPrimaryBrown">#3e2723</color>
+    <color name="colorPrimaryDarkBrown">#1b0000</color>
+    <color name="colorAccentBrown">#3e2723</color>
+
+    <color name="colorPrimaryGray">#212121</color>
+    <color name="colorPrimaryDarkGray">#000000</color>
+    <color name="colorAccentGray">#212121</color>
+
+    <color name="colorPrimaryBlueGray">#263238</color>
+    <color name="colorPrimaryDarkBlueGray">#000a12</color>
+    <color name="colorAccentBlueGray">#263238</color>
+
+
 
     <color name="primaryPressed">#303F9F</color>
     <color name="primaryFocused">#303F9F</color>

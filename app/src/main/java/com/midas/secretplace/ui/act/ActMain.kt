@@ -1,14 +1,19 @@
 
 package com.midas.secretplace.ui.act
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.GridLayoutManager
 import android.view.MenuItem
 import android.view.ScaleGestureDetector
 import android.view.View
@@ -21,12 +26,18 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.midas.mytimeline.ui.adapter.ThemeColorRvAdapter
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import com.midas.secretplace.service.MyJobService
+import com.midas.secretplace.structure.core.theme
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.MainPagerAdapter
+import com.midas.secretplace.ui.custom.dlg_theme_setting
+import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_main.*
+import kotlinx.android.synthetic.main.dlg_theme_setting.view.*
 import kotlinx.android.synthetic.main.ly_main.*
 
 
@@ -34,8 +45,21 @@ import kotlinx.android.synthetic.main.ly_main.*
 
 
 
-class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
+class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeColorRvAdapter.ifCallback
 {
+
+    //----------------------------------------------------------
+    //filter
+    inline fun Activity.showThemeSettingDialog(func: dlg_theme_setting.() -> Unit): AlertDialog =
+            dlg_theme_setting(this).apply {
+                func()
+            }.create()
+
+    inline fun Fragment.showThemeSettingDialog(func: dlg_theme_setting.() -> Unit): AlertDialog =
+            dlg_theme_setting(this.context!!).apply {
+                func()
+            }.create()
+
     /*********************** Define ***********************/
 
     /*********************** Member ***********************/
@@ -47,19 +71,21 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
     /*********************** Controller ***********************/
     private var m_iv_Profile: ImageView? = null
     private var m_iv_None:ImageView? = null
+    var m_ThemeSettingDialog:AlertDialog? = null
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
     //
     override fun onCreate(savedInstanceState: Bundle?)
     {
-        setTheme(R.style.AppTheme)
-
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.act_main)
+
         m_Context = this
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context as ActMain)
+
+        Util.setTheme(m_Context!!, m_App!!.m_SpCtrl!!.getSpTheme()!!)
+        setContentView(R.layout.act_main)
 
         initValue()
         recvIntentData()
@@ -126,7 +152,34 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
                 .build()
         dispatcher.mustSchedule(job)
     }
-
+    //--------------------------------------------------------------
+    //
+    fun setToolbarBackgroundColor(strTheme:String)
+    {
+        when(strTheme)
+        {
+            Constant.THEME_PINK -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkPink))
+            Constant.THEME_RED -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkRed))
+            Constant.THEME_PUPLE -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkPuple))
+            Constant.THEME_DEEPPUPLE -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkDeepPuple))
+            Constant.THEME_INDIGO-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkIndigo))
+            Constant.THEME_BLUE-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkBlue))
+            Constant.THEME_LIGHTBLUE-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkLightBlue))
+            Constant.THEME_CYAN-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkCyan))
+            Constant.THEME_TEAL-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryTeal))
+            Constant.THEME_GREEN-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryGreen))
+            Constant.THEME_LIGHTGREEN-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryLightGreen))
+            Constant.THEME_LIME-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryLime))
+            Constant.THEME_YELLOW-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryYellow))
+            Constant.THEME_AMBER-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryAmber))
+            Constant.THEME_ORANGE-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryOrange))
+            Constant.THEME_DEEPORANGE-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDeepOrange))
+            Constant.THEME_BROWN-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryBrown))
+            Constant.THEME_GRAY-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryGray))
+            Constant.THEME_BLUEGRAY-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryBlueGray))
+            else -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+        }
+    }
     //--------------------------------------------------------------
     //
     fun settingDrawerView()
@@ -134,6 +187,9 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.setDisplayUseLogoEnabled(true)
+
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        setToolbarBackgroundColor(strTheme!!)
 
         val toggle = ActionBarDrawerToggle(this,drawer_layout,toolbar,R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
@@ -203,6 +259,51 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
     }
     //--------------------------------------------------------------
     //
+    fun showThmeSelectDialog()
+    {
+        var themeAdapter: ThemeColorRvAdapter? = null
+        var arrTheme:ArrayList<theme>? = ArrayList()
+        arrTheme!!.add(theme(Constant.THEME_PINK))
+        arrTheme!!.add(theme(Constant.THEME_RED))
+        arrTheme!!.add(theme(Constant.THEME_PUPLE))
+        arrTheme!!.add(theme(Constant.THEME_DEEPPUPLE))
+        arrTheme!!.add(theme(Constant.THEME_INDIGO))
+        arrTheme!!.add(theme(Constant.THEME_BLUE))
+        arrTheme!!.add(theme(Constant.THEME_LIGHTBLUE))
+        arrTheme!!.add(theme(Constant.THEME_CYAN))
+        arrTheme!!.add(theme(Constant.THEME_TEAL))
+        arrTheme!!.add(theme(Constant.THEME_GREEN))
+        arrTheme!!.add(theme(Constant.THEME_LIGHTGREEN))
+        arrTheme!!.add(theme(Constant.THEME_LIME))
+        arrTheme!!.add(theme(Constant.THEME_YELLOW))
+        arrTheme!!.add(theme(Constant.THEME_AMBER))
+        arrTheme!!.add(theme(Constant.THEME_ORANGE))
+        arrTheme!!.add(theme(Constant.THEME_DEEPORANGE))
+        arrTheme!!.add(theme(Constant.THEME_BROWN))
+        arrTheme!!.add(theme(Constant.THEME_GRAY))
+        arrTheme!!.add(theme(Constant.THEME_BLUEGRAY))
+
+        m_ThemeSettingDialog = showThemeSettingDialog {
+            cancelable = true
+
+            themeAdapter = ThemeColorRvAdapter(m_Context!!, arrTheme!!, this@ActMain)
+            dialogView!!.themeRecyclerView!!.adapter = themeAdapter
+            var nSpanCnt = 5
+            val pLayoutManager = GridLayoutManager(m_Context!!, nSpanCnt)
+            dialogView!!.themeRecyclerView!!.setHasFixedSize(true)
+            dialogView!!.themeRecyclerView!!.layoutManager = pLayoutManager
+            //close..
+            closeIconClickListener {
+                m_ThemeSettingDialog!!.dismiss()
+            }
+
+
+        }
+        //  and showing
+        m_ThemeSettingDialog?.show()
+    }
+    //--------------------------------------------------------------
+    //
     fun showLogoutDialog()
     {
         val builder = AlertDialog.Builder(this@ActMain)
@@ -232,6 +333,11 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
 
         when(item.itemId)
         {
+            R.id.theme ->
+            {
+                showThmeSelectDialog()
+                return true
+            }
             R.id.logout ->
             {
                 showLogoutDialog()
@@ -240,6 +346,13 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return result
+    }
+    //--------------------------------------------------------------
+    //theme color adapter callback
+    override fun themeSelect(pInfo: theme)
+    {
+        m_App!!.m_SpCtrl!!.setSpTheme(pInfo!!.colorName)
+        m_App!!.goMain(m_Context!!)
     }
     /*********************** util ***********************/
 }

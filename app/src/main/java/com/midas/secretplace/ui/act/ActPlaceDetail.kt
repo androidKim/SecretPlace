@@ -43,9 +43,11 @@ import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
-import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
+import com.midas.secretplace.ui.custom.dlg_photo_filter
 import com.midas.secretplace.ui.custom.dlg_photo_view
+import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_place_detail.*
+import kotlinx.android.synthetic.main.dlg_photo_filter.view.*
 import kotlinx.android.synthetic.main.dlg_photo_view.view.*
 import java.io.*
 import java.util.*
@@ -53,7 +55,9 @@ import kotlin.collections.ArrayList
 
 
 class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback{
-    //extention functions..
+    /*********************** extention fun ***********************/
+    //----------------------------------------------------------
+    //pinchToZoom
     inline fun Activity.showPhotoViewDialog(func: dlg_photo_view.() -> Unit): AlertDialog =
             dlg_photo_view(this).apply {
                 func()
@@ -61,6 +65,18 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
     inline fun Fragment.showPhotoViewDialog(func: dlg_photo_view.() -> Unit): AlertDialog =
             dlg_photo_view(this.context!!).apply {
+                func()
+            }.create()
+
+    //----------------------------------------------------------
+    //filter
+    inline fun Activity.showPhotoFilterDialog(func: dlg_photo_filter.() -> Unit): AlertDialog =
+            dlg_photo_filter(this).apply {
+                func()
+            }.create()
+
+    inline fun Fragment.showPhotoFilterDialog(func: dlg_photo_filter.() -> Unit): AlertDialog =
+            dlg_photo_filter(this.context!!).apply {
                 func()
             }.create()
 
@@ -82,29 +98,34 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_Adapter: PhotoRvAdapter? = null
     var selectedImage: Uri? = null
     var imageUri: Uri? = null
-    var m_strImgpath:String = ""
+    var m_bitmapRotateBitmap:Bitmap? = null
+    var m_UploadImgFile:Bitmap? = null
     //var m_strImgLastSeq:String? = null
     var m_bRunning:Boolean = false
     var m_bFinish:Boolean = false
     var m_bModify:Boolean = false
     var m_bScrollTouch:Boolean = false
+    var m_bCamera:Boolean = false
     var m_arrItem:ArrayList<String> = ArrayList<String>()
+    var m_nUploadPhotoType = 0//TYPE_ALBUM,  TYPE_CAMERA
     /*********************** Controller ***********************/
     var m_PhotoViewDialog:AlertDialog? = null
+    var m_PhotoFilterDialog:AlertDialog? = null
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
     //
     override fun onCreate(savedInstanceState: Bundle?)
     {
-        setTheme(R.style.AppTheme)
-
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.act_place_detail)
+
         m_Context = this
         m_RequestManager = Glide.with(this)
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context as ActPlaceDetail)
+
+        Util.setTheme(m_Context!!, m_App!!.m_SpCtrl!!.getSpTheme()!!)
+        setContentView(R.layout.act_place_detail)
 
         initValue()
         recvIntentData()
@@ -123,7 +144,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         {
             super.onBackPressed()
         }
-
     }
 
     //---------------------------------------------------------------------------------------------------
@@ -134,59 +154,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         if(requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM)//select gallery
         {
             if (data != null) {
-                progressBar.visibility = View.VISIBLE
-                tv_Progress.visibility = View.VISIBLE
+                m_nUploadPhotoType = REQUEST_SELECT_IMAGE_IN_ALBUM
                 val contentURI = data!!.data
                 try {
-                    val imageReference = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
-                    val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, contentURI)
-
-                    //메모리데이터 업로드 방식
-                    val baos = ByteArrayOutputStream()
-                    bitmap!!.compress(Bitmap.CompressFormat.JPEG, 15, baos)//압축 0~100사이 품질 조절가능
-                    m_strImgpath = saveImage(bitmap)
-                    val byteArr: ByteArray = baos.toByteArray()
-                    var timestamp: Long = System.currentTimeMillis()
-                    var fileName: String = String.format("%s_%s", timestamp, "img")
-
-                    val fileRef = imageReference!!.reference.child(fileName)
-                    fileRef.putBytes(byteArr)
-                            .addOnSuccessListener { taskSnapshot ->
-                                //val uri = taskSnapshot.downloadUrl
-
-                                //update
-                                var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
-                                pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
-
-                                //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
-                                pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                    override fun onDataChange(dataSnapshot: DataSnapshot?) {
-                                        if (dataSnapshot!!.exists()) {
-                                            m_bModify = true
-                                            setRefresh()
-                                            progressBar.visibility = View.GONE
-                                            tv_Progress.visibility = View.GONE
-                                        }
-                                    }
-
-                                    override fun onCancelled(p0: DatabaseError?) {
-                                        progressBar.visibility = View.GONE
-                                        tv_Progress.visibility = View.GONE
-                                    }
-                                })
-                            }
-                            .addOnFailureListener { exception ->
-                                Toast.makeText(this, exception.message, Toast.LENGTH_LONG).show()
-                            }
-                            .addOnProgressListener { taskSnapshot ->
-                                // progress percentage
-                                val progress = 100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
-
-                                // percentage in progress dialog
-                                val intProgress = progress.toInt()
-                                tv_Progress.text = "Uploaded " + intProgress + "%..."
-                            }
-                            .addOnPausedListener { System.out.println("Upload is paused!") }
+                    showPhotoFilterDialog(contentURI!!)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
@@ -195,73 +166,57 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             {
                 Toast.makeText(this, "No File!", Toast.LENGTH_LONG).show()
             }
+
         }
         else if (requestCode == REQUEST_TAKE_PHOTO)//take photo
         {
-            progressBar.visibility = View.VISIBLE
-            tv_Progress.visibility = View.VISIBLE
-
             try
             {
                 try
                 {
+                    m_nUploadPhotoType = REQUEST_TAKE_PHOTO
                     selectedImage = imageUri
                 }
                 catch (e: Exception)
                 {
                     Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show()
                 }
+                showPhotoFilterDialog(selectedImage!!)
 
-                val imageReference = FirebaseStorage.getInstance("gs://secretplace-29d5e.appspot.com")
-                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, selectedImage)
-                //메모리데이터 업로드 방식
-                val baos = ByteArrayOutputStream()
-                bitmap!!.compress(Bitmap.CompressFormat.JPEG, 15, baos)//압축 0~100사이 품질 조절가능
-                m_strImgpath = saveImage(bitmap)
-                val byteArr: ByteArray = baos.toByteArray()
-                var timestamp: Long = System.currentTimeMillis()
-                var fileName: String = String.format("%s_%s", timestamp, "img")
-
-                val fileRef = imageReference!!.reference.child(fileName)
-                fileRef.putBytes(byteArr)
-                        .addOnSuccessListener { taskSnapshot ->
-                            //val uri = taskSnapshot.downloadUrl
-
-                            //update
-                            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
-                            pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
-
-                            //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
-                            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(dataSnapshot: DataSnapshot?) {
-                                    if (dataSnapshot!!.exists()) {
-                                        m_bModify = true
-                                        setRefresh()
-                                        progressBar.visibility = View.GONE
-                                        tv_Progress.visibility = View.GONE
-                                    }
-                                }
-
-                                override fun onCancelled(p0: DatabaseError?) {
-                                    progressBar.visibility = View.GONE
-                                    tv_Progress.visibility = View.GONE
-                                }
-                            })
-                        }
-                        .addOnFailureListener { exception ->
-                            Toast.makeText(this, exception.message, Toast.LENGTH_LONG).show()
-                        }
-                        .addOnProgressListener { taskSnapshot ->
-                            // progress percentage
-                            val progress = 100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
-
-                            // percentage in progress dialog
-                            val intProgress = progress.toInt()
-                            tv_Progress.text = "Uploaded " + intProgress + "%..."
-                        }
-                        .addOnPausedListener { System.out.println("Upload is paused!") }
             } catch (e: IOException) {
                 e.printStackTrace()
+            }
+        }
+    }
+    //--------------------------------------------------------------
+    //permission checking callback
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED)//거부
+        {
+            Toast.makeText(m_Context, m_Context!!.resources.getString(R.string.str_msg_24), Toast.LENGTH_LONG).show()
+            return
+        }
+        else //허용
+        {
+            when(requestCode)
+            {
+                Constant.PERMISSION_WRITE_EXTERNAL_STORAGE ->
+                {
+                    if(!m_bCamera)
+                        selectImageInAlbum()
+                    else
+                        takePhoto()
+
+                    return
+                }
+                Constant.PERMISSION_CAMERA ->
+                {
+                    checkPermissionCamera()
+                    return
+                }
             }
         }
     }
@@ -573,7 +528,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 .setListener(null)
     }
     //-------------------------------------------------------------
-    //
+    //저장소
     private fun checkPermissionWriteStorage()
     {
         val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -588,30 +543,39 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         }
     }
     //-------------------------------------------------------------
-    //
+    //카메라
     private fun checkPermissionCamera()
     {
-        val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-        if(permission != PackageManager.PERMISSION_GRANTED)
+        val permissionCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+        val permissionWriteExternalStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if(permissionCamera != PackageManager.PERMISSION_GRANTED)
         {
-            permissionCamerra()
+
+            permissionCamera()
+            return
         }
-        else
+
+        if(permissionWriteExternalStorage != PackageManager.PERMISSION_GRANTED)
         {
-            takePhoto()
+            m_bCamera = true
+            permissionWriteStorege()
+            return
         }
+
+
+        takePhoto()
     }
     //-------------------------------------------------------------
     //
     private fun permissionWriteStorege()
     {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_SELECT_IMAGE_IN_ALBUM)
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), Constant.PERMISSION_WRITE_EXTERNAL_STORAGE )
     }
     //-------------------------------------------------------------
     //
-    private fun permissionCamerra()
+    private fun permissionCamera()
     {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_TAKE_PHOTO)
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), Constant.PERMISSION_CAMERA)
     }
     //-------------------------------------------------------------
     //add local image filename
@@ -727,13 +691,13 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_9))
         pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_msg_11),{
             dialogInterface, i ->
-            checkPermissionWriteStorage();
-            pAlert.dismiss();
+            checkPermissionWriteStorage()
+            pAlert.dismiss()
         })
         pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_msg_10),{
             dialogInterface, i ->
-            checkPermissionCamera();
-            pAlert.dismiss();
+            checkPermissionCamera()
+            pAlert.dismiss()
         })
         pAlert.show()
     }
@@ -802,6 +766,163 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //  and showing
         m_PhotoViewDialog?.show()
     }
+
+    //----------------------------------------------------------
+    //  showing dialog
+    fun showPhotoFilterDialog(pUri:Uri)
+    {
+        m_PhotoFilterDialog = showPhotoFilterDialog {
+            cancelable = true
+            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, pUri)
+            dialogView!!.iv_Photo.setImageBitmap(bitmap!!)
+
+            //close..
+            closeIconClickListener {
+                m_PhotoFilterDialog!!.dismiss()
+            }
+
+            //rotate..
+            rotateIconClickListener {
+                if(m_bitmapRotateBitmap != null)
+                {
+                    m_bitmapRotateBitmap = Util.getRotateBitmap(m_bitmapRotateBitmap!!)
+                    m_UploadImgFile = m_bitmapRotateBitmap
+                }
+                else
+                {
+                    m_bitmapRotateBitmap = Util.getRotateBitmap(bitmap)
+                    m_UploadImgFile = m_bitmapRotateBitmap
+                    bitmap!!.recycle()
+                    System.gc()
+                }
+
+                dialogView!!.iv_Photo.setImageBitmap(m_bitmapRotateBitmap!!)
+            }
+
+            //upload..
+            sendIconClickListener {
+                m_PhotoFilterDialog!!.dismiss()
+
+                when(m_nUploadPhotoType)
+                {
+                    REQUEST_SELECT_IMAGE_IN_ALBUM -> uploadCameraPhoto(m_UploadImgFile!!)
+                    REQUEST_TAKE_PHOTO -> uploadAlbumPhoto(m_UploadImgFile!!)
+                }
+
+            }
+        }
+        //  and showing
+        m_PhotoFilterDialog?.show()
+    }
+    //--------------------------------------------------------------------------------
+    //
+    fun uploadAlbumPhoto(bitmap:Bitmap)
+    {
+        progressBar.visibility = View.VISIBLE
+        tv_Progress.visibility = View.VISIBLE
+
+        val imageReference = FirebaseStorage.getInstance(Constant.FIRE_STORE_URL)
+
+        //메모리데이터 업로드 방식
+        val baos = ByteArrayOutputStream()
+        bitmap!!.compress(Bitmap.CompressFormat.JPEG, 15, baos)//압축 0~100사이 품질 조절가능
+        val byteArr: ByteArray = baos.toByteArray()
+        var timestamp: Long = System.currentTimeMillis()
+        var fileName: String = String.format("%s_%s", timestamp, "img")
+
+        val fileRef = imageReference!!.reference.child(fileName)
+        fileRef.putBytes(byteArr)
+        .addOnSuccessListener { taskSnapshot ->
+            //val uri = taskSnapshot.downloadUrl
+
+            //update
+            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
+            pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
+
+            //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
+            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                    if (dataSnapshot!!.exists()) {
+                        m_bModify = true
+                        setRefresh()
+                        progressBar.visibility = View.GONE
+                        tv_Progress.visibility = View.GONE
+                    }
+                }
+
+                override fun onCancelled(p0: DatabaseError?) {
+                    progressBar.visibility = View.GONE
+                    tv_Progress.visibility = View.GONE
+                }
+            })
+        }
+        .addOnFailureListener { exception ->
+            Toast.makeText(this, exception.message, Toast.LENGTH_LONG).show()
+        }
+        .addOnProgressListener { taskSnapshot ->
+            // progress percentage
+            val progress = 100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
+
+            // percentage in progress dialog
+            val intProgress = progress.toInt()
+            tv_Progress.text = "Uploaded " + intProgress + "%..."
+        }
+        .addOnPausedListener { System.out.println("Upload is paused!") }
+    }
+    //--------------------------------------------------------------------------------
+    //
+    fun uploadCameraPhoto(bitmap:Bitmap)
+    {
+        progressBar.visibility = View.VISIBLE
+        tv_Progress.visibility = View.VISIBLE
+        val imageReference = FirebaseStorage.getInstance(Constant.FIRE_STORE_URL)
+        //메모리데이터 업로드 방식
+        val baos = ByteArrayOutputStream()
+        bitmap!!.compress(Bitmap.CompressFormat.JPEG, 15, baos)//압축 0~100사이 품질 조절가능
+        val byteArr: ByteArray = baos.toByteArray()
+        var timestamp: Long = System.currentTimeMillis()
+        var fileName: String = String.format("%s_%s", timestamp, "img")
+
+        val fileRef = imageReference!!.reference.child(fileName)
+        fileRef.putBytes(byteArr)
+        .addOnSuccessListener { taskSnapshot ->
+            //val uri = taskSnapshot.downloadUrl
+
+            //update
+            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
+            pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
+
+            //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
+            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                    if (dataSnapshot!!.exists()) {
+                        m_bModify = true
+                        setRefresh()
+                        progressBar.visibility = View.GONE
+                        tv_Progress.visibility = View.GONE
+                    }
+                }
+
+                override fun onCancelled(p0: DatabaseError?) {
+                    progressBar.visibility = View.GONE
+                    tv_Progress.visibility = View.GONE
+                }
+            })
+        }
+        .addOnFailureListener { exception ->
+            Toast.makeText(this, exception.message, Toast.LENGTH_LONG).show()
+        }
+        .addOnProgressListener { taskSnapshot ->
+            // progress percentage
+            val progress = 100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
+
+            // percentage in progress dialog
+            val intProgress = progress.toInt()
+            tv_Progress.text = "Uploaded " + intProgress + "%..."
+        }
+        .addOnPausedListener { System.out.println("Upload is paused!") }
+    }
+
 
 
     /************************* listener *************************/

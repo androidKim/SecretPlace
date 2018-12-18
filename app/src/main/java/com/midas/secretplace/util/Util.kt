@@ -1,33 +1,33 @@
 package com.midas.secretplace.util
 
 import android.content.Context
-import android.util.DisplayMetrics
-import android.provider.MediaStore
+import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Environment
+import android.provider.MediaStore
+import android.util.DisplayMetrics
+import android.widget.Toast
+import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.nio.file.Files.delete
-import java.nio.file.Files.exists
-import android.widget.Toast
-import android.os.Environment.MEDIA_MOUNTED_READ_ONLY
-import com.midas.secretplace.R.string.app_name
-import android.os.Environment.getExternalStorageDirectory
-import android.os.Environment.MEDIA_MOUNTED
-import com.midas.secretplace.R
+import java.io.IOException
 
 
 class Util
 {
-
     //-----------------------------------------------------------------
     //static
     companion object
     {
         private val TMP_FILE_NAME = "ImageFile"
         private val fileFormate = ".JPEG"
-
+        //-----------------------------------------------------------------
+        //
         fun getTempFilePath(context: Context): File
         {
             var file: File? = null
@@ -38,7 +38,8 @@ class Util
             file = File(getExternalFolder(context), TMP_FILE_NAME + fileFormate)
             return file
         }
-
+        //-----------------------------------------------------------------
+        //
         fun getExternalFolder(context: Context): File?
         {
             try
@@ -69,7 +70,7 @@ class Util
             return null
         }
 
-
+        //-----------------------------------------------------------------
         //getUri From bitmap..
         fun getImageUri(context: Context, inImage: Bitmap): Uri
         {
@@ -78,6 +79,135 @@ class Util
             val path = MediaStore.Images.Media.insertImage(context.getContentResolver(), inImage, "Title", null)
             return Uri.parse(path)
         }
+
+
+        /****************************** Bitmap ******************************/
+        fun getBitmapFromPath(filePath:String):Bitmap
+        {
+            val imgFile = File(filePath)
+            if (imgFile.exists())
+            {
+                val myBitmap:Bitmap = BitmapFactory.decodeFile(imgFile.absolutePath)
+                //Drawable d = new BitmapDrawable(getResources(), myBitmap);
+                return  myBitmap
+            }
+            else
+                return null!!
+        }
+
+        //-----------------------------------------------------------------
+        //samsung device ..etc rotation issue 방지
+        fun getRotatePathBitmap(photoPath:String, bitmap:Bitmap):Bitmap
+        {
+
+            val exif = ExifInterface(photoPath)
+            val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+
+            try {
+                val matrix = Matrix()
+                when (orientation) {
+                    ExifInterface.ORIENTATION_NORMAL -> return bitmap
+                    ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.setScale(-1f, 1f)
+                    ExifInterface.ORIENTATION_ROTATE_180 -> matrix.setRotate(180f)
+                    ExifInterface.ORIENTATION_FLIP_VERTICAL -> {
+                        matrix.setRotate(180f)
+                        matrix.postScale(-1f, 1f)
+                    }
+                    ExifInterface.ORIENTATION_TRANSPOSE -> {
+                        matrix.setRotate(90f)
+                        matrix.postScale(-1f, 1f)
+                    }
+                    ExifInterface.ORIENTATION_ROTATE_90 -> matrix.setRotate(90f)
+                    ExifInterface.ORIENTATION_TRANSVERSE -> {
+                        matrix.setRotate(-90f)
+                        matrix.postScale(-1f, 1f)
+                    }
+                    ExifInterface.ORIENTATION_ROTATE_270 -> matrix.setRotate(-90f)
+                    else -> return bitmap
+                }
+                try
+                {
+                    val bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+                    bitmap.recycle()
+                    return bmRotated
+                } catch (e: OutOfMemoryError) {
+                    e.printStackTrace()
+                    return null!!
+                }
+
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return null!!
+            }
+
+            return bitmap!!
+        }
+        //-----------------------------------------------------------------
+        //
+        fun getRotateBitmap(bitmap:Bitmap):Bitmap
+        {
+            try {
+                val matrix = Matrix()
+                matrix.setRotate(90f)
+
+                try
+                {
+                    val bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+                    bitmap.recycle()
+                    return bmRotated
+                } catch (e: OutOfMemoryError) {
+                    e.printStackTrace()
+                    return null!!
+                }
+
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return null!!
+            }
+
+            return bitmap!!
+        }
+
+        //-----------------------------------------------------------------
+        //
+        fun rotateImage(source: Bitmap, angle: Float): Bitmap
+        {
+            val matrix = Matrix()
+            matrix.postRotate(angle)
+            return Bitmap.createBitmap(source, 0, 0, source.width, source.height,
+                    matrix, true)
+        }
+
+        //-----------------------------------------------------------------
+        //
+        fun setTheme(context:Context, strTheme:String): Resources.Theme
+        {
+            val theme = context!!.theme
+            when (strTheme) {
+                Constant.THEME_PINK -> theme.applyStyle(R.style.AppThemePink, true)
+                Constant.THEME_RED -> theme.applyStyle(R.style.AppThemeRed, true)
+                Constant.THEME_PUPLE -> theme.applyStyle(R.style.AppThemePuple, true)
+                Constant.THEME_DEEPPUPLE -> theme.applyStyle(R.style.AppThemeDeepPuple, true)
+                Constant.THEME_INDIGO-> theme.applyStyle(R.style.AppThemeIndigo, true)
+                Constant.THEME_BLUE-> theme.applyStyle(R.style.AppThemeBlue, true)
+                Constant.THEME_LIGHTBLUE-> theme.applyStyle(R.style.AppThemeLightBlue, true)
+                Constant.THEME_CYAN-> theme.applyStyle(R.style.AppThemeCyan, true)
+                Constant.THEME_TEAL-> theme.applyStyle(R.style.AppThemeTeal, true)
+                Constant.THEME_GREEN-> theme.applyStyle(R.style.AppThemeGreen, true)
+                Constant.THEME_LIGHTGREEN-> theme.applyStyle(R.style.AppThemeLightGreen, true)
+                Constant.THEME_LIME-> theme.applyStyle(R.style.AppThemeLime, true)
+                Constant.THEME_YELLOW-> theme.applyStyle(R.style.AppThemeYello, true)
+                Constant.THEME_AMBER-> theme.applyStyle(R.style.AppThemeAmber, true)
+                Constant.THEME_ORANGE-> theme.applyStyle(R.style.AppThemeOrange, true)
+                Constant.THEME_DEEPORANGE-> theme.applyStyle(R.style.AppThemeDeepOrange, true)
+                Constant.THEME_BROWN-> theme.applyStyle(R.style.AppThemeBrown, true)
+                Constant.THEME_GRAY-> theme.applyStyle(R.style.AppThemeGray, true)
+                Constant.THEME_BLUEGRAY-> theme.applyStyle(R.style.AppThemeBlueGray, true)
+                else -> theme.applyStyle(R.style.AppTheme, true)
+            }
+            return theme
+        }
+
     }
 
     fun Int.dpToPx(displayMetrics: DisplayMetrics): Int = (this * displayMetrics.density).toInt()

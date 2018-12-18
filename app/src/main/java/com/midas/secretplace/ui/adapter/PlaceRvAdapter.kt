@@ -2,22 +2,17 @@ package com.midas.mytimeline.ui.adapter
 
 
 import android.content.Context
-import android.content.Intent
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import android.widget.TextView
+import android.widget.Toast
 import com.midas.secretplace.R
-import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.place
-import com.midas.secretplace.ui.act.ActPlaceDetail
-import java.io.Serializable
 
 class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var m_IfCallback:ifCallback) :
         RecyclerView.Adapter<PlaceRvAdapter.Holder>()
@@ -100,7 +95,7 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var 
             var bPermission:Boolean = m_IfCallback.checkPermission()
             if(bPermission)
             {
-                val pInfo:place = view.getTag() as place
+                val pInfo:place = view.tag as place
                 if(m_IfCallback != null)
                 {
                     m_IfCallback!!.moveDetailActivity(pInfo)

@@ -1,0 +1,44 @@
+<resources>
+    <string name="google_maps_key">AIzaSyDtbMkveLaoHDA18vK7GZKFK8E7IW3Wi6M</string>
+    <string name="facebook_app_id" translatable="false">1698683040237300</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb1698683040237300</string>
+    <string name="twitter_consumer_key" translatable="false">1Gqkat9htRhTfHP31DG64F1LK</string>
+    <string name="twitter_consumer_secret" translatable="false">desMpaNzISR5xtGXAADUFm2xeckH1fWGQLFn1XHmqPHIIzlEox</string>
+
+    <string name="app_name">SecretPlace</string>
+    <string name="navigation_drawer_open">Navigation Drawer Is Open</string>
+    <string name="navigation_drawer_close">Navigation Drawer Is Close</string>
+
+    <string name="str_login_google">google</string>
+    <string name="str_login_facebook">facebook</string>
+
+    <string name="str_ok">Yes</string>
+    <string name="str_no">No</string>
+    <string name="str_cancel">Cancel</string>
+    <string name="str_setting">Settings</string>
+    <string name="str_msg_1">Logout</string>
+    <string name="str_msg_2">Logout?</string>
+    <string name="str_msg_3">Save this place?</string>
+    <string name="str_msg_4">Title</string>
+    <string name="str_msg_5">Save</string>
+    <string name="str_msg_6">Add This Place</string>
+    <string name="str_msg_7">Need Permission</string>
+    <string name="str_msg_8">Change?</string>
+    <string name="str_msg_9">Select Please</string>
+    <string name="str_msg_10">Camera</string>
+    <string name="str_msg_11">Gallery</string>
+    <string name="str_msg_12">Add Photo?</string>
+    <string name="str_msg_13">Change Text?</string>
+    <string name="str_msg_14">Not exist Photo.\n add photo please.</string>
+    <string name="str_msg_15">Not exist Photo.\n save photo please.</string>
+    <string name="str_msg_16">change text?</string>
+    <string name="str_msg_17">input please.</string>
+    <string name="str_msg_18">create group?</string>
+    <string name="str_msg_19">delete?</string>
+    <string name="str_msg_20">terms</string>
+    <string name="str_msg_21">ok</string>
+    <string name="str_msg_22">detail</string>
+    <string name="str_msg_23">check please.</string>
+    <string name="str_msg_24">permission please.</string>
+    <string name="str_msg_25">Theme Setting</string>
+</resources>

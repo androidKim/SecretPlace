@@ -7,12 +7,35 @@
     android:padding="14dp"
     tools:context=".ui.act.ActMain">
 
-    <RelativeLayout
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/baseline_edit_location_black_48"
+        app:layout_constraintBottom_toTopOf="@+id/loginLayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/loginLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="14dp">
+
+        <com.twitter.sdk.android.core.identity.TwitterLoginButton
+            android:id="@+id/twitter_sign_in_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
 
         <com.facebook.login.widget.LoginButton
+            android:layout_marginTop="10dp"
             android:id="@+id/facebook_sign_in_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
@@ -23,10 +46,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/facebook_sign_in_button"
-            android:layout_marginTop="5dp"
-            android:text="@string/str_login_google"
-            android:textAllCaps="true" />
-    </RelativeLayout>
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
 
 
     <ProgressBar

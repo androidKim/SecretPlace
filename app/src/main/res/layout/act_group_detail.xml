@@ -11,10 +11,9 @@
         android:layout_height="wrap_content">
 
         <RelativeLayout
-            android:id="@+id/ly_TItle"
+            android:id="@+id/ly_Title"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@color/colorPrimary">
+            android:layout_height="50dp">
 
             <TextView
                 android:id="@+id/tv_GroupName"
@@ -24,7 +23,7 @@
                 android:layout_centerVertical="true"
                 android:gravity="center"
                 android:padding="5dp"
-                android:textColor="@color/color_white"
+                android:textColor="@color/color_black"
                 android:textSize="20dp" />
 
 
@@ -40,7 +39,7 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:background="@drawable/baseline_edit_white_18dp" />
+                    android:background="@drawable/baseline_edit_black_18dp" />
             </LinearLayout>
         </RelativeLayout>
     </RelativeLayout>

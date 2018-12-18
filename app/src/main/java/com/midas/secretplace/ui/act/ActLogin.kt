@@ -26,15 +26,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.firebase.auth.FacebookAuthProvider
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.*
 import com.google.firebase.database.*
 import com.midas.secretplace.R
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.custom.dlg_terms_agree
+import com.twitter.sdk.android.core.*
 import kotlinx.android.synthetic.main.act_login.*
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -61,7 +60,9 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
     /******************* Define *******************/
     private val TAG:String = "ActLogin"
-    private val GOOGLE_LOG_IN_RC = 9001
+    private val TWITTER_LOG_IN_RC = 9001
+    private val FACEBOOK_LOG_IN_RC = 9002
+    private val GOOGLE_LOG_IN_RC = 9003
     /******************* Member *******************/
     private var m_App:MyApp? = null
     private var m_Context:Context? = null
@@ -72,6 +73,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     private var callbackManager:CallbackManager? = null//facebookcallback
     private var m_TermsAgreeDialog: AlertDialog? = null
 
+
     /******************* System Function *******************/
     //------------------------------------------------
     //
@@ -79,11 +81,20 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.act_login)
+        //twitter config & init..
+        var twitterConfig = TwitterConfig.Builder(this)
+                .logger(DefaultLogger(Log.DEBUG))
+                .twitterAuthConfig(TwitterAuthConfig(resources.getString(R.string.twitter_consumer_key), resources.getString(R.string.twitter_consumer_secret)))
+                .debug(false)
+                .build()
+        Twitter.initialize(twitterConfig)
 
         m_Context = this
         m_App = MyApp()
         m_App!!.init(m_Context as ActLogin)
+        setTheme(R.style.AppTheme)
+        setContentView(R.layout.act_login)
+
         mAuth = FirebaseAuth.getInstance()
 
         initValue()
@@ -114,8 +125,12 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     //
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
     {
-        callbackManager!!.onActivityResult(requestCode, resultCode, data)
+
         super.onActivityResult(requestCode, resultCode, data)
+
+        twitter_sign_in_button!!.onActivityResult(requestCode, resultCode, data)//twitter
+
+        callbackManager!!.onActivityResult(requestCode, resultCode, data)//facebobok
 
         if (requestCode == GOOGLE_LOG_IN_RC)
         {
@@ -151,6 +166,9 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     //
     private fun initLayout()
     {
+        LoginManager.getInstance().logOut()
+
+        setTwitterSign()
         setFacebookSign()
         setGoogleSign()
         getHashKey()
@@ -178,7 +196,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
     //----------------------------------------------------------
     //  showing dialog
-    fun showTermsAgreeDialog(userInfo:user, fbToken: AccessToken?, acct:GoogleSignInAccount?)
+    fun showTermsAgreeDialog(userInfo:user, twSession: TwitterSession?, fbToken: AccessToken?, acct:GoogleSignInAccount?)
     {
         progressBar.visibility = View.GONE
 
@@ -198,7 +216,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
             }
 
             termsDetailClickListener {
-                val url = "http://13.125.225.201:8080/terms"
+                val url = "http://54.180.109.122:8081/terms"
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
             }
 
@@ -206,7 +224,18 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                 if(m_bCheck)
                 {
                     //join..
-                    if(userInfo.sns_type.equals(user.SNS_TYPE_FACEBOOK))
+                    if(userInfo.sns_type.equals(user.SNS_TYPE_TWITTER))
+                    {
+                        var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!
+                        val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                        var strUserName:String? = mAuth!!.currentUser!!.displayName
+                        var strImgUrl: String? = ""
+                        userInfo.user_key = currentFirebaseUser!!.uid
+                        userInfo.name = strUserName
+                        userInfo.img_url = strImgUrl
+                        pDbRef!!.child(userInfo.user_key).setValue(userInfo!!)//insert
+                    }
+                    else if(userInfo.sns_type.equals(user.SNS_TYPE_FACEBOOK))
                     {
                         var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!
                         val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
@@ -240,6 +269,118 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         m_TermsAgreeDialog?.show()
 
     }
+    /******************* twitter login *******************/
+    //------------------------------------------------------------------
+    //
+    private fun setTwitterSign()
+    {
+        twitter_sign_in_button.callback = object : Callback<TwitterSession>() {
+            override fun success(result: Result<TwitterSession>) {
+                Log.d(TAG, "twitterLogin:success" + result)
+                handleTwitterSession(result.data)
+            }
+            override fun failure(exception: TwitterException) {
+                Log.w(TAG, "twitterLogin:failure", exception)
+            }
+        }
+    }
+    //------------------------------------------------------------------
+    //
+    private fun handleTwitterSession(session: TwitterSession) {
+        Log.d(TAG, "handleTwitterSession:" + session)
+
+        var credential:AuthCredential  = TwitterAuthProvider.getCredential(
+                session.authToken.token,
+                session.authToken.secret)
+
+        mAuth!!.signInWithCredential(credential)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithCredential:success")
+                        //val user = mAuth!!.currentUser
+                        //startActivity(Intent(this@ActLogin, ActMain::class.java))
+                        //handleSignInResult(task)
+                        progressBar.visibility = View.VISIBLE
+
+                        var snsKey:String? = String.format("%s",session!!.userId)
+                        var strUserName:String? = mAuth!!.currentUser!!.displayName
+                        var strImgUrl: String = ""
+
+                        var pInfo: user = user(user.SNS_TYPE_TWITTER, snsKey!!, "", strUserName!!, strImgUrl)
+
+                        var pQuery:Query= m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).orderByChild("sns_key").equalTo(snsKey)
+                        pQuery.addChildEventListener(object : ChildEventListener {
+                            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                            {
+                                if (dataSnapshot!!.exists())//exist..
+                                {
+                                    val pRes:user = dataSnapshot!!.getValue(user::class.java)!!
+                                    val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                                    var strUserName:String? = mAuth!!.currentUser!!.displayName
+                                    var strImgUrl: String=""
+                                    pRes.user_key = currentFirebaseUser!!.uid
+                                    pRes.name = strUserName
+                                    pRes.img_url = strImgUrl
+                                    m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key).setValue(pRes)//update..
+                                    m_App!!.m_SpCtrl!!.setSpUserKey(pRes.user_key!!)
+                                    m_App!!.m_SpCtrl!!.setSnsType(user.SNS_TYPE_TWITTER)
+                                    m_App!!.goMain(m_Context!!)
+                                }
+                                else
+                                {
+
+                                }
+                            }
+
+                            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                            {
+                                Log.d("onChildChanged", "")
+                            }
+
+                            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+                            {
+                                Log.d("onChildRemoved", "")
+                            }
+
+                            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                            {
+                                Log.d("onChildMoved", "")
+                            }
+
+                            override fun onCancelled(databaseError: DatabaseError?)
+                            {
+                                Log.d("onCancelled", "")
+                            }
+                        })
+
+
+                        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(dataSnapshot: DataSnapshot?)
+                            {
+                                if(dataSnapshot!!.exists())
+                                {
+
+                                }
+                                else
+                                {
+                                    showTermsAgreeDialog(pInfo!!, session!!, null, null)
+                                }
+                            }
+
+                            override fun onCancelled(p0: DatabaseError?)
+                            {
+                                Log.d("onCancelled", "")
+                            }
+                        })
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithCredential:failure", task.getException())
+                        Toast.makeText(this@ActLogin, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+    }
+
     /******************* facebook login *******************/
     //------------------------------------------------------------------
     //
@@ -269,8 +410,6 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                 // App code
             }
         })
-
-        LoginManager.getInstance().logOut()
     }
     //----------------------------------------------------------------
     //
@@ -312,7 +451,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                     pRes.img_url = strImgUrl
                                     m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key).setValue(pRes)//update..
                                     m_App!!.m_SpCtrl!!.setSpUserKey(pRes.user_key!!)
-                                    m_App!!.m_SpCtrl!!.setSnsType(user.SNS_TYPE_GOOGLE)
+                                    m_App!!.m_SpCtrl!!.setSnsType(user.SNS_TYPE_FACEBOOK)
                                     m_App!!.goMain(m_Context!!)
                                 }
                                 else
@@ -352,7 +491,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                 }
                                 else
                                 {
-                                    showTermsAgreeDialog(pInfo!!, token!!, null)
+                                    showTermsAgreeDialog(pInfo!!, null, token!!, null)
                                 }
                             }
 
@@ -461,7 +600,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         }
                         else
                         {
-                            showTermsAgreeDialog(pInfo!!, null, acct!!)
+                            showTermsAgreeDialog(pInfo!!, null, null, acct!!)
                         }
                     }
 

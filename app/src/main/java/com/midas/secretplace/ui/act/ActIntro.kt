@@ -22,7 +22,6 @@ class ActIntro : AppCompatActivity()
         m_Context = this
         m_App = MyApp()
         m_App!!.init(m_Context as ActIntro)
-
         var strUserKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()
         if(strUserKey != null && !strUserKey.equals(""))
         {
