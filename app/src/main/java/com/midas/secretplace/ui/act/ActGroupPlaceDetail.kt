@@ -776,17 +776,12 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     {
                         override fun onLoadFailed(p0: GlideException?, p1: Any?, p2: com.bumptech.glide.request.target.Target<Drawable>?, p3: Boolean): Boolean
                         {
-                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                            dialogView!!.iv_DlgNone!!.visibility = View.GONE
-                            dialogView!!.iv_DlgNone!!.visibility = View.VISIBLE
+                            m_PhotoViewDialog!!.dismiss()
+                            return false
                         }
                         override fun onResourceReady(p0: Drawable?, p1: Any?, p2: com.bumptech.glide.request.target.Target<Drawable>?, p3: DataSource?, p4: Boolean): Boolean
                         {
                             //do something when picture already loaded
-                            dialogView!!.iv_DlgNone!!.visibility = View.GONE
-                            dialogView!!.iv_DlgNone!!.visibility = View.GONE
-
-
                             if(p0 != null)
                                 dialogView!!.iv_DlgNone!!.tag = url
 
@@ -840,6 +835,8 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
             //upload..
             sendIconClickListener {
                 m_PhotoFilterDialog!!.dismiss()
+                if(m_UploadImgFile == null)//회전을안했을때..
+                    m_UploadImgFile = bitmap
 
                 when(m_nUploadPhotoType)
                 {
