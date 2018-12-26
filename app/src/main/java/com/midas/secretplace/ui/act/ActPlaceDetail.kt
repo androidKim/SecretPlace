@@ -796,6 +796,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             //upload..
             sendIconClickListener {
                 m_PhotoFilterDialog!!.dismiss()
+                if(m_UploadImgFile == null)//회전을안했을때..
+                    m_UploadImgFile = bitmap
 
                 when(m_nUploadPhotoType)
                 {
