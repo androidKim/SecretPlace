@@ -25,18 +25,20 @@ class ActIntro : AppCompatActivity()
         var strUserKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()
         if(strUserKey != null && !strUserKey.equals(""))
         {
-            var pIntent = Intent(m_Context, ActMain::class.java)
-            startActivity(pIntent)
-            finish()
+             Intent(m_Context, ActMain::class.java).let{
+                 startActivity(it)
+                 finish()
+            }
+
         }
         else
         {
-            var pIntent = Intent(m_Context, ActLogin::class.java)
-            startActivity(pIntent)
-            finish()
+            Intent(m_Context, ActLogin::class.java).let {
+                startActivity(it)
+                finish()
+            }
+
         }
-
-
     }
     /*********************** User Function ***********************/
 }

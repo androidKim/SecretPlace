@@ -32,6 +32,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
@@ -48,6 +49,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
+/*
+한 그룹의 매장리스트
+ */
 class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PlaceRvAdapter.ifCallback , GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener
 {
     //extention functions..
@@ -377,6 +381,96 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         getPlaceListProc()
     }
+    //----------------------------------------------------------------------
+    //storage image delete
+    fun storageDeleteItemProc(placeKey:String)
+    {
+        val storageRef = FirebaseStorage.getInstance(Constant.FIRE_STORE_URL)
+
+        var pQuery:Query? = null
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(placeKey).child("img_list")//where
+        pQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
+
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            {
+                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
+
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
+
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError?)
+            {
+                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+            }
+        })
+
+        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        var fileNm:String = it!!.getValue(String::class.java)!!
+
+                        //split ?
+                        var arrTemp:List<String> = fileNm.split("?")
+                        fileNm = arrTemp.get(0)
+                        //split "/"  get lastItem is FileName
+                        arrTemp = fileNm.split("/")
+                        fileNm = arrTemp.get(arrTemp.size - 1)
+
+                        // Create a reference to the file to delete
+                        var desertRef = storageRef.reference.child(fileNm)//test..
+                        // Delete the file
+                        desertRef.delete().addOnSuccessListener {
+                            // File deleted successfully
+
+                        }.addOnFailureListener {
+                            // Uh-oh, an error occurred!
+
+                        }
+
+
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+
+    }
+
     //-------------------------------------------------------------
     //
     fun getPlaceListProc()
@@ -735,12 +829,18 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //listAdapter callback
     override fun deleteProc(pInfo: place)
     {
+        //place data remove
         var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.child(pInfo.place_key)//where
         pDbRef!!.removeValue()
 
+        //file storage remove
+        storageDeleteItemProc(pInfo.place_key!!)
+
+        //file data remove
         pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
         pDbRef!!.removeValue()
 
+        //refresh
         setRefresh()
     }
     //----------------------------------------------------------------------
