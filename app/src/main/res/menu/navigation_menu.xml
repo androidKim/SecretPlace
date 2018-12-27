@@ -36,6 +36,11 @@
                 android:id="@+id/logout"
                 android:title="@string/str_msg_1"
                 android:icon="@drawable/baseline_exit_to_app_black_48"/>
+
+            <item
+                android:id="@+id/delete"
+                android:title="@string/str_msg_26"
+                android:icon="@drawable/baseline_clear_black_48"/>
         </menu>
     </item>
 </menu>

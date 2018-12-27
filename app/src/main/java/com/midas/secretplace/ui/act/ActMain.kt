@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -22,14 +23,16 @@ import com.bumptech.glide.Glide
 import com.firebase.jobdispatcher.Constraint
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.GooglePlayDriver
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.ThemeColorRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
+import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.service.MyJobService
+import com.midas.secretplace.structure.core.group
+import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.structure.core.theme
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
@@ -258,7 +261,7 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
         }
     }
     //--------------------------------------------------------------
-    //
+    //테마설정 dialog
     fun showThmeSelectDialog()
     {
         var themeAdapter: ThemeColorRvAdapter? = null
@@ -303,7 +306,7 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
         m_ThemeSettingDialog?.show()
     }
     //--------------------------------------------------------------
-    //
+    //로그아웃 dialog
     fun showLogoutDialog()
     {
         val builder = AlertDialog.Builder(this@ActMain)
@@ -323,6 +326,394 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
         val dialog: AlertDialog = builder.create()
         dialog.show()
     }
+    //--------------------------------------------------------------
+    //회원 탈퇴 dialog
+    fun showMemberDeleteDialog()
+    {
+        val builder = AlertDialog.Builder(this@ActMain)
+        builder.setMessage(getString(R.string.str_msg_27))
+        builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
+            deleteMemberProc()
+        }
+
+        builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
+
+        }
+
+        builder.setNeutralButton(getString(R.string.str_cancel)){_,_ ->
+
+        }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+    }
+    //--------------------------------------------------------------
+    //
+    fun showFinishDialog()
+    {
+        val builder = AlertDialog.Builder(this@ActMain)
+        builder.setMessage(getString(R.string.str_msg_28))
+        builder.setCancelable(false)
+        builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
+            m_App!!.logoutProc(m_Context as ActMain)
+        }
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+    }
+    //--------------------------------------------------------------
+    //
+    fun deleteMemberProc()
+    {
+        if (drawer_layout.isDrawerOpen(GravityCompat.START))//open  상태이면 닫고.,
+            drawer_layout.closeDrawer(GravityCompat.START)
+
+        progressBar.visibility = View.VISIBLE
+
+        //FIRE AUTH
+        deleteFireAuthData()
+
+        //TB_PLACE
+        deletePlaceTableData()
+
+        //TB_GROUP_PLACE
+        deleteGroupPlaceTableData()
+
+        //TB_GROUP
+        deleteGroupTableData()
+
+        //TB_USER
+        deleteUserTableData()
+
+        //delay 5seconds..
+        Handler().postDelayed({
+            progressBar.visibility = View.GONE
+            //서비스 종료팝업.. 그동안 이용해주셔서 감사..ㅠㅠ
+            showFinishDialog()
+        }, 5000)
+    }
+    //--------------------------------------------------------------
+    //
+    fun deletePlaceTableData()
+    {
+        var pQuery: Query? = null
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+
+
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            {
+
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError?)
+            {
+
+            }
+        })
+
+        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        var pInfo:place = it.getValue(place::class.java)!!
+
+                        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
+                        pDbRef!!.removeValue()
+
+                        //file storage remove
+                        storageDeleteItemProc(pInfo.place_key!!)
+
+                        //file data remove
+                        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
+                        pDbRef!!.removeValue()
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+    }
+
+    //--------------------------------------------------------------
+    //TB_GROUP_PLACE
+    fun deleteGroupPlaceTableData()
+    {
+        var pQuery: Query? = null
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+
+
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            {
+
+
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError?)
+            {
+
+            }
+        })
+
+        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        var pInfo:place = it.getValue(place::class.java)!!
+
+                        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.child(pInfo.place_key)//where
+                        pDbRef!!.removeValue()
+
+                        //file storage remove
+                        storageDeleteItemProc(pInfo.place_key!!)
+
+                        //file data remove
+                        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
+                        pDbRef!!.removeValue()
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+    }
+    //--------------------------------------------------------------
+    //TB_GROUP
+    fun deleteGroupTableData()
+    {
+        var pQuery: Query? = null
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+
+
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            {
+
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError?)
+            {
+
+            }
+        })
+
+        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        var pInfo:group = it.getValue(group::class.java)!!
+
+                        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!.child(pInfo.group_key)//where
+                        pDbRef!!.removeValue()
+
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+    }
+    //----------------------------------------------------------------------
+    //storage image delete
+    fun storageDeleteItemProc(placeKey:String)
+    {
+        val storageRef = FirebaseStorage.getInstance(Constant.FIRE_STORE_URL)
+
+        var pQuery:Query? = null
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(placeKey).child("img_list")//where
+        pQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
+
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            {
+                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
+
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            {
+                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
+
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError?)
+            {
+                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+            }
+        })
+
+        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        var fileNm:String = it!!.getValue(String::class.java)!!
+
+                        //split ?
+                        var arrTemp:List<String> = fileNm.split("?")
+                        fileNm = arrTemp.get(0)
+                        //split "/"  get lastItem is FileName
+                        arrTemp = fileNm.split("/")
+                        fileNm = arrTemp.get(arrTemp.size - 1)
+
+                        // Create a reference to the file to delete
+                        var desertRef = storageRef.reference.child(fileNm)//test..
+                        // Delete the file
+                        desertRef.delete().addOnSuccessListener {
+                            // File deleted successfully
+
+                        }.addOnFailureListener {
+                            // Uh-oh, an error occurred!
+
+                        }
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+    }
+    //--------------------------------------------------------------
+    //
+    fun deleteUserTableData()
+    {
+        var pQuery: Query? = null
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).child(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery.removeValue()
+    }
+    //--------------------------------------------------------------
+    //
+    fun deleteFireAuthData()
+    {
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.delete()?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+
+                    }
+                }
+    }
 
     /*********************** listener ***********************/
     //--------------------------------------------------------------
@@ -341,6 +732,11 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
             R.id.logout ->
             {
                 showLogoutDialog()
+                return true
+            }
+            R.id.delete ->
+            {
+                showMemberDeleteDialog()
                 return true
             }
         }

@@ -132,7 +132,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     override fun onStart()
     {
-        super.onStart();
+        super.onStart()
         if (mGoogleApiClient != null)
         {
             mGoogleApiClient.connect()
@@ -142,7 +142,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     override fun onStop()
     {
-        super.onStop();
+        super.onStop()
         if (mGoogleApiClient.isConnected())
         {
             mGoogleApiClient.disconnect()

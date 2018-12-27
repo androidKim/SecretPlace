@@ -12,10 +12,10 @@
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <android.support.v4.view.ViewPager
-        android:layout_below="@+id/toolbar"
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar">
 
         <android.support.v4.view.PagerTabStrip
             android:id="@+id/pager_header"
@@ -23,7 +23,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:background="@color/color_white"
-            android:padding="13dp"/>
+            android:padding="13dp" />
 
     </android.support.v4.view.ViewPager>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
 </RelativeLayout>

@@ -41,4 +41,7 @@
     <string name="str_msg_23">동의에 체크해 주세요.</string>
     <string name="str_msg_24">권한을 허용해 주세요.</string>
     <string name="str_msg_25">테마설정</string>
+    <string name="str_msg_26">회원탈퇴</string>
+    <string name="str_msg_27">회원탈퇴 하시겠습니까?\n모든 정보가 삭제됩니다.</string>
+    <string name="str_msg_28">그동안 이용해주셔서 감사합니다.</string>
 </resources>

@@ -67,9 +67,7 @@ FrPlace.ifCallback, FrGroup.ifCallback
     {
         super.onStart();
         if (mGoogleApiClient != null)
-        {
             mGoogleApiClient.connect()
-        }
     }
     //--------------------------------------------------------------
     //
@@ -77,9 +75,7 @@ FrPlace.ifCallback, FrGroup.ifCallback
     {
         super.onStop();
         if (mGoogleApiClient.isConnected())
-        {
             mGoogleApiClient.disconnect()
-        }
     }
     //--------------------------------------------------------------
     //
@@ -182,7 +178,7 @@ FrPlace.ifCallback, FrGroup.ifCallback
     }
     /*********************** User Function ***********************/
     //--------------------------------------------------------------
-    //f
+    //
     private fun checkPermissionLocation():Boolean
     {
         var bResult:Boolean = false

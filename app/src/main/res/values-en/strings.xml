@@ -41,4 +41,7 @@
     <string name="str_msg_23">check please.</string>
     <string name="str_msg_24">permission please.</string>
     <string name="str_msg_25">Theme Setting</string>
+    <string name="str_msg_26">Withdraw</string>
+    <string name="str_msg_27">Do you want Withdraw?\nRemove all your data</string>
+    <string name="str_msg_28">Thank you, GoodLuck!</string>
 </resources>
