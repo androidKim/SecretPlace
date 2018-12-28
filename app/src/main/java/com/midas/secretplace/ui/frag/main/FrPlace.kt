@@ -178,7 +178,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     {
         m_bRunning = true
         //m_App!!.showLoadingDialog(ly_LoadingDialog)
-        progressBar.visibility = View.VISIBLE
 
         //var pQuery: Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(seq!!)
         //pQuery!!.addListenerForSingleValueEvent(listenerForSingleValueEvent)
@@ -264,7 +263,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
 
                 m_bRunning = false
-                progressBar.visibility = View.GONE
             }
 
             override fun onCancelled(p0: DatabaseError?)
