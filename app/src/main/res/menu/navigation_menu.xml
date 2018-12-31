@@ -1,46 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--
+
     <group android:checkableBehavior="single">
-
+        <item
+            android:id="@+id/couple"
+            android:icon="@drawable/baseline_people_black_48"
+            android:title="@string/str_msg_29" />
 
         <item
-            android:id="@+id/menu_option_one"
-            android:title="option_one"
-            android:icon="@drawable/ic_launcher_background"/>
-
-        <item
-            android:id="@+id/menu_option_two"
-            android:title="option_two"
-            android:icon="@drawable/ic_launcher_background"/>
-
-        <item
-            android:id="@+id/menu_option_three"
-            android:title="option_three"
-            android:icon="@drawable/ic_launcher_background"/>
-
+            android:id="@+id/theme"
+            android:icon="@drawable/baseline_view_comfy_black_48"
+            android:title="@string/str_msg_25" />
     </group>
--->
+
     <item
         android:id="@+id/other_options"
-        android:title="@string/str_setting">
+        android:title="@string/str_menu">
 
         <menu>
             <item
-                android:id="@+id/theme"
-                android:title="@string/str_msg_25"
-                android:icon="@drawable/baseline_view_comfy_black_48"/>
-
-            <item
                 android:id="@+id/logout"
-                android:title="@string/str_msg_1"
-                android:icon="@drawable/baseline_exit_to_app_black_48"/>
+                android:icon="@drawable/baseline_exit_to_app_black_48"
+                android:title="@string/str_msg_1" />
 
             <item
                 android:id="@+id/delete"
-                android:title="@string/str_msg_26"
-                android:icon="@drawable/baseline_clear_black_48"/>
+                android:icon="@drawable/baseline_clear_black_48"
+                android:title="@string/str_msg_26" />
         </menu>
     </item>
 </menu>
