@@ -261,6 +261,22 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
         }
     }
     //--------------------------------------------------------------
+    //
+    fun goMyInformationActivity()
+    {
+        Intent(m_Context, ActMyInformation::class.java).let{
+            startActivity(it)
+        }
+    }
+    //--------------------------------------------------------------
+    //
+    fun goCoupleActivity()
+    {
+        Intent(m_Context, ActCouple::class.java).let{
+            startActivity(it)
+        }
+    }
+    //--------------------------------------------------------------
     //테마설정 dialog
     fun showThmeSelectDialog()
     {
@@ -724,17 +740,27 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
 
         when(item.itemId)
         {
-            R.id.theme ->
+            R.id.my_information ->//내정보
+            {
+                goMyInformationActivity()
+                return true
+            }
+            R.id.couple ->//커플
+            {
+                goCoupleActivity()
+                return true
+            }
+            R.id.theme ->//테마설정
             {
                 showThmeSelectDialog()
                 return true
             }
-            R.id.logout ->
+            R.id.logout ->//로그아웃
             {
                 showLogoutDialog()
                 return true
             }
-            R.id.delete ->
+            R.id.delete ->//회원탈퇴
             {
                 showMemberDeleteDialog()
                 return true

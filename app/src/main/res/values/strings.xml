@@ -45,4 +45,5 @@
     <string name="str_msg_27">회원탈퇴 하시겠습니까?\n모든 정보가 삭제됩니다.</string>
     <string name="str_msg_28">그동안 이용해주셔서 감사합니다.</string>
     <string name="str_msg_29">커플맺기</string>
+    <string name="str_msg_30">내 정보</string>
 </resources>

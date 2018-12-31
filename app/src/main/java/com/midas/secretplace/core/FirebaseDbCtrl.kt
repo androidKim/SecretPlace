@@ -42,7 +42,7 @@ class FirebaseDbCtrl
         //val key = m_FirebaseDb!!.getReference(TB_USER)!!.push().key
         //var childUpdates:HashMap<String, Any> = HashMap()
         //childUpdates.put("/"+TB_USER+"/"+key, pMap)
-        //childUpdates.put("/user-messages/" + user!!.uid + "/" + key, messageValues)
+        //childUpdates.put("/vm_user-messages/" + vm_user!!.uid + "/" + key, messageValues)
 
         //m_FirebaseDb!!.getReference(TB_USER).updateChildren(childUpdates)
 
@@ -61,7 +61,7 @@ class FirebaseDbCtrl
         //pDbRef.updateChildren(pMap)
     }
     //---------------------------------------------------------------
-    //user key
+    //vm_user key
     fun getUserDbRef():DatabaseReference
     {
         var pDbRef = m_FirebaseDb!!.getReference(TB_USER)

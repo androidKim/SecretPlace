@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <group android:checkableBehavior="none">
 
-    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/my_information"
+            android:icon="@drawable/baseline_account_circle_black_48"
+            android:title="@string/str_msg_30" />
+
         <item
             android:id="@+id/couple"
             android:icon="@drawable/baseline_people_black_48"

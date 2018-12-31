@@ -187,7 +187,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 // Initialize the map with both permissions
                 perms[Manifest.permission.ACCESS_COARSE_LOCATION] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.ACCESS_FINE_LOCATION] = PackageManager.PERMISSION_GRANTED
-                // Fill with actual results from user
+                // Fill with actual results from vm_user
                 if (grantResults.size > 0)
                 {
                     for (i in permissions.indices)

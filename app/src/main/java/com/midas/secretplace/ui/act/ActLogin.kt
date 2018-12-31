@@ -107,7 +107,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     override fun onStart()
     {
         super.onStart()
-         // Check if user is signed in (non-null) and update UI accordingly.
+         // Check if vm_user is signed in (non-null) and update UI accordingly.
         //FirebaseUser currentUser = mAuth.getCurrentUser();
         //updateUI(currentUser);
     }
@@ -296,9 +296,9 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         mAuth!!.signInWithCredential(credential)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
+                        // Sign in success, update UI with the signed-in vm_user's information
                         Log.d(TAG, "signInWithCredential:success")
-                        //val user = mAuth!!.currentUser
+                        //val vm_user = mAuth!!.currentUser
                         //startActivity(Intent(this@ActLogin, ActMain::class.java))
                         //handleSignInResult(task)
                         progressBar.visibility = View.VISIBLE
@@ -374,7 +374,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                             }
                         })
                     } else {
-                        // If sign in fails, display a message to the user.
+                        // If sign in fails, display a message to the vm_user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException())
                         Toast.makeText(this@ActLogin, "Authentication failed.", Toast.LENGTH_SHORT).show()
                     }
@@ -421,9 +421,9 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful)
                     {
-                        // Sign in success, update UI with the signed-in user's information
+                        // Sign in success, update UI with the signed-in vm_user's information
                         Log.d(TAG, "signInWithCredential:success")
-                        //val user = mAuth!!.currentUser
+                        //val vm_user = mAuth!!.currentUser
                         //startActivity(Intent(this@ActLogin, ActMain::class.java))
                         //handleSignInResult(task)
                         progressBar.visibility = View.VISIBLE
@@ -503,7 +503,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                     }
                     else
                     {
-                        // If sign in fails, display a message to the user.
+                        // If sign in fails, display a message to the vm_user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException())
                         Toast.makeText(this@ActLogin, "Authentication failed.", Toast.LENGTH_SHORT).show()
                     }
@@ -536,7 +536,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         mAuth?.signInWithCredential(credential)?.addOnCompleteListener(this) { task ->
             if (task.isSuccessful)
             {
-                // Sign in success, update UI with the signed-in user's information
+                // Sign in success, update UI with the signed-in vm_user's information
 
                 //handleSignInResult(task)
                 progressBar.visibility = View.VISIBLE
@@ -612,7 +612,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
             }
             else
             {
-                // If sign in fails, display a message to the user.
+                // If sign in fails, display a message to the vm_user.
             }
         }
     }
