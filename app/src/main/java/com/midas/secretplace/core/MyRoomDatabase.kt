@@ -8,7 +8,7 @@ import com.midas.secretplace.structure.room.dao_user
 import com.midas.secretplace.structure.room.data_user
 
 
-@Database(entities = [data_user::class], version = 1)
+@Database(entities = [data_user::class], version = 1, exportSchema = false)
 abstract class MyRoomDatabase : RoomDatabase() {
 
     abstract fun userDao(): dao_user

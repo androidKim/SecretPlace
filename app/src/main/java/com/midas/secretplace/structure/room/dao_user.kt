@@ -4,11 +4,15 @@ import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.Query
+import android.arch.persistence.room.Update
 
 @Dao
 interface dao_user {
     @Insert
     fun insert(pInfo: data_user)
+
+    @Update
+    fun update(pInfo: data_user)
 
     @Query("DELETE FROM tb_user")
     fun deleteAll()

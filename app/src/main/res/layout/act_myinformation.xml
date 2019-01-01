@@ -10,22 +10,41 @@
 
     <TextView
         android:id="@+id/textView1"
-        android:textSize="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Name : "
-        />
+        android:textSize="20dp" />
+
 
     <TextView
-        android:id="@+id/tv_Name"
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:text="My Key : "
         android:textSize="20dp"
-        app:layout_constraintStart_toEndOf="@+id/textView1"
-        tools:layout_editor_absoluteY="0dp"
-        tools:text="홍길동"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_Name" />
+
+
+    <EditText
+        android:id="@+id/edit_Name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Name"
+        app:layout_constraintTop_toBottomOf="@+id/textView1" />
+
+    <EditText
+        android:id="@+id/edit_UserKey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        tools:text="UserKey" />
 
 
     <ProgressBar
@@ -38,5 +57,4 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 </android.support.constraint.ConstraintLayout>

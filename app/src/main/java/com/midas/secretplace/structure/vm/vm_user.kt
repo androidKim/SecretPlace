@@ -20,4 +20,12 @@ class vm_user (application: Application) : AndroidViewModel(application) {
     fun insert(pInfo: data_user) {
         userRepository!!.insert(pInfo)
     }
+
+    fun update(pInfo: data_user) {
+        userRepository!!.update(pInfo)
+    }
+
+    fun select() {
+        userRepository!!.getUserData()
+    }
 }

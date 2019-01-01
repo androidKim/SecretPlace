@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -20,6 +21,9 @@ import kotlinx.android.synthetic.main.act_myinformation.*
 
 class ActMyInformation : AppCompatActivity()
 {
+    /*********************** extentios function ***********************/
+    fun String.toEditable(): Editable =  Editable.Factory.getInstance().newEditable(this)
+
     /*********************** Define ***********************/
 
     /*********************** Member ***********************/
@@ -46,9 +50,12 @@ class ActMyInformation : AppCompatActivity()
         m_UserViewModel?.userInfo?.observe(this, object : Observer<data_user> {
             override fun onChanged(t: data_user?) {
                 if(t != null)
-                    tv_Name.text = t!!.name
+                {
+                    edit_Name.text = t!!.name.toEditable()
+                    edit_UserKey.text = t!!.user_key.toEditable()
+                }
             }
-        });
+        })
     }
     //--------------------------------------------------------------
     //
@@ -70,6 +77,11 @@ class ActMyInformation : AppCompatActivity()
             if(dataSnapshot!!.exists())
             {
                 var pInfo:user = dataSnapshot!!.getValue(user::class.java)!!
+                edit_Name.text = pInfo!!.name!!.toEditable()
+                edit_UserKey.text = pInfo!!.user_key!!.toEditable()
+                var dataUser:data_user = data_user(0, pInfo!!.img_url!!, pInfo!!.name!!, pInfo!!.sns_key!!, pInfo!!.sns_type!!, pInfo!!.user_key!!)
+
+                m_UserViewModel?.insert(dataUser)//
             }
         }
 
