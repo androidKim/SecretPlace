@@ -46,4 +46,13 @@
     <string name="str_msg_28">Thank you, GoodLuck!</string>
     <string name="str_msg_29">Couple</string>
     <string name="str_msg_30">My Information</string>
+    <string name="str_msg_31">Name</string>
+    <string name="str_msg_32">User Key</string>
+    <string name="str_msg_33">Copy</string>
+    <string name="str_msg_34">Copy Complete</string>
+    <string name="str_msg_35">Please register the recipient"'s'" unique key.\nIf the recipient accepts, it becomes a couple.</string>
+    <string name="str_msg_36">Input</string>
+    <string name="str_msg_37">Request</string>
+    <string name="str_msg_38">request from me</string>
+    <string name="str_msg_39">* Only one person can request</string>
 </resources>

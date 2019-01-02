@@ -46,4 +46,13 @@
     <string name="str_msg_28">그동안 이용해주셔서 감사합니다.</string>
     <string name="str_msg_29">커플맺기</string>
     <string name="str_msg_30">내 정보</string>
+    <string name="str_msg_31">이름</string>
+    <string name="str_msg_32">고유키</string>
+    <string name="str_msg_33">복사</string>
+    <string name="str_msg_34">복사가 완료 되었습니다.</string>
+    <string name="str_msg_35">상대방의 고유키를 등록하세요.\n수신자가 수락하면 커플이 됩니다.</string>
+    <string name="str_msg_36">입력하세요.</string>
+    <string name="str_msg_37">요청하기</string>
+    <string name="str_msg_38">나에게 온 요청</string>
+    <string name="str_msg_39">* 요청은 1명에게만 가능합니다</string>
 </resources>

@@ -152,4 +152,17 @@
         <item name="cardElevation">4dp</item>
     </style>
 
+
+    <!-- TextView -->
+    <style name="TextViewStyle"  parent="@android:style/Widget.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_marginBottom">15dp</item>
+        <item name="android:paddingRight">3dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:textColor">@color/color_black</item>
+        <item name="android:background">@color/color_white</item>
+    </style>
 </resources>
