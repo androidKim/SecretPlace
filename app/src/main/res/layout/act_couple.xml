@@ -19,43 +19,77 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/ly_RequestStatusNot"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/str_msg_35"
-        android:textColor="@color/color_black"
-        android:textSize="20dp" />
+        android:visibility="visible">
 
-    <EditText
-        android:id="@+id/edit_UserKey"
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/str_msg_35"
+            android:textColor="@color/color_black"
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/edit_UserKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="@string/str_msg_36"
+            app:layout_constraintTop_toBottomOf="@+id/textView4"
+            tools:layout_editor_absoluteX="16dp" />
+
+        <Button
+            android:id="@+id/btn_requset"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:onClick="coupleRequestProc"
+            android:text="@string/str_msg_37"
+            app:layout_constraintEnd_toEndOf="@+id/edit_UserKey"
+            app:layout_constraintTop_toBottomOf="@+id/edit_UserKey" />
+
+        <TextView
+            android:id="@+id/textView4"
+            style="@style/TextViewStyle"
+            android:layout_marginTop="10dp"
+            android:text="@string/str_msg_39"
+            app:layout_constraintStart_toStartOf="@+id/textView"
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/ly_RequestStatusOk"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="@string/str_msg_36"
-        android:inputType="textPersonName"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
-        tools:layout_editor_absoluteX="16dp" />
+        android:visibility="gone"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="14dp">
 
-    <Button
-        android:id="@+id/btn_requset"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:onClick="coupleRequestProc"
-        android:text="@string/str_msg_37"
-        app:layout_constraintEnd_toEndOf="@+id/edit_UserKey"
-        app:layout_constraintTop_toBottomOf="@+id/edit_UserKey" />
+        <TextView
+            android:id="@+id/tv_CurrentRequestUser"
+            style="@style/TextViewMedium"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="16dp"
+            tools:text="홍길동님에게 요청중입니다." />
 
-    <TextView
-        android:id="@+id/textView4"
-        style="@style/TextViewStyle"
-        android:layout_marginTop="10dp"
-        android:text="@string/str_msg_39"
-        app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        <Button
+            android:id="@+id/btn_ReqCancel"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:onClick="cancelProc"
+            android:text="@string/str_cancel"
+            app:layout_constraintTop_toBottomOf="@+id/tv_CurrentRequestUser"
+            tools:layout_editor_absoluteX="279dp" />
+    </android.support.constraint.ConstraintLayout>
+
+
 
 </android.support.constraint.ConstraintLayout>

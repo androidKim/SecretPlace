@@ -96,7 +96,10 @@ class ActMyInformation : AppCompatActivity()
                 tv_UserKey.text = pInfo!!.user_key!!
                 var dataUser:data_user = data_user(0, pInfo!!.img_url!!, pInfo!!.name!!, pInfo!!.sns_key!!, pInfo!!.sns_type!!, pInfo!!.user_key!!)
 
-                m_UserViewModel?.insert(dataUser)//
+                if(m_UserViewModel?.select() != null)
+                    m_UserViewModel?.update(dataUser)//
+                else
+                    m_UserViewModel?.insert(dataUser)//
             }
         }
 

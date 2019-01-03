@@ -51,8 +51,10 @@
     <string name="str_msg_33">Copy</string>
     <string name="str_msg_34">Copy Complete</string>
     <string name="str_msg_35">Please register the recipient"'s'" unique key.\nIf the recipient accepts, it becomes a couple.</string>
-    <string name="str_msg_36">Input</string>
+    <string name="str_msg_36">Copy and enter the unique key of the couples target.</string>
     <string name="str_msg_37">Request</string>
     <string name="str_msg_38">request from me</string>
     <string name="str_msg_39">* Only one person can request</string>
+    <string name="str_msg_40">cant Request me</string>
+    <string name="str_msg_41">No spaces are allowed.</string>
 </resources>
