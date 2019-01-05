@@ -42,11 +42,9 @@ class ActCouple : AppCompatActivity()
     //
     override fun onStart()
     {
+        m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
+        m_pCoupleDbRef!!.addValueEventListener(coupleTableValueEventListener)
         super.onStart()
-
-        m_pCoupleDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)
-        m_pCoupleDbRef!!.addListenerForSingleValueEvent(coupleTableValueEventListener)
-        m_pCoupleDbRef!!.orderByChild("requester_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//내가 요청한것
     }
 
     /*********************** User Function ***********************/
@@ -67,17 +65,21 @@ class ActCouple : AppCompatActivity()
             return
         }
 
+        var pInfo:couple = couple(m_App!!.m_SpCtrl!!.getSpUserKey()!! , edit_UserKey.text.toString(), couple.APPCET_N)
+        m_pCoupleDbRef!!.setValue(pInfo!!)
         m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
-        var pInfo:couple = couple(m_App!!.m_SpCtrl!!.getSpUserKey()!! , edit_UserKey.text.toString(), false)
-        m_pCoupleDbRef!!.child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)!!.setValue(pInfo!!)
+
     }
     //--------------------------------------------------------------
     //요청취소
     fun cancelProc(view: View)
     {
-        m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
-        pDbRef!!.removeValue()
+        ly_RequestStatusOk.visibility = View.GONE
+        ly_RequestStatusNot.visibility = View.VISIBLE
+
+
+        m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
+        m_pCoupleDbRef!!.removeValue()
     }
 
     /*********************** Firebase DB EventListener ***********************/
@@ -87,38 +89,32 @@ class ActCouple : AppCompatActivity()
     {
         override fun onDataChange(dataSnapshot: DataSnapshot)
         {
-            // Get Post object and use the values to update the UI
-            if(dataSnapshot!!.exists())
-            {
-                //
-                val children = dataSnapshot!!.children
-                children.forEach {
-                    val pInfo:couple = it!!.getValue(couple::class.java)!!
-                    if(pInfo.requester_key!!.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
-                    {
-                        if(pInfo.accept!!)
-                        {
-                            tv_CurrentRequestUser.text = pInfo.responser_key + "과 커플입니다."
-                        }
-                        else
-                        {
-                            tv_CurrentRequestUser.text = pInfo.responser_key + "님 에게 커플 요청중입니다."
-                        }
 
-                        ly_RequestStatusOk.visibility = View.VISIBLE
-                        ly_RequestStatusNot.visibility = View.GONE
+            if (dataSnapshot!!.exists())//exist..
+            {
+                val pInfo:couple = dataSnapshot!!.getValue(couple::class.java)!!
+
+                if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
+                {
+                    ly_RequestStatusOk.visibility = View.VISIBLE
+                    ly_RequestStatusNot.visibility = View.GONE
+                    if(pInfo.accept.equals(couple.APPCET_Y))
+                    {
+                        tv_CurrentRequestUser.text = pInfo.responser_key + "과 커플입니다."
                     }
                     else
                     {
-                        ly_RequestStatusOk.visibility = View.GONE
-                        ly_RequestStatusNot.visibility = View.VISIBLE
+                        tv_CurrentRequestUser.text = pInfo.responser_key + "님 에게 커플 요청중입니다."
                     }
+                }
+                else
+                {
+
                 }
             }
             else
             {
-                ly_RequestStatusOk.visibility = View.GONE
-                ly_RequestStatusNot.visibility = View.VISIBLE
+
             }
         }
 
@@ -140,31 +136,11 @@ class ActCouple : AppCompatActivity()
     {
         override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
         {
-            if (dataSnapshot!!.exists())//exist..
+            // Get Post object and use the values to update the UI
+            if(dataSnapshot!!.exists())
             {
-                val pInfo:couple = dataSnapshot!!.getValue(couple::class.java)!!
-                if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
-                {
-                    if(pInfo.accept!!)
-                    {
-                        tv_CurrentRequestUser.text = pInfo.responser_key + "과 커플입니다."
-                    }
-                    else
-                    {
-                        tv_CurrentRequestUser.text = pInfo.responser_key + "님 에게 커플 요청중입니다."
-                    }
-
-                    ly_RequestStatusOk.visibility = View.VISIBLE
-                    ly_RequestStatusNot.visibility = View.GONE
-                }
-                else
-                {
-
-                }
-            }
-            else
-            {
-
+                ly_RequestStatusOk.visibility = View.VISIBLE
+                ly_RequestStatusNot.visibility = View.GONE
             }
         }
 

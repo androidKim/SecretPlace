@@ -11,6 +11,9 @@
 
     <string name="str_login_google">google</string>
     <string name="str_login_facebook">facebook</string>
+    <string name="str_tab_title_my">내 장소</string>
+    <string name="str_tab_title_group">내 묶음장소</string>
+    <string name="str_tab_title_couple">커플 장소</string>
 
     <string name="str_ok">예</string>
     <string name="str_no">아니오</string>
@@ -57,4 +60,6 @@
     <string name="str_msg_39">* 요청은 1명에게만 가능합니다</string>
     <string name="str_msg_40">나에게는 요청할 수 없습니다.</string>
     <string name="str_msg_41">공백은 입력할 수 없습니다.</string>
+    <string name="str_msg_42">커플은 1명만 가능합니다.\n수락하세요.</string>
+    <string name="str_msg_43">나에게 커플 요청한 사람이 없습니다.</string>
 </resources>

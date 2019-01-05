@@ -3,6 +3,7 @@ package com.midas.secretplace.ui.frag.main
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -142,12 +143,10 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         m_RecyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
 
         var nSpanCnt = 1
-        /*
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode..
         {
-            nSpanCnt = 4
+            nSpanCnt = 3
         }
-        */
 
         val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
         m_RecyclerView!!.setHasFixedSize(true)

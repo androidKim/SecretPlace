@@ -136,7 +136,7 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
         val viewPager: ViewPager = findViewById(R.id.viewPager)
         if (viewPager != null)
         {
-            val adapter = MainPagerAdapter(supportFragmentManager)
+            val adapter = MainPagerAdapter(m_Context!!, supportFragmentManager)
             viewPager.adapter = adapter
         }
 

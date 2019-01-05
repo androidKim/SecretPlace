@@ -1,16 +1,15 @@
 package com.midas.secretplace.structure.core
 
-import com.google.firebase.database.Exclude
 import java.io.Serializable
 
 class place:Serializable
 {
-    var user_key:String? = null
-    var place_key:String? = null
-    var group_key:String? = null
-    var name:String? = null
-    var lat:String? = null
-    var lng:String? = null
+    var user_key:String? = ""
+    var place_key:String? = ""
+    var group_key:String? = ""
+    var name:String? = ""
+    var lat:String? = ""
+    var lng:String? = ""
     //필수..
     constructor()
     {

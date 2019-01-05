@@ -22,7 +22,8 @@ class Constant
         val PERMISSION_CAMERA = 1004
 
         //ActivityForResult
-        val FOR_RESULT_IS_REFRESH:Int = 2000
+        val FOR_RESULT_IS_REFRESH:Int = 2000//새로고침 필요
+        val FOR_RESULT_REQUEST_FOR_ME:Int = 2001//나에게 온 요청 Activity 종료
 
         //theme
         val THEME_PINK:String = "THEME_PINK"

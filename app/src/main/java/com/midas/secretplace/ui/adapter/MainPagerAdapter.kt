@@ -1,17 +1,23 @@
 package com.midas.secretplace.ui.adapter
 
+import android.content.Context
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import com.midas.secretplace.R
 import com.midas.secretplace.ui.frag.main.FrGroup
 import com.midas.secretplace.ui.frag.main.FrPlace
 
-class MainPagerAdapter internal constructor(fm: FragmentManager) : FragmentPagerAdapter(fm)
+class MainPagerAdapter internal constructor(pContext: Context, fm: FragmentManager) : FragmentPagerAdapter(fm)
 {
     /************************** Define **************************/
-    private val TAB_NAME_0 = "One Place"
-    private val TAB_NAME_1 = "Group Place"
-    private val COUNT = 2
+    private var TAB_NAME_0 = pContext.resources.getString(R.string.str_tab_title_my)
+    private var TAB_NAME_1 = pContext.resources.getString(R.string.str_tab_title_group)
+    private var TAB_NAME_2 = pContext.resources.getString(R.string.str_tab_title_couple)
+    private var COUNT = 2
+
+    /************************** Member **************************/
+
     /************************** System Fucntion **************************/
     //--------------------------------------------------------
     //

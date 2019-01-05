@@ -66,10 +66,11 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_Name" />
 
     <Button
-        android:id="@+id/btn_ForMe"
+        android:id="@+id/btn_RequestForMe"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="showRequestForMe"
         android:layout_marginTop="20dp"
         android:text="@string/str_msg_38"
         app:layout_constraintTop_toBottomOf="@+id/tv_UserKey" />

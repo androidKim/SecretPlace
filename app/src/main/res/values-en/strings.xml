@@ -11,6 +11,9 @@
 
     <string name="str_login_google">google</string>
     <string name="str_login_facebook">facebook</string>
+    <string name="str_tab_title_my">My</string>
+    <string name="str_tab_title_group">Group</string>
+    <string name="str_tab_title_couple">Couple</string>
 
     <string name="str_ok">Yes</string>
     <string name="str_no">No</string>
@@ -57,4 +60,7 @@
     <string name="str_msg_39">* Only one person can request</string>
     <string name="str_msg_40">cant Request me</string>
     <string name="str_msg_41">No spaces are allowed.</string>
+    <string name="str_msg_42">Only one couples are allowed.\nAccept</string>
+    <string name="str_msg_43">No one has asked me for a couple.</string>
+
 </resources>
