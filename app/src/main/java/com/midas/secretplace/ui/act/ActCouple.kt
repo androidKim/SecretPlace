@@ -1,12 +1,16 @@
 package com.midas.secretplace.ui.act
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.google.firebase.database.*
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.midas.secretplace.R
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.couple
@@ -36,19 +40,26 @@ class ActCouple : AppCompatActivity()
 
         Util.setTheme(m_Context!!, m_App!!.m_SpCtrl!!.getSpTheme()!!)
         setContentView(R.layout.act_couple)
-
+        initLayout()
     }
     //--------------------------------------------------------------
     //
     override fun onStart()
     {
-        m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
-        m_pCoupleDbRef!!.addValueEventListener(coupleTableValueEventListener)
+        m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
+        m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
         super.onStart()
     }
 
     /*********************** User Function ***********************/
-
+    //--------------------------------------------------------------
+    //
+    fun initLayout()
+    {
+        //default UI
+        ly_RequestStatusOk.visibility = View.GONE
+        ly_RequestStatusNot.visibility = View.VISIBLE
+    }
     /*********************** Listener ***********************/
     //--------------------------------------------------------------
     //커플 요청
@@ -66,7 +77,7 @@ class ActCouple : AppCompatActivity()
         }
 
         var pInfo:couple = couple(m_App!!.m_SpCtrl!!.getSpUserKey()!! , edit_UserKey.text.toString(), couple.APPCET_N)
-        m_pCoupleDbRef!!.setValue(pInfo!!)
+        m_pCoupleDbRef!!.push().setValue(pInfo!!)
         m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
 
     }
@@ -78,58 +89,20 @@ class ActCouple : AppCompatActivity()
         ly_RequestStatusNot.visibility = View.VISIBLE
 
 
-        m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
+        m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
         m_pCoupleDbRef!!.removeValue()
+    }
+    //--------------------------------------------------------------
+    //나에게 온 요청리스트
+    fun showRequestForMe(view:View)
+    {
+        //
+        Intent(m_Context, ActRequestForMe::class.java).let{
+            startActivityForResult(it, 0)
+        }
     }
 
     /*********************** Firebase DB EventListener ***********************/
-    //--------------------------------------------------------------
-    //valueEventListenre..
-    var coupleTableValueEventListener:ValueEventListener = object : ValueEventListener
-    {
-        override fun onDataChange(dataSnapshot: DataSnapshot)
-        {
-
-            if (dataSnapshot!!.exists())//exist..
-            {
-                val pInfo:couple = dataSnapshot!!.getValue(couple::class.java)!!
-
-                if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
-                {
-                    ly_RequestStatusOk.visibility = View.VISIBLE
-                    ly_RequestStatusNot.visibility = View.GONE
-                    if(pInfo.accept.equals(couple.APPCET_Y))
-                    {
-                        tv_CurrentRequestUser.text = pInfo.responser_key + "과 커플입니다."
-                    }
-                    else
-                    {
-                        tv_CurrentRequestUser.text = pInfo.responser_key + "님 에게 커플 요청중입니다."
-                    }
-                }
-                else
-                {
-
-                }
-            }
-            else
-            {
-
-            }
-        }
-
-        override fun onCancelled(databaseError: DatabaseError)
-        {
-            // Getting Post failed, log a message
-
-            // ...
-            if(databaseError != null)
-            {
-
-            }
-        }
-    }
-
     //--------------------------------------------------------------
     //childEventListener..
     var coupleTableChildEventListener:ChildEventListener = object : ChildEventListener
@@ -139,8 +112,38 @@ class ActCouple : AppCompatActivity()
             // Get Post object and use the values to update the UI
             if(dataSnapshot!!.exists())
             {
-                ly_RequestStatusOk.visibility = View.VISIBLE
-                ly_RequestStatusNot.visibility = View.GONE
+                val pInfo:couple = dataSnapshot!!.getValue(couple::class.java)!!
+                if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))// 요청자가 나일떄
+                {
+                    ly_RequestStatusOk.visibility = View.VISIBLE
+                    ly_RequestStatusNot.visibility = View.GONE
+                    if(pInfo.accept.equals(couple.APPCET_Y))
+                    {
+                        tv_CurrentRequestUser.text = pInfo.responser_key + "와 커플입니다."
+                    }
+                    else
+                    {
+                        tv_CurrentRequestUser.text = "내가" + pInfo.responser_key + "님 에게 커플 요청중입니다."
+                        btn_ReqCancel.visibility = View.VISIBLE
+                    }
+                }
+                else if(pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//응답자가 나일떄
+                {
+                    if(pInfo.accept.equals(couple.APPCET_Y))
+                    {
+                        ly_RequestStatusOk.visibility = View.VISIBLE
+                        ly_RequestStatusNot.visibility = View.GONE
+                        tv_CurrentRequestUser.text = pInfo.requester_key + "와 커플입니다."
+                    }
+                    else
+                    {
+
+                    }
+                }
+                else
+                {
+
+                }
             }
         }
 

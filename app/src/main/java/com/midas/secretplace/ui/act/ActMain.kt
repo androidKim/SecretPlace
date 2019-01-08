@@ -31,10 +31,7 @@ import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.service.MyJobService
-import com.midas.secretplace.structure.core.group
-import com.midas.secretplace.structure.core.place
-import com.midas.secretplace.structure.core.theme
-import com.midas.secretplace.structure.core.user
+import com.midas.secretplace.structure.core.*
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.MainPagerAdapter
 import com.midas.secretplace.ui.custom.dlg_theme_setting
@@ -400,6 +397,9 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
         //TB_USER
         deleteUserTableData()
 
+        //TB_COUPLE
+        deleteCoupleTableData()
+
         //delay 5seconds..
         Handler().postDelayed({
             progressBar.visibility = View.GONE
@@ -719,6 +719,42 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
         pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).child(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
         pQuery.removeValue()
     }
+    //--------------------------------------------------------------
+    //
+    fun deleteCoupleTableData()
+    {
+        var pQuery: Query? = null
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE).orderByKey()
+        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            {
+                if(dataSnapshot!!.exists())
+                {
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        var pInfo: couple = it.getValue(couple::class.java)!!
+
+                        if(pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            || pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
+                        {
+                            var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key)//where
+                            pDbRef!!.removeValue()
+                        }
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?)
+            {
+
+            }
+        })
+    }
+
     //--------------------------------------------------------------
     //
     fun deleteFireAuthData()

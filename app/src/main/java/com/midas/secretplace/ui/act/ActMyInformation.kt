@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
@@ -130,14 +129,5 @@ class ActMyInformation : AppCompatActivity()
         m_Clip = ClipData.newPlainText("text", tv_UserKey.text)
         m_Clipboard?.primaryClip = m_Clip
         Toast.makeText(this, m_Context!!.resources!!.getString(R.string.str_msg_34), Toast.LENGTH_SHORT).show();
-    }
-    //--------------------------------------------------------------
-    //나에게 온 요청리스트
-    fun showRequestForMe(view:View)
-    {
-        //
-        Intent(m_Context, ActRequestForMe::class.java).let{
-            startActivityForResult(it, 0)
-        }
     }
 }
