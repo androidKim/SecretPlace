@@ -93,6 +93,17 @@ class ActCouple : AppCompatActivity()
         m_pCoupleDbRef!!.removeValue()
     }
     //--------------------------------------------------------------
+    //
+    fun goChatActivity(view:View)
+    {
+        //
+        Intent(m_Context, ActChat::class.java).let{
+            startActivity(it)
+        }
+    }
+
+
+    //--------------------------------------------------------------
     //나에게 온 요청리스트
     fun showRequestForMe(view:View)
     {
@@ -125,6 +136,7 @@ class ActCouple : AppCompatActivity()
                     {
                         tv_CurrentRequestUser.text = "내가" + pInfo.responser_key + "님 에게 커플 요청중입니다."
                         btn_ReqCancel.visibility = View.VISIBLE
+                        btn_Chat.visibility = View.VISIBLE
                     }
                 }
                 else if(pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//응답자가 나일떄
@@ -134,6 +146,7 @@ class ActCouple : AppCompatActivity()
                         ly_RequestStatusOk.visibility = View.VISIBLE
                         ly_RequestStatusNot.visibility = View.GONE
                         tv_CurrentRequestUser.text = pInfo.requester_key + "와 커플입니다."
+                        btn_Chat.visibility = View.VISIBLE
                     }
                     else
                     {

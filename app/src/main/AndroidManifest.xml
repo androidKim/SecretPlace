@@ -72,6 +72,10 @@
             android:name=".ui.act.ActRequestForMe"
             android:screenOrientation="unspecified"
             android:theme="@style/AppTheme"></activity>
+        <activity
+            android:name=".ui.act.ActChat"
+            android:screenOrientation="unspecified"
+            android:theme="@style/AppTheme"></activity>
 
         <service
             android:exported="false"

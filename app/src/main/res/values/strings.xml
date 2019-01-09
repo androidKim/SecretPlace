@@ -62,4 +62,6 @@
     <string name="str_msg_41">공백은 입력할 수 없습니다.</string>
     <string name="str_msg_42">커플은 1명만 가능합니다.</string>
     <string name="str_msg_43">나에게 커플 요청한 사람이 없습니다.</string>
+    <string name="str_msg_44">채팅</string>
+
 </resources>
