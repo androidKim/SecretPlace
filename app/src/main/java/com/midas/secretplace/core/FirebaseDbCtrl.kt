@@ -18,7 +18,9 @@ class FirebaseDbCtrl
         val TB_GROUP_PLACE:String = "tb_group_place"
         val TB_COUPLE:String = "tb_couple"
         val TB_COUPLE_PLACE:String = "tb_couple_place"
-        val TB_COUPLE_CHAT:String = "tb_couple_chat"
+        val TB_CHAT:String = "tb_chat"
+        val TB_CHAT_MEMBER:String = "tb_chat_member"
+        val TB_CHAT_MESSAGE:String = "tb_chat_message"
     }
 
     var m_FirebaseDb: FirebaseDatabase? = null
