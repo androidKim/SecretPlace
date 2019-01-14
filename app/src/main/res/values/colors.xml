@@ -89,6 +89,7 @@
     <color name="color_none">#00000000</color>
     <color name="color_black">#000000</color>
     <color name="color_white">#FFFFFF</color>
+    <color name="color_gray">#CCCCCC</color>
     <color name="color_red">#FF0000</color>
     <color name="color_green">#00FF00</color>
     <color name="color_blue">#0000FF</color>
