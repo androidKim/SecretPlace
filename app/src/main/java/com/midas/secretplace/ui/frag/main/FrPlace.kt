@@ -348,7 +348,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         if(m_Adapter != null)
             m_Adapter!!.clearData()
 
-        ly_SwipeRefresh.setRefreshing(false)
+        ly_SwipeRefresh.isRefreshing = false
 
         getPlaceListProc("")
     }
