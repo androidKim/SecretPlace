@@ -12,7 +12,6 @@ import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.MessageRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.core.FirebaseDbCtrl
-import com.midas.secretplace.structure.ReqBase
 import com.midas.secretplace.structure.core.chat
 import com.midas.secretplace.structure.core.couple
 import com.midas.secretplace.structure.core.message
@@ -35,7 +34,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
     var m_CoupleInfo:couple = couple()
     var m_UserInfo:user = user()
     var m_strChayKey:String = ""
-    var m_strMessageKey:String = ""
+    var m_strLastKey:String = ""
     var m_bExistCouple:Boolean = false//커풀 존재유무
     var m_bExistChat:Boolean = false//커플채팅방존재유무
     /*********************** System Function ***********************/
@@ -123,8 +122,8 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
 
         ly_SwipeRefresh.isRefreshing = false
 
-        m_strMessageKey = ""
-        getMessageList(m_strMessageKey, ReqBase.ITEM_COUNT)
+        m_strLastKey = ""
+        getMessageList()
     }
     //--------------------------------------------------------------
     //
@@ -151,72 +150,83 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
                 val totalItemCount = pLayoutManager.itemCount
                 val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
 
+
                 if((visibleItemCount + firstVisible) >= totalItemCount)
                 {
-                    // Call your API to load more items
-                    //if(!m_bPagingFinish)
-                    //getPlaceListProc(m_strPlaceLastSeq!!)
 
-                    getMessageList(m_strMessageKey, ReqBase.ITEM_COUNT)
                 }
             }
         })
 
-        getMessageList(m_strMessageKey, ReqBase.ITEM_COUNT)
+        getMessageList()
     }
     //--------------------------------------------------------------
     //
-    fun getMessageList(message_key:String, item_count:Int)
+    fun getMessageList()
     {
-        if(!message_key.equals(""))//paging get
-        {
-            var messageQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_MESSAGE)!!.equalTo(message_key).limitToLast(item_count)
-        }
-        else//first get
-        {
-            var messageQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_MESSAGE)!!.orderByChild("chat_key").equalTo(m_strChayKey).limitToLast(item_count)
-            messageQuery!!.addChildEventListener(object:ChildEventListener {
-                override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
-                    if(p0!!.exists())
-                    {
-                        //save item key
-                        m_strMessageKey = p0.key
+        //전체 데이터
+        var messageQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_MESSAGE)!!.orderByChild("chat_key").equalTo(m_strChayKey)
+        messageQuery!!.addListenerForSingleValueEvent(object:ValueEventListener {
 
-                        //UI update
-                        val pInfo:message = p0!!.getValue(message::class.java)!!
-                        m_Adapter!!.addData(pInfo)
-                    }
+            override fun onDataChange(p0: DataSnapshot?) {
+                val children = p0!!.children
+                children.forEach {
+                    m_strLastKey = it.key//last Key
+
+                    //UI update
+                    val pInfo:message = it!!.getValue(message::class.java)!!
+                    m_Adapter!!.addData(pInfo)
+
                 }
 
-                override fun onChildChanged(p0: DataSnapshot?, p1: String?)
+                messageQuery.removeEventListener(this)
+            }
+
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+        })
+
+        //추가적인 이벤트 발생시..
+        messageQuery!!.addChildEventListener(object :ChildEventListener {
+            override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
+
+                if(m_strLastKey!!.equals(""))
+                    return
+
+                if(p0!!.exists())
                 {
-                    if(p0!!.exists())
-                    {
-                        //refresh
-                        refreshUi()
-                    }
+                    val pInfo:message = p0!!.getValue(message::class.java)!!
+                    m_Adapter!!.addData(pInfo)
+                    progressBar.visibility = View.GONE
                 }
+            }
 
-                override fun onChildRemoved(p0: DataSnapshot?) {
-                    if(p0!!.exists())
-                    {
-                        //refresh
-                        refreshUi()
-                    }
-                }
-
-                override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
-                    if(p0!!.exists())
-                    {
-
-                    }
-                }
-
-                override fun onCancelled(p0: DatabaseError?) {
+            override fun onChildChanged(p0: DataSnapshot?, p1: String?) {
+                if(p0!!.exists())
+                {
 
                 }
-            })
-        }
+            }
+
+            override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
+                if(p0!!.exists())
+                {
+
+                }
+            }
+
+            override fun onChildRemoved(p0: DataSnapshot?) {
+                if(p0!!.exists())
+                {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+        })
     }
 
     //--------------------------------------------------------------
@@ -308,18 +318,6 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
         var pInfo:message = message(m_strChayKey, m_UserInfo.user_key!!, m_UserInfo.name!!, edit_Input.text.toString(), m_UserInfo.img_url!!)
         var MessageDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_MESSAGE)!!
         MessageDbRef!!.push().setValue(pInfo)
-        MessageDbRef!!.addListenerForSingleValueEvent(object :ValueEventListener{
-            override fun onDataChange(p0: DataSnapshot?) {
-                if(p0!!.exists())
-                {
-                    progressBar.visibility = View.GONE
-                }
-            }
-
-            override fun onCancelled(p0: DatabaseError?) {
-
-            }
-        })
         edit_Input.setText("")
     }
 }
