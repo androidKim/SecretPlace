@@ -154,7 +154,7 @@
 
 
     <!-- TextView -->
-    <style name="TextViewStyle"  parent="@android:style/Widget.TextView">
+    <style name="TextViewStyle" parent="@android:style/Widget.TextView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginLeft">5dp</item>
@@ -166,7 +166,7 @@
         <item name="android:background">@color/color_white</item>
     </style>
 
-    <style name="TextViewSmall"  parent="@android:style/Widget.TextView">
+    <style name="TextViewSmall" parent="@android:style/Widget.TextView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">10dp</item>
@@ -179,7 +179,7 @@
         <item name="android:background">@color/color_white</item>
     </style>
 
-    <style name="TextViewMedium"  parent="@android:style/Widget.TextView">
+    <style name="TextViewMedium" parent="@android:style/Widget.TextView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">15dp</item>
@@ -192,7 +192,7 @@
         <item name="android:background">@color/color_white</item>
     </style>
 
-    <style name="TextViewLarge"  parent="@android:style/Widget.TextView">
+    <style name="TextViewLarge" parent="@android:style/Widget.TextView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">20dp</item>
@@ -202,6 +202,17 @@
         <item name="android:paddingRight">3dp</item>
         <item name="android:paddingLeft">8dp</item>
         <item name="android:textColor">@color/color_black</item>
+        <item name="android:background">@color/color_white</item>
+    </style>
+
+    <style name="TextViewTop" parent="@android:style/Widget.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">20dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:background">@color/color_white</item>
     </style>
 </resources>

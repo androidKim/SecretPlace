@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.MessageRvAdapter
 import com.midas.secretplace.R
@@ -19,6 +21,7 @@ import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_chat.*
+import kotlinx.android.synthetic.main.ly_top.*
 
 class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, MessageRvAdapter.ifCallback
 {
@@ -28,6 +31,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
     /*********************** Member ***********************/
     var m_App:MyApp? = null
     var m_Context: Context? = null
+    var m_Imm:InputMethodManager? = null
 
     var m_Adapter:MessageRvAdapter? = null
     var m_arrMessage:ArrayList<message>  = ArrayList<message>()
@@ -49,7 +53,11 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
         Util.setTheme(m_Context!!, m_App!!.m_SpCtrl!!.getSpTheme()!!)
         setContentView(R.layout.act_chat)
 
+        m_Imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
         ly_SwipeRefresh.setOnRefreshListener(this)//swife refresh listener
+        tv_Top.text = m_Context!!.resources.getString(R.string.str_msg_48)//TopTitle
+        progressBar.visibility = View.VISIBLE
 
         var pUserQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
         pUserQuery.addListenerForSingleValueEvent(object :ValueEventListener{
@@ -129,7 +137,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
     //
     fun settingChatData()
     {
-        m_Adapter = MessageRvAdapter(m_Context!!, m_arrMessage!!, this)
+        m_Adapter = MessageRvAdapter(m_Context!!, m_arrMessage!!, m_App!!.m_SpCtrl!!.getSpUserKey()!!, this)
         recyclerView!!.adapter = m_Adapter
 
         var nSpanCnt = 1
@@ -179,6 +187,10 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
 
                 }
 
+                progressBar.visibility = View.GONE
+                if(m_Adapter!!.itemCount > 0)
+                    recyclerView.smoothScrollToPosition(m_Adapter!!.itemCount - 1)
+
                 messageQuery.removeEventListener(this)
             }
 
@@ -198,6 +210,11 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
                 {
                     val pInfo:message = p0!!.getValue(message::class.java)!!
                     m_Adapter!!.addData(pInfo)
+
+                    m_Imm!!.hideSoftInputFromWindow(edit_Input.windowToken, 0)//키보드 숨기기
+                    if(m_Adapter!!.itemCount > 0)
+                        recyclerView.smoothScrollToPosition(m_Adapter!!.itemCount - 1)//recyclerview position move to last item
+
                     progressBar.visibility = View.GONE
                 }
             }
@@ -315,7 +332,8 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
     fun onClickSendMessage(view:View)
     {
         progressBar.visibility = View.VISIBLE
-        var pInfo:message = message(m_strChayKey, m_UserInfo.user_key!!, m_UserInfo.name!!, edit_Input.text.toString(), m_UserInfo.img_url!!)
+        val timestamp = System.currentTimeMillis() / 1000
+        var pInfo:message = message(m_strChayKey, m_UserInfo.user_key!!, m_UserInfo.name!!, edit_Input.text.toString(), m_UserInfo.img_url!!, timestamp)
         var MessageDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_MESSAGE)!!
         MessageDbRef!!.push().setValue(pInfo)
         edit_Input.setText("")

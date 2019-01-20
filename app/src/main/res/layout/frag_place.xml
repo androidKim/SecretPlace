@@ -19,6 +19,7 @@
         </android.support.v7.widget.RecyclerView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fbtn_SaveLocation"
         android:layout_width="wrap_content"

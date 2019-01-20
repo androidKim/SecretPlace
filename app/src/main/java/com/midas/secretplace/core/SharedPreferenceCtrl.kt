@@ -41,7 +41,7 @@ class SharedPreferenceCtrl
     //
     private fun getStrLoadData(key:String) : String?
     {
-        var strResult:String ?= null
+        var strResult:String ?= ""
         strResult = preference.getString(key, "")
         return strResult
     }
