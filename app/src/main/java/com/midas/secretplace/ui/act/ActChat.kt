@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.MessageRvAdapter
@@ -32,13 +31,12 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
     var m_App:MyApp? = null
     var m_Context: Context? = null
     var m_Imm:InputMethodManager? = null
-
+    var m_MessageDbRef:DatabaseReference? = null
     var m_Adapter:MessageRvAdapter? = null
     var m_arrMessage:ArrayList<message>  = ArrayList<message>()
     var m_CoupleInfo:couple = couple()
     var m_UserInfo:user = user()
     var m_strChayKey:String = ""
-    var m_strLastKey:String = ""
     var m_bExistCouple:Boolean = false//커풀 존재유무
     var m_bExistChat:Boolean = false//커플채팅방존재유무
     /*********************** System Function ***********************/
@@ -118,6 +116,47 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
     /*********************** Firebase Listener ***********************/
     //--------------------------------------------------------------
     //
+    var messageChildEventListener:ChildEventListener = object:ChildEventListener{
+        override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
+            if(p0!!.exists())
+            {
+                val pInfo:message = p0!!.getValue(message::class.java)!!
+                m_Adapter!!.addData(pInfo)
+
+                m_Imm!!.hideSoftInputFromWindow(edit_Input.windowToken, 0)//키보드 숨기기
+                if(m_Adapter!!.itemCount > 0)
+                    recyclerView.smoothScrollToPosition(m_Adapter!!.itemCount - 1)//recyclerview position move to last item
+
+                progressBar.visibility = View.GONE
+                m_MessageDbRef!!.removeEventListener(this)
+            }
+        }
+
+        override fun onChildChanged(p0: DataSnapshot?, p1: String?) {
+            if(p0!!.exists())
+            {
+
+            }
+        }
+
+        override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
+            if(p0!!.exists())
+            {
+
+            }
+        }
+
+        override fun onChildRemoved(p0: DataSnapshot?) {
+            if(p0!!.exists())
+            {
+
+            }
+        }
+
+        override fun onCancelled(p0: DatabaseError?) {
+
+        }
+    }
     /*********************** User Function ***********************/
     //--------------------------------------------------------------
     //
@@ -129,8 +168,6 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
             m_Adapter!!.clearData()
 
         ly_SwipeRefresh.isRefreshing = false
-
-        m_strLastKey = ""
         getMessageList()
     }
     //--------------------------------------------------------------
@@ -179,15 +216,13 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
             override fun onDataChange(p0: DataSnapshot?) {
                 val children = p0!!.children
                 children.forEach {
-                    m_strLastKey = it.key//last Key
-
                     //UI update
                     val pInfo:message = it!!.getValue(message::class.java)!!
                     m_Adapter!!.addData(pInfo)
-
                 }
 
                 progressBar.visibility = View.GONE
+
                 if(m_Adapter!!.itemCount > 0)
                     recyclerView.smoothScrollToPosition(m_Adapter!!.itemCount - 1)
 
@@ -198,54 +233,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
 
             }
         })
-
-        //추가적인 이벤트 발생시..
-        messageQuery!!.addChildEventListener(object :ChildEventListener {
-            override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
-
-                if(m_strLastKey!!.equals(""))
-                    return
-
-                if(p0!!.exists())
-                {
-                    val pInfo:message = p0!!.getValue(message::class.java)!!
-                    m_Adapter!!.addData(pInfo)
-
-                    m_Imm!!.hideSoftInputFromWindow(edit_Input.windowToken, 0)//키보드 숨기기
-                    if(m_Adapter!!.itemCount > 0)
-                        recyclerView.smoothScrollToPosition(m_Adapter!!.itemCount - 1)//recyclerview position move to last item
-
-                    progressBar.visibility = View.GONE
-                }
-            }
-
-            override fun onChildChanged(p0: DataSnapshot?, p1: String?) {
-                if(p0!!.exists())
-                {
-
-                }
-            }
-
-            override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
-                if(p0!!.exists())
-                {
-
-                }
-            }
-
-            override fun onChildRemoved(p0: DataSnapshot?) {
-                if(p0!!.exists())
-                {
-
-                }
-            }
-
-            override fun onCancelled(p0: DatabaseError?) {
-
-            }
-        })
     }
-
     //--------------------------------------------------------------
     //
     fun showChatLayout()
@@ -260,12 +248,17 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
                 val children = dataSnapshot!!.children
                 children.forEach {
                     val pInfo:chat = it!!.getValue(chat::class.java)!!
+
                     if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()) ||
-                            pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))// 요청자또는 응답자가가 나일떄
+                            pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//요청자또는 응답자가 나일때
                     {
-                        m_bExistChat = true
-                        m_strChayKey = it.key
-                        settingChatData()
+                        if(pInfo.requester_key.equals(m_CoupleInfo.requester_key) &&
+                                pInfo.responser_key.equals(m_CoupleInfo.responser_key))//커플정보와 일치하면
+                        {
+                            m_bExistChat = true
+                            m_strChayKey = it.key
+                            settingChatData()
+                        }
                     }
                 }
 
@@ -316,6 +309,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
     //
     fun showEmptyLayout()
     {
+        progressBar.visibility = View.GONE
         ly_Empty.visibility = View.VISIBLE
         ly_Chat.visibility = View.GONE
     }
@@ -334,8 +328,9 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
         progressBar.visibility = View.VISIBLE
         val timestamp = System.currentTimeMillis() / 1000
         var pInfo:message = message(m_strChayKey, m_UserInfo.user_key!!, m_UserInfo.name!!, edit_Input.text.toString(), m_UserInfo.img_url!!, timestamp)
-        var MessageDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_MESSAGE)!!
-        MessageDbRef!!.push().setValue(pInfo)
+        m_MessageDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_MESSAGE)!!
+        m_MessageDbRef!!.push().setValue(pInfo)
+        m_MessageDbRef!!.addChildEventListener(messageChildEventListener)
         edit_Input.setText("")
     }
 }

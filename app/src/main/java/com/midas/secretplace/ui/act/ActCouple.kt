@@ -7,10 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.*
 import com.midas.secretplace.R
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.couple
@@ -88,9 +85,25 @@ class ActCouple : AppCompatActivity()
         ly_RequestStatusOk.visibility = View.GONE
         ly_RequestStatusNot.visibility = View.VISIBLE
 
+        var pCoupleDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
+        pCoupleDbRef!!.addListenerForSingleValueEvent(object :ValueEventListener{
+            override fun onDataChange(p0: DataSnapshot?) {
+                val children = p0!!.children
+                children.forEach {
+                    val pInfo: couple = it!!.getValue(couple::class.java)!!
 
-        m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
-        m_pCoupleDbRef!!.removeValue()
+                    if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//내가 요청인 데이터  삭제
+                    {
+                        var dbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key)
+                        dbRef!!.removeValue()
+                    }
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+        })
     }
     //--------------------------------------------------------------
     //
