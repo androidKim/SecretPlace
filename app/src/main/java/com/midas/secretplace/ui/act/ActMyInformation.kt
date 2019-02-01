@@ -46,10 +46,7 @@ class ActMyInformation : AppCompatActivity()
     private var m_Clip: ClipData? = null
 
     //
-
     /*********************** Controller ***********************/
-
-
 
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
@@ -79,13 +76,14 @@ class ActMyInformation : AppCompatActivity()
             }
         })
 
-
+        setInitLayout()
     }
     //--------------------------------------------------------------
     //
     override fun onStart()
     {
         //firebase database reference..
+        progressBar.visibility = View.VISIBLE
         m_UserDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())//where
         m_UserDbRef!!.addValueEventListener(userTableRefListener)
         super.onStart()
@@ -111,6 +109,8 @@ class ActMyInformation : AppCompatActivity()
                 else
                     m_UserViewModel?.insert(dataUser)//
             }
+
+            progressBar.visibility = View.GONE
         }
 
         override fun onCancelled(databaseError: DatabaseError)
@@ -118,16 +118,33 @@ class ActMyInformation : AppCompatActivity()
             // Getting Post failed, log a message
 
             // ...
+
+            progressBar.visibility = View.GONE
         }
     }
     /*********************** User Function ***********************/
+    //--------------------------------------------------------------
+    //
+    fun setInitLayout()
+    {
+        tv_TopTitle.text = m_Context!!.resources.getString(R.string.str_msg_30)
+    }
+    //--------------------------------------------------------------------
+    //show share dialog
 
     //--------------------------------------------------------------------
-    // on click copy button
+    //copy
     fun copyKey(view: View)
     {
         m_Clip = ClipData.newPlainText("text", tv_UserKey.text)
         m_Clipboard?.primaryClip = m_Clip
         Toast.makeText(this, m_Context!!.resources!!.getString(R.string.str_msg_34), Toast.LENGTH_SHORT).show();
     }
+    //--------------------------------------------------------------------
+    //sms
+
+
+    //--------------------------------------------------------------------
+    //kakao
+
 }

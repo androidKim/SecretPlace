@@ -50,7 +50,7 @@
     <string name="str_msg_29">Couple</string>
     <string name="str_msg_30">My Information</string>
     <string name="str_msg_31">Name</string>
-    <string name="str_msg_32">User Key</string>
+    <string name="str_msg_32">My privateKey</string>
     <string name="str_msg_33">Copy</string>
     <string name="str_msg_34">Copy Complete</string>
     <string name="str_msg_35">Please register the recipient"'s'" unique key.\nIf the recipient accepts, it becomes a couple.</string>
@@ -66,4 +66,5 @@
     <string name="str_msg_46">do not have a couple to chat with.</string>
     <string name="str_msg_47">Type your message.</string>
     <string name="str_msg_48">Couple Chat</string>
+    <string name="str_msg_49">Share your key and match couple</string>
 </resources>

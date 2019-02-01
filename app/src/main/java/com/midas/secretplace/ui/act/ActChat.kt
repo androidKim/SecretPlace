@@ -20,7 +20,6 @@ import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_chat.*
-import kotlinx.android.synthetic.main.ly_top.*
 
 class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, MessageRvAdapter.ifCallback
 {
@@ -54,7 +53,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
         m_Imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
         ly_SwipeRefresh.setOnRefreshListener(this)//swife refresh listener
-        tv_Top.text = m_Context!!.resources.getString(R.string.str_msg_48)//TopTitle
+        tv_TopTitle.text = m_Context!!.resources.getString(R.string.str_msg_48)//TopTitle
         progressBar.visibility = View.VISIBLE
 
         var pUserQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
