@@ -1,5 +1,6 @@
 package com.midas.secretplace.ui.act
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.view.View
 import android.widget.Toast
 import com.google.firebase.database.*
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.couple
 import com.midas.secretplace.ui.MyApp
@@ -24,6 +26,7 @@ class ActCouple : AppCompatActivity()
     var m_Context: Context? = null
 
     var m_pCoupleDbRef: DatabaseReference? = null
+    var m_bExistCouple:Boolean = false//
     /*********************** xwSystem Function ***********************/
     //--------------------------------------------------------------
     //
@@ -48,19 +51,33 @@ class ActCouple : AppCompatActivity()
         super.onStart()
     }
 
+    //--------------------------------------------------------------
+    //
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode == Constant.FOR_RESULT_REQUEST_FOR_ME)
+        {
+            m_bExistCouple = false
+            //refresh..
+            m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
+            m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
+        }
+    }
+
     /*********************** User Function ***********************/
     //--------------------------------------------------------------
     //
     fun initLayout()
     {
         //default UI
+        tv_TopTitle.text = m_Context!!.resources.getString(R.string.str_msg_29);
         ly_RequestStatusOk.visibility = View.GONE
         ly_RequestStatusNot.visibility = View.VISIBLE
     }
     /*********************** Listener ***********************/
     //--------------------------------------------------------------
     //커플 요청
-    fun coupleRequestProc(view:View)
+    public fun coupleRequestProc(view:View)
     {
         if(edit_UserKey.text.toString().equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
         {
@@ -136,6 +153,10 @@ class ActCouple : AppCompatActivity()
             // Get Post object and use the values to update the UI
             if(dataSnapshot!!.exists())
             {
+                if(m_bExistCouple)
+                    return
+
+                m_pCoupleDbRef!!.removeEventListener(this)//중복 진입 방지..
                 val pInfo:couple = dataSnapshot!!.getValue(couple::class.java)!!
                 if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))// 요청자가 나일떄
                 {
@@ -143,32 +164,34 @@ class ActCouple : AppCompatActivity()
                     ly_RequestStatusNot.visibility = View.GONE
                     if(pInfo.accept.equals(couple.APPCET_Y))
                     {
+                        m_bExistCouple = true
                         tv_CurrentRequestUser.text = pInfo.responser_key + "와 커플입니다."
                     }
                     else
                     {
                         tv_CurrentRequestUser.text = "내가" + pInfo.responser_key + "님 에게 커플 요청중입니다."
                         btn_ReqCancel.visibility = View.VISIBLE
-                        btn_Chat.visibility = View.VISIBLE
                     }
                 }
                 else if(pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//응답자가 나일떄
                 {
                     if(pInfo.accept.equals(couple.APPCET_Y))
                     {
+                        m_bExistCouple = true
                         ly_RequestStatusOk.visibility = View.VISIBLE
                         ly_RequestStatusNot.visibility = View.GONE
                         tv_CurrentRequestUser.text = pInfo.requester_key + "와 커플입니다."
-                        btn_Chat.visibility = View.VISIBLE
                     }
                     else
                     {
-
+                        ly_RequestStatusOk.visibility = View.GONE
+                        ly_RequestStatusNot.visibility = View.VISIBLE
                     }
                 }
                 else
                 {
-
+                    ly_RequestStatusOk.visibility = View.GONE
+                    ly_RequestStatusNot.visibility = View.VISIBLE
                 }
             }
         }

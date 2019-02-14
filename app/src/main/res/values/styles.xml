@@ -218,7 +218,15 @@
 
     <style name="topLayout" parent="@style/AlertDialog.AppCompat">
         <item name="android:gravity">center</item>
+        <item name="android:orientation">vertical</item>
         <item name="android:padding">10dp</item>
         <item name="android:background">@color/color_white</item>
+    </style>
+
+    <style name="default_button">
+        <item name="android:textSize">15dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:buttonStyle">@style/Base.Widget.AppCompat.Button.Colored</item>
     </style>
 </resources>

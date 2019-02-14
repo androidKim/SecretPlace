@@ -13,6 +13,7 @@ import android.view.View
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.RequestForMeRvAdapter
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.couple
 import com.midas.secretplace.ui.MyApp
@@ -114,6 +115,11 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback, S
     override fun onStart()
     {
         super.onStart()
+    }
+
+    override fun onBackPressed() {
+        setResult(Constant.FOR_RESULT_REQUEST_FOR_ME)
+        finish()
     }
 
     /*********************** Firebase DB EventListener ***********************/

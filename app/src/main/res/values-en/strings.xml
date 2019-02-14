@@ -57,7 +57,7 @@
     <string name="str_msg_36">Copy and enter the unique key of the couples target.</string>
     <string name="str_msg_37">Request</string>
     <string name="str_msg_38">request from me</string>
-    <string name="str_msg_39">* Only one person can request</string>
+    <string name="str_msg_39">!!Only one person can request</string>
     <string name="str_msg_40">cant Request me</string>
     <string name="str_msg_41">No spaces are allowed.</string>
     <string name="str_msg_42">Only one couples are allowed.</string>
@@ -67,4 +67,5 @@
     <string name="str_msg_47">Type your message.</string>
     <string name="str_msg_48">Couple Chat</string>
     <string name="str_msg_49">Share your key and match couple</string>
+    <string name="str_msg_50">My Couple</string>
 </resources>
