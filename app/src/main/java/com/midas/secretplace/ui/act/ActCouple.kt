@@ -69,6 +69,7 @@ class ActCouple : AppCompatActivity()
     //
     fun initLayout()
     {
+        m_bExistCouple = false
         //default UI
         tv_TopTitle.text = m_Context!!.resources.getString(R.string.str_msg_29);
         ly_RequestStatusOk.visibility = View.GONE
@@ -162,6 +163,7 @@ class ActCouple : AppCompatActivity()
                 {
                     ly_RequestStatusOk.visibility = View.VISIBLE
                     ly_RequestStatusNot.visibility = View.GONE
+
                     if(pInfo.accept.equals(couple.APPCET_Y))
                     {
                         m_bExistCouple = true
