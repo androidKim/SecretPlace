@@ -9,6 +9,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.MessageRvAdapter
 import com.midas.secretplace.R
@@ -328,6 +329,13 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
     //send  message
     fun onClickSendMessage(view:View)
     {
+        if( edit_Input.text.toString().equals("")
+            ||  edit_Input.text.toString().length == 0)
+        {
+            Toast.makeText(m_Context!!, m_Context!!.resources!!.getString(R.string.str_msg_54), Toast.LENGTH_SHORT).show()
+            return
+        }
+
         progressBar.visibility = View.VISIBLE
         val timestamp = System.currentTimeMillis() / 1000
         var pInfo:message = message(m_strChayKey, m_UserInfo.user_key!!, m_UserInfo.name!!, edit_Input.text.toString(), m_UserInfo.img_url!!, timestamp)

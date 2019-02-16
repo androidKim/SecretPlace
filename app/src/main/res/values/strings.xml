@@ -68,4 +68,8 @@
     <string name="str_msg_48">커플 채팅</string>
     <string name="str_msg_49">고유키를 공유해서 커플을 맺으세요.</string>
     <string name="str_msg_50">나의 커플</string>
+    <string name="str_msg_51">복사</string>
+    <string name="str_msg_52">카카오톡</string>
+    <string name="str_msg_53">문자</string>
+    <string name="str_msg_54">메세지를 입력하세요.</string>
 </resources>

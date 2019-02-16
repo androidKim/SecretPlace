@@ -61,6 +61,9 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
         if(pPlaceInfo == null)
             return
 
+        if(pPlaceInfo.lat == null || pPlaceInfo.lng == null)
+            return
+
         mMap!!.clear()
         var nLat:Double = pPlaceInfo.lat!!.toDouble()
         var nLng:Double = pPlaceInfo.lng!!.toDouble()
@@ -83,33 +86,37 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
         var arrLatLng:ArrayList<LatLng> = ArrayList()
         var pLatLngInfo:LatLng? = null
 
+        //add Marker..
         for (i in 0 until pPlaceList!!.size)
         {
             var pInfo: place = pPlaceList.get(i)
-            var nLat:Double = pInfo.lat!!.toDouble()
-            var nLng:Double = pInfo.lng!!.toDouble()
-            pLatLngInfo = LatLng(nLat, nLng)
-            arrLatLng!!.add(pLatLngInfo)
-            var pMarker:Marker = mMap.addMarker(MarkerOptions().position(pLatLngInfo).title(pInfo.name))
-            pMarker!!.tag = pInfo
-
-            mMap!!.setOnMarkerClickListener(object : GoogleMap.OnMarkerClickListener {
-                override fun onMarkerClick(pMarker: Marker): Boolean {
-                    var pInfo:place = pMarker.tag as place
-
-                    if(m_IfCallback != null)
-                        m_IfCallback!!.selectPlaceItem(pInfo)
-
-                    return false
-                }
-            })
-
-            mMap!!.setOnMapClickListener(object : GoogleMap.OnMapClickListener {
-                override fun onMapClick(latLng: LatLng) {
-
-                }
-            })
+            if(pInfo.lat != null && pInfo.lng != null && pInfo.name != null)
+            {
+                var nLat:Double = pInfo.lat!!.toDouble()
+                var nLng:Double = pInfo.lng!!.toDouble()
+                pLatLngInfo = LatLng(nLat, nLng)
+                arrLatLng!!.add(pLatLngInfo)
+                var pMarker:Marker = mMap.addMarker(MarkerOptions().position(pLatLngInfo).title(pInfo.name))
+                pMarker!!.tag = pInfo
+            }
         }
+
+        mMap!!.setOnMarkerClickListener(object : GoogleMap.OnMarkerClickListener {
+            override fun onMarkerClick(pMarker: Marker): Boolean {
+                var pInfo:place = pMarker.tag as place
+
+                if(m_IfCallback != null)
+                    m_IfCallback!!.selectPlaceItem(pInfo)
+
+                return false
+            }
+        })
+
+        mMap!!.setOnMapClickListener(object : GoogleMap.OnMapClickListener {
+            override fun onMapClick(latLng: LatLng) {
+
+            }
+        })
 
         //poly line..
         if(pLatLngInfo != null && arrLatLng.size > 0)

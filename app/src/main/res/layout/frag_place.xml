@@ -12,6 +12,8 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/ly_MenuContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/color_white"
@@ -24,8 +26,7 @@
                 android:layout_margin="10dp"
                 android:onClick="showMap"
                 android:visibility="visible"
-                app:srcCompat="@drawable/ic_baseline_pin_drop_24px"
-                tools:visibility="visible" />
+                app:srcCompat="@drawable/ic_baseline_pin_drop_24px" />
         </LinearLayout>
 
         <FrameLayout

@@ -98,7 +98,7 @@
                 android:layout_below="@+id/tv_Desc"
                 android:layout_toRightOf="@id/tv_Desc"
                 android:layout_centerVertical="true"
-                android:onClick="copyKey"
+                android:onClick="onClickSahre"
                 app:srcCompat="@drawable/ic_baseline_share_24px" />
 
         </RelativeLayout>

@@ -68,4 +68,8 @@
     <string name="str_msg_48">Couple Chat</string>
     <string name="str_msg_49">Share your key and match couple</string>
     <string name="str_msg_50">My Couple</string>
+    <string name="str_msg_51">Copy</string>
+    <string name="str_msg_52">Kakao Talk</string>
+    <string name="str_msg_53">SMS</string>
+    <string name="str_msg_54">must write message</string>
 </resources>

@@ -29,7 +29,6 @@ import com.midas.secretplace.ui.act.ActPlaceDetail
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import kotlinx.android.synthetic.main.frag_place.*
 import java.io.Serializable
-import java.util.*
 
 
 class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter.ifCallback
@@ -42,7 +41,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     var m_App:MyApp? = null
     var m_IfCallback:ifCallback? = null
     var m_Adapter:PlaceRvAdapter? = null
-    var m_arrPlace:ArrayList<place>? = null
+    var m_arrPlace:ArrayList<place>? = ArrayList()
 
     //var m_strPlaceLastSeq:String? = ""
     var m_bRunning:Boolean = false
@@ -143,6 +142,15 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //show map dialog
     fun goMapDetail()
     {
+        if(m_Adapter != null)
+            m_arrPlace = m_Adapter!!.placeList
+
+        if(m_arrPlace == null)
+            return
+
+        if(m_arrPlace!!.size == 0)
+            return
+
         var pIntent = Intent(m_Context, ActMapDetail::class.java)
         pIntent.putExtra(Constant.INTENT_DATA_PLACE_LIST_OBJECT, m_arrPlace!! as Serializable)
         startActivity(pIntent)
@@ -189,6 +197,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //
     fun getPlaceListProc(seq:String)
     {
+        progressBar.visibility = View.VISIBLE
         m_bRunning = true
         //m_App!!.showLoadingDialog(ly_LoadingDialog)
 
@@ -226,6 +235,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 {
                     m_bPagingFinish = true
                 }
+
+                progressBar.visibility = View.GONE
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -276,6 +287,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
 
                 m_bRunning = false
+                ly_MenuContainer.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
             }
 
             override fun onCancelled(p0: DatabaseError?)

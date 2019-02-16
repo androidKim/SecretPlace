@@ -80,6 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/btn_Send"
                 android:hint="@string/str_msg_47"
+                android:inputType="text"
                 android:textColorHint="@color/color_gray" />
 
             <ImageButton
