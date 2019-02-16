@@ -1,6 +1,5 @@
 package com.midas.secretplace.ui.act
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -69,16 +68,18 @@ class ActCouple : AppCompatActivity()
     //
     fun initLayout()
     {
-        m_bExistCouple = false
         //default UI
-        tv_TopTitle.text = m_Context!!.resources.getString(R.string.str_msg_29);
-        ly_RequestStatusOk.visibility = View.GONE
-        ly_RequestStatusNot.visibility = View.VISIBLE
+        tv_TopTitle.text = m_Context!!.resources.getString(R.string.str_msg_29)
+
+        //refresh..
+        m_bExistCouple = false
+        m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
+        m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
     }
     /*********************** Listener ***********************/
     //--------------------------------------------------------------
     //커플 요청
-    public fun coupleRequestProc(view:View)
+    fun coupleRequestProc(view:View)
     {
         if(edit_UserKey.text.toString().equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
         {

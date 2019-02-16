@@ -52,7 +52,7 @@
     <string name="str_msg_31">Name</string>
     <string name="str_msg_32">My privateKey</string>
     <string name="str_msg_33">Copy</string>
-    <string name="str_msg_34">Copy Complete</string>
+    <string name="str_msg_34">copy complete \n send for someone</string>
     <string name="str_msg_35">Please register the recipient"'s'" unique key.\nIf the recipient accepts, it becomes a couple.</string>
     <string name="str_msg_36">Copy and enter the unique key of the couples target.</string>
     <string name="str_msg_37">Request</string>

@@ -19,12 +19,12 @@ import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
-import com.midas.secretplace.R.id.fbtn_SaveLocation
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
+import com.midas.secretplace.ui.act.ActMapDetail
 import com.midas.secretplace.ui.act.ActPlaceDetail
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import kotlinx.android.synthetic.main.frag_place.*
@@ -63,7 +63,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context!!)
-        
+
         return view
     }
     //------------------------------------------------------------------------
@@ -132,7 +132,20 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             }
         })
 
+        //지도로 좌표보기..
+        btn_ShowMap!!.setOnClickListener(View.OnClickListener {
+            goMapDetail()
+        })
+
         settingView()
+    }
+    //-----------------------------------------------------
+    //show map dialog
+    fun goMapDetail()
+    {
+        var pIntent = Intent(m_Context, ActMapDetail::class.java)
+        pIntent.putExtra(Constant.INTENT_DATA_PLACE_LIST_OBJECT, m_arrPlace!! as Serializable)
+        startActivity(pIntent)
     }
     //--------------------------------------------------------------
     //
@@ -450,6 +463,18 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     override fun onRefresh()
     {
         setRefresh()
+    }
+    //----------------------------------------------------------------------
+    //
+    fun showList(view:View)
+    {
+
+    }
+    //----------------------------------------------------------------------
+    //
+    fun showMap(view:View)
+    {
+
     }
     /******************************** callback function ********************************/
     //----------------------------------------------------------------------

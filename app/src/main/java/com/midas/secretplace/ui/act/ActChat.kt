@@ -111,6 +111,8 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
     override fun onStart()
     {
         super.onStart()
+        m_MessageDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_MESSAGE)!!
+        m_MessageDbRef!!.addChildEventListener(messageChildEventListener)
     }
     /*********************** Firebase Listener ***********************/
     //--------------------------------------------------------------
@@ -119,6 +121,9 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
         override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
             if(p0!!.exists())
             {
+                if(m_Adapter == null)
+                    return
+
                 val pInfo:message = p0!!.getValue(message::class.java)!!
                 m_Adapter!!.addData(pInfo)
 
@@ -127,7 +132,6 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
                     recyclerView.smoothScrollToPosition(m_Adapter!!.itemCount - 1)//recyclerview position move to last item
 
                 progressBar.visibility = View.GONE
-                m_MessageDbRef!!.removeEventListener(this)
             }
         }
 
@@ -327,9 +331,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
         progressBar.visibility = View.VISIBLE
         val timestamp = System.currentTimeMillis() / 1000
         var pInfo:message = message(m_strChayKey, m_UserInfo.user_key!!, m_UserInfo.name!!, edit_Input.text.toString(), m_UserInfo.img_url!!, timestamp)
-        m_MessageDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_MESSAGE)!!
         m_MessageDbRef!!.push().setValue(pInfo)
-        m_MessageDbRef!!.addChildEventListener(messageChildEventListener)
         edit_Input.setText("")
     }
 }

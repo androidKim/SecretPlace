@@ -138,7 +138,7 @@ class ActMyInformation : AppCompatActivity()
     {
         m_Clip = ClipData.newPlainText("text", tv_UserKey.text)
         m_Clipboard?.primaryClip = m_Clip
-        Toast.makeText(this, m_Context!!.resources!!.getString(R.string.str_msg_34), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, m_Context!!.resources!!.getString(R.string.str_msg_34), Toast.LENGTH_LONG).show()
     }
     //--------------------------------------------------------------------
     //sms
