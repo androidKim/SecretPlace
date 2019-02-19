@@ -19,6 +19,7 @@ class ActMapDetail : AppCompatActivity()
     var m_App:MyApp = MyApp()
     var m_Context: Context = this
     var m_PlaceInfo:place = place()
+    var m_arrPlace:ArrayList<place> = ArrayList()
     /*********************** xwSystem Function ***********************/
     //--------------------------------------------------------------
     //
@@ -53,16 +54,34 @@ class ActMapDetail : AppCompatActivity()
 
         if(pIntent.hasExtra(Constant.INTENT_DATA_PLACE_OBJECT))
             m_PlaceInfo =  pIntent.extras.get(Constant.INTENT_DATA_PLACE_OBJECT) as place
+
+        if(pIntent.hasExtra(Constant.INTENT_DATA_PLACE_LIST_OBJECT))
+            m_arrPlace = pIntent.extras.get(Constant.INTENT_DATA_PLACE_LIST_OBJECT) as ArrayList<place>
     }
     //--------------------------------------------------------------
     //
     fun initLayout()
     {
-        //map..
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
-        mapFragment!!.getMapAsync(mapFragment)
-        val mArgs = Bundle()
-        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo!!)
-        mapFragment.arguments = mArgs
+        if(m_arrPlace!!.size > 0)//리스트
+        {
+            val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
+            mapFragment!!.getMapAsync(mapFragment)
+            val mArgs = Bundle()
+            mArgs.putSerializable(Constant.INTENT_DATA_PLACE_LIST_OBJECT, m_arrPlace!!)
+            mapFragment.arguments = mArgs
+        }
+        else if(m_PlaceInfo != null)//1개장소
+        {
+            //map..
+            val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
+            mapFragment!!.getMapAsync(mapFragment)
+            val mArgs = Bundle()
+            mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo!!)
+            mapFragment.arguments = mArgs
+        }
+        else
+        {
+            return
+        }
     }
 }

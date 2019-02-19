@@ -7,11 +7,9 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.*
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.couple
 import com.midas.secretplace.ui.MyApp
@@ -27,6 +25,7 @@ class ActCouple : AppCompatActivity()
     var m_Context: Context? = null
 
     var m_pCoupleDbRef: DatabaseReference? = null
+    var m_bExistCouple:Boolean = false//
     /*********************** xwSystem Function ***********************/
     //--------------------------------------------------------------
     //
@@ -51,14 +50,31 @@ class ActCouple : AppCompatActivity()
         super.onStart()
     }
 
+    //--------------------------------------------------------------
+    //
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode == Constant.FOR_RESULT_REQUEST_FOR_ME)
+        {
+            m_bExistCouple = false
+            //refresh..
+            m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
+            m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
+        }
+    }
+
     /*********************** User Function ***********************/
     //--------------------------------------------------------------
     //
     fun initLayout()
     {
         //default UI
-        ly_RequestStatusOk.visibility = View.GONE
-        ly_RequestStatusNot.visibility = View.VISIBLE
+        tv_TopTitle.text = m_Context!!.resources.getString(R.string.str_msg_29)
+
+        //refresh..
+        m_bExistCouple = false
+        m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
+        m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
     }
     /*********************** Listener ***********************/
     //--------------------------------------------------------------
@@ -88,9 +104,25 @@ class ActCouple : AppCompatActivity()
         ly_RequestStatusOk.visibility = View.GONE
         ly_RequestStatusNot.visibility = View.VISIBLE
 
+        var pCoupleDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
+        pCoupleDbRef!!.addListenerForSingleValueEvent(object :ValueEventListener{
+            override fun onDataChange(p0: DataSnapshot?) {
+                val children = p0!!.children
+                children.forEach {
+                    val pInfo: couple = it!!.getValue(couple::class.java)!!
 
-        m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
-        m_pCoupleDbRef!!.removeValue()
+                    if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//내가 요청인 데이터  삭제
+                    {
+                        var dbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key)
+                        dbRef!!.removeValue()
+                    }
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+        })
     }
     //--------------------------------------------------------------
     //
@@ -123,39 +155,46 @@ class ActCouple : AppCompatActivity()
             // Get Post object and use the values to update the UI
             if(dataSnapshot!!.exists())
             {
+                if(m_bExistCouple)
+                    return
+
+                m_pCoupleDbRef!!.removeEventListener(this)//중복 진입 방지..
                 val pInfo:couple = dataSnapshot!!.getValue(couple::class.java)!!
                 if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))// 요청자가 나일떄
                 {
                     ly_RequestStatusOk.visibility = View.VISIBLE
                     ly_RequestStatusNot.visibility = View.GONE
+
                     if(pInfo.accept.equals(couple.APPCET_Y))
                     {
+                        m_bExistCouple = true
                         tv_CurrentRequestUser.text = pInfo.responser_key + "와 커플입니다."
                     }
                     else
                     {
                         tv_CurrentRequestUser.text = "내가" + pInfo.responser_key + "님 에게 커플 요청중입니다."
                         btn_ReqCancel.visibility = View.VISIBLE
-                        btn_Chat.visibility = View.VISIBLE
                     }
                 }
                 else if(pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//응답자가 나일떄
                 {
                     if(pInfo.accept.equals(couple.APPCET_Y))
                     {
+                        m_bExistCouple = true
                         ly_RequestStatusOk.visibility = View.VISIBLE
                         ly_RequestStatusNot.visibility = View.GONE
                         tv_CurrentRequestUser.text = pInfo.requester_key + "와 커플입니다."
-                        btn_Chat.visibility = View.VISIBLE
                     }
                     else
                     {
-
+                        ly_RequestStatusOk.visibility = View.GONE
+                        ly_RequestStatusNot.visibility = View.VISIBLE
                     }
                 }
                 else
                 {
-
+                    ly_RequestStatusOk.visibility = View.GONE
+                    ly_RequestStatusNot.visibility = View.VISIBLE
                 }
             }
         }

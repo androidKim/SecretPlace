@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/app_bar_fav"
+        android:icon="@drawable/baseline_chat_black_48"
+        android:title="@string/str_cancel"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/app_bar_search"
+        android:icon="@drawable/baseline_chat_black_48"
+        android:title="@string/str_cancel"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/app_bar_settings"
+        android:title="@string/str_cancel"
+        app:showAsAction="never"/>
+</menu>

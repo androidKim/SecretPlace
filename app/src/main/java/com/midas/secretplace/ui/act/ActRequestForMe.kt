@@ -3,6 +3,7 @@ package com.midas.secretplace.ui.act
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -12,30 +13,73 @@ import android.view.View
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.RequestForMeRvAdapter
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.couple
 import com.midas.secretplace.ui.MyApp
-import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_request_for_me.*
-import java.util.*
 
 /*
 나에게 온 요청 보기
  */
 
-class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback
+class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback, SwipeRefreshLayout.OnRefreshListener
 {
     /*********************** Interface Callback ***********************/
+    //-------------------------------------------------------------
+    //
     override fun serRequestOnOffProc(pInfo:couple)
     {
-        if(pInfo!!.accept.equals(couple.APPCET_N))
-            pInfo!!.accept = couple.APPCET_Y
-        else
-            pInfo!!.accept = couple.APPCET_N
-
         var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)
-        pDbRef!!.addListenerForSingleValueEvent(valueEventListener)
+        pDbRef!!.addListenerForSingleValueEvent(object :ValueEventListener{
+            override fun onDataChange(dataSnapshot: DataSnapshot)
+            {
+                // Get Post object and use the values to update the UI
+                if(dataSnapshot!!.exists())
+                {
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        val targetInfo:couple = it!!.getValue(couple::class.java)!!
+                        if(pInfo.responser_key.equals(targetInfo.responser_key)
+                            && pInfo.requester_key.equals(targetInfo.requester_key))//선택한 아이템만 변경..
+                        {
+                            //update accept value
+                            if(pInfo.accept.equals(couple.APPCET_Y))
+                                pInfo.accept = couple.APPCET_N
+                            else
+                                pInfo.accept = couple.APPCET_Y
+
+                            m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key).setValue(pInfo)
+                        }
+                        else//선택되지않은아이템..
+                        {
+                            if(targetInfo.accept.equals(couple.APPCET_Y))//커플설정이 된 아이템이 있으면 N으로 변경
+                            {
+                                targetInfo.accept = couple.APPCET_N
+                                m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key).setValue(targetInfo)
+                            }
+                        }
+                    }
+                    //ui refresh..
+                    setRefresh()
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError)
+            {
+                // Getting Post failed, log a message
+
+                // ...
+            }
+        })
+    }
+
+    //-------------------------------------------------------------
+    //
+    override fun onRefresh()
+    {
+        setRefresh()
     }
 
     /*********************** extentios function ***********************/
@@ -63,23 +107,25 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback
 
         Util.setTheme(m_Context!!, m_App!!.m_SpCtrl!!.getSpTheme()!!)
         setContentView(R.layout.act_request_for_me)
-
+        ly_SwipeRefresh.setOnRefreshListener(this)
         settingView()
     }
     //--------------------------------------------------------------
     //
     override fun onStart()
     {
-        //나에게 온 요청
-        var pQuery: Query? = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.orderByChild("responser_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())
-        pQuery!!.addChildEventListener(coupleTableChildEventListener)
         super.onStart()
+    }
+
+    override fun onBackPressed() {
+        setResult(Constant.FOR_RESULT_REQUEST_FOR_ME)
+        finish()
     }
 
     /*********************** Firebase DB EventListener ***********************/
     //--------------------------------------------------------------
     //childEventListener..
-    var coupleTableChildEventListener: ChildEventListener = object : ChildEventListener
+    var childEventListener: ChildEventListener = object : ChildEventListener
     {
         override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
         {
@@ -118,41 +164,6 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback
             Log.d("onCancelled", "")
         }
     }
-
-    //--------------------------------------------------------------
-    //
-    var valueEventListener:ValueEventListener = object : ValueEventListener
-    {
-        override fun onDataChange(dataSnapshot: DataSnapshot)
-        {
-            // Get Post object and use the values to update the UI
-            if(dataSnapshot!!.exists())
-            {
-                val children = dataSnapshot!!.children
-                children.forEach {
-                    val pInfo:couple = it!!.getValue(couple::class.java)!!
-                    if(pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
-                    {
-                        //update accept value
-                        if(pInfo.accept.equals(couple.APPCET_Y))
-                            pInfo.accept = couple.APPCET_N
-                        else
-                            pInfo.accept = couple.APPCET_Y
-
-                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key).setValue(pInfo)
-                    }
-                }
-            }
-        }
-
-        override fun onCancelled(databaseError: DatabaseError)
-        {
-            // Getting Post failed, log a message
-
-            // ...
-        }
-    }
-
     /*********************** User Function ***********************/
     //--------------------------------------------------------------
     //
@@ -160,8 +171,6 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback
     {
         m_Adapter = RequestForMeRvAdapter(m_Context!!, m_arrRequest!!, this)
         recyclerView!!.adapter = m_Adapter!!
-
-        recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
 
         var nSpanCnt = 1
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode..
@@ -183,12 +192,25 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback
 
                 if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)
                 {
-                    // Call your API to load more items
-                    //if(!m_bPagingFinish)
-                    //getPlaceListProc(m_strPlaceLastSeq!!)
+
                 }
             }
         })
+
+        //getData
+        var pQuery: Query? = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.orderByChild("responser_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())
+        pQuery!!.addChildEventListener(childEventListener)
     }
 
+    //-------------------------------------------------------------
+    //
+    fun setRefresh()
+    {
+        if(m_Adapter != null)
+            m_Adapter!!.clearData()
+
+        m_arrRequest = ArrayList()
+        ly_SwipeRefresh.isRefreshing = false
+        settingView()
+    }
 }

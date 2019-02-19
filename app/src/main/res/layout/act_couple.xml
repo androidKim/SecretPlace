@@ -5,8 +5,141 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="14dp"
-    tools:context=".ui.act.ActMain">
+    tools:context=".ui.act.ActCouple">
 
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/ly_Top"
+            style="@style/topLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_TopTitle"
+                style="@style/TextViewTop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Top Title" />
+        </LinearLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/ly_Container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ly_Top">
+
+            <LinearLayout
+                android:id="@+id/ly_RequestStatusNot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/str_msg_35"
+                    android:textColor="@color/color_black"
+                    android:textSize="20dp" />
+
+                <EditText
+                    android:id="@+id/edit_UserKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/str_msg_36" />
+
+                <Button
+                    android:id="@+id/btn_requset"
+                    style="@style/default_button"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:onClick="coupleRequestProc"
+                    android:text="@string/str_msg_37" />
+
+                <TextView
+                    android:id="@+id/textView4"
+                    style="@style/TextViewStyle"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/str_msg_39" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ly_RequestStatusOk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ly_RequestStatusNot"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/textView1"
+                        style="@style/TextViewMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/str_msg_50"
+                        tools:text="@string/str_msg_50" />
+
+                    <TextView
+                        android:id="@+id/tv_CurrentRequestUser"
+                        style="@style/TextViewMedium"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/textView1"
+                        tools:text="SJaksksiw939" />
+                </RelativeLayout>
+
+
+                <Button
+                    android:id="@+id/btn_ReqCancel"
+                    style="@style/default_button"
+                    android:layout_marginTop="8dp"
+                    android:onClick="cancelProc"
+                    android:text="@string/str_cancel"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_CurrentRequestUser"
+                    tools:layout_editor_absoluteX="279dp" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ly_Container"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_RequestForMe"
+                style="@style/default_button"
+                android:layout_weight="1"
+                android:onClick="showRequestForMe"
+                android:text="@string/str_msg_38" />
+
+            <Button
+                android:id="@+id/btn_Chat"
+                style="@style/default_button"
+                android:layout_weight="1"
+                android:onClick="goChatActivity"
+                android:text="@string/str_msg_44" />
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -18,111 +151,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <RelativeLayout
-            android:id="@+id/ly_Container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <android.support.constraint.ConstraintLayout
-                android:id="@+id/ly_RequestStatusNot"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/str_msg_35"
-                    android:textColor="@color/color_black"
-                    android:textSize="20dp" />
-
-                <EditText
-                    android:id="@+id/edit_UserKey"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:hint="@string/str_msg_36"
-                    app:layout_constraintTop_toBottomOf="@+id/textView4"
-                    tools:layout_editor_absoluteX="16dp" />
-
-                <Button
-                    android:id="@+id/btn_requset"
-                    style="@style/Widget.AppCompat.Button.Colored"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:onClick="coupleRequestProc"
-                    android:text="@string/str_msg_37"
-                    app:layout_constraintEnd_toEndOf="@+id/edit_UserKey"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_UserKey" />
-
-                <TextView
-                    android:id="@+id/textView4"
-                    style="@style/TextViewStyle"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/str_msg_39"
-                    app:layout_constraintStart_toStartOf="@+id/textView"
-                    app:layout_constraintTop_toBottomOf="@+id/textView" />
-            </android.support.constraint.ConstraintLayout>
-
-            <android.support.constraint.ConstraintLayout
-                android:id="@+id/ly_RequestStatusOk"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                tools:layout_editor_absoluteX="16dp"
-                tools:layout_editor_absoluteY="14dp">
-
-                <TextView
-                    android:id="@+id/tv_CurrentRequestUser"
-                    style="@style/TextViewMedium"
-                    tools:layout_editor_absoluteX="8dp"
-                    tools:layout_editor_absoluteY="16dp"
-                    tools:text="홍길동님에게 요청중입니다." />
-
-                <Button
-                    android:id="@+id/btn_ReqCancel"
-                    style="@style/Widget.AppCompat.Button.Colored"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:onClick="cancelProc"
-                    android:text="@string/str_cancel"
-                    android:visibility="gone"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_CurrentRequestUser"
-                    tools:layout_editor_absoluteX="279dp" />
-
-            </android.support.constraint.ConstraintLayout>
-
-        </RelativeLayout>
-
-        <Button
-            android:id="@+id/btn_RequestForMe"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/ly_Container"
-            android:layout_marginEnd="8dp"
-            android:onClick="showRequestForMe"
-            android:text="@string/str_msg_38" />
-
-        <Button
-            android:id="@+id/btn_Chat"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_RequestForMe"
-            android:onClick="goChatActivity"
-            android:text="@string/str_msg_44"
-            android:visibility="visible" />
-    </RelativeLayout>
 
 
 </android.support.constraint.ConstraintLayout>

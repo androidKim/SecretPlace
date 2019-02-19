@@ -1,67 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="14dp"
+    android:background="@color/color_white"
     tools:context=".ui.act.ActMyInformation">
 
+    <LinearLayout
+        android:id="@+id/ly_Top"
+        style="@style/topLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/str_msg_31"
-        android:textSize="20dp" />
+        <TextView
+            android:id="@+id/tv_TopTitle"
+            style="@style/TextViewTop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Top Title" />
+    </LinearLayout>
 
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/str_msg_32"
-        android:textSize="20dp"
-        app:layout_constraintTop_toBottomOf="@+id/tv_Name" />
-
-
-    <TextView
-        android:id="@+id/tv_Name"
+    <RelativeLayout
+        android:id="@+id/ly_Container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Name"
-        app:layout_constraintTop_toBottomOf="@+id/textView1" />
+        android:layout_below="@+id/ly_Top">
 
-    <TextView
-        android:id="@+id/tv_UserKey"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
-        tools:text="UserKey" />
+        <RelativeLayout
+            android:id="@+id/layout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
+            <TextView
+                android:id="@+id/textView1"
+                style="@style/TextViewMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/str_msg_31"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/tv_Name"
+                style="@style/TextViewMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/textView1"
+                tools:text="김태준" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout1">
+
+            <TextView
+                android:id="@+id/textView2"
+                style="@style/TextViewMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/str_msg_32"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/tv_UserKey"
+                style="@style/TextViewMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/textView2"
+                tools:text="ABCDEFG" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout2">
+
+            <TextView
+                android:id="@+id/tv_Desc"
+                style="@style/TextViewMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:text="@string/str_msg_49" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/btn_Copy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_Desc"
+                android:layout_toRightOf="@id/tv_Desc"
+                android:layout_centerVertical="true"
+                android:onClick="onClickSahre"
+                app:srcCompat="@drawable/ic_baseline_share_24px" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/btn_Copy"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="1dp"
-        android:onClick="copyKey"
-        android:text="@string/str_msg_33"
-        app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/tv_Name" />
-</android.support.constraint.ConstraintLayout>
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+</RelativeLayout>

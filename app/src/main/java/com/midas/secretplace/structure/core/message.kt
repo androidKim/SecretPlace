@@ -1,5 +1,6 @@
 package com.midas.secretplace.structure.core
 
+import com.google.firebase.database.Exclude
 import java.io.Serializable
 
 
@@ -17,18 +18,18 @@ class message: Serializable
     var msssage:String? = ""//메세지내용
     var img_url:String? = ""//이미지URL
     var timestamp:Long = 0//작성시간
-
     constructor()
     {
 
     }
 
-    constructor(chat_key:String, user_key:String, name:String, message:String, img_url:String)
+    constructor(chat_key:String, user_key:String, name:String, message:String, img_url:String, timestamp:Long)
     {
         this.chat_key = chat_key
         this.user_key = user_key
         this.name = name
         this.msssage = message
         this.img_url = img_url
+        this.timestamp = timestamp
     }
 }

@@ -24,11 +24,11 @@ import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
+import com.midas.secretplace.ui.act.ActMapDetail
 import com.midas.secretplace.ui.act.ActPlaceDetail
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import kotlinx.android.synthetic.main.frag_place.*
 import java.io.Serializable
-import java.util.*
 
 
 class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter.ifCallback
@@ -41,7 +41,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     var m_App:MyApp? = null
     var m_IfCallback:ifCallback? = null
     var m_Adapter:PlaceRvAdapter? = null
-    var m_arrPlace:ArrayList<place>? = null
+    var m_arrPlace:ArrayList<place>? = ArrayList()
 
     //var m_strPlaceLastSeq:String? = ""
     var m_bRunning:Boolean = false
@@ -62,7 +62,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context!!)
-        
+
         return view
     }
     //------------------------------------------------------------------------
@@ -131,7 +131,29 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             }
         })
 
+        //지도로 좌표보기..
+        btn_ShowMap!!.setOnClickListener(View.OnClickListener {
+            goMapDetail()
+        })
+
         settingView()
+    }
+    //-----------------------------------------------------
+    //show map dialog
+    fun goMapDetail()
+    {
+        if(m_Adapter != null)
+            m_arrPlace = m_Adapter!!.placeList
+
+        if(m_arrPlace == null)
+            return
+
+        if(m_arrPlace!!.size == 0)
+            return
+
+        var pIntent = Intent(m_Context, ActMapDetail::class.java)
+        pIntent.putExtra(Constant.INTENT_DATA_PLACE_LIST_OBJECT, m_arrPlace!! as Serializable)
+        startActivity(pIntent)
     }
     //--------------------------------------------------------------
     //
@@ -175,6 +197,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //
     fun getPlaceListProc(seq:String)
     {
+        progressBar.visibility = View.VISIBLE
         m_bRunning = true
         //m_App!!.showLoadingDialog(ly_LoadingDialog)
 
@@ -212,6 +235,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 {
                     m_bPagingFinish = true
                 }
+
+                progressBar.visibility = View.GONE
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -262,6 +287,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
 
                 m_bRunning = false
+                ly_MenuContainer.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -348,7 +375,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         if(m_Adapter != null)
             m_Adapter!!.clearData()
 
-        ly_SwipeRefresh.setRefreshing(false)
+        ly_SwipeRefresh.isRefreshing = false
 
         getPlaceListProc("")
     }
@@ -449,6 +476,18 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     override fun onRefresh()
     {
         setRefresh()
+    }
+    //----------------------------------------------------------------------
+    //
+    fun showList(view:View)
+    {
+
+    }
+    //----------------------------------------------------------------------
+    //
+    fun showMap(view:View)
+    {
+
     }
     /******************************** callback function ********************************/
     //----------------------------------------------------------------------

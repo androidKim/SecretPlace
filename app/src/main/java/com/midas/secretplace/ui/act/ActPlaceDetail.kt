@@ -154,6 +154,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         if(requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM)//select gallery
         {
             if (data != null) {
+                m_bitmapRotateBitmap = null
                 m_nUploadPhotoType = REQUEST_SELECT_IMAGE_IN_ALBUM
                 val contentURI = data!!.data
                 try {
@@ -170,6 +171,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         }
         else if (requestCode == REQUEST_TAKE_PHOTO)//take photo
         {
+            m_bitmapRotateBitmap = null //
             try
             {
                 try

@@ -1,11 +1,14 @@
 package com.midas.secretplace.ui.act
 
+import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.view.View
@@ -20,6 +23,7 @@ import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.structure.room.data_user
 import com.midas.secretplace.structure.vm.vm_user
 import com.midas.secretplace.ui.MyApp
+import com.midas.secretplace.ui.custom.dlg_share_view
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_myinformation.*
 
@@ -31,6 +35,18 @@ class ActMyInformation : AppCompatActivity()
 {
     /*********************** extentios function ***********************/
     fun String.toEditable(): Editable =  Editable.Factory.getInstance().newEditable(this)
+
+    //----------------------------------------------------------
+    //pinchToZoom
+    inline fun Activity.showShareViewDialog(func: dlg_share_view.() -> Unit): AlertDialog =
+            dlg_share_view(this).apply {
+                func()
+            }.create()
+
+    inline fun Fragment.showShareViewDialog(func: dlg_share_view.() -> Unit): AlertDialog =
+            dlg_share_view(this.context!!).apply {
+                func()
+            }.create()
 
     /*********************** Define ***********************/
 
@@ -46,11 +62,8 @@ class ActMyInformation : AppCompatActivity()
     private var m_Clip: ClipData? = null
 
     //
-
     /*********************** Controller ***********************/
-
-
-
+    var m_ShareViewDialog:AlertDialog? = null
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
     //
@@ -79,13 +92,14 @@ class ActMyInformation : AppCompatActivity()
             }
         })
 
-
+        setInitLayout()
     }
     //--------------------------------------------------------------
     //
     override fun onStart()
     {
         //firebase database reference..
+        progressBar.visibility = View.VISIBLE
         m_UserDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())//where
         m_UserDbRef!!.addValueEventListener(userTableRefListener)
         super.onStart()
@@ -111,6 +125,8 @@ class ActMyInformation : AppCompatActivity()
                 else
                     m_UserViewModel?.insert(dataUser)//
             }
+
+            progressBar.visibility = View.GONE
         }
 
         override fun onCancelled(databaseError: DatabaseError)
@@ -118,16 +134,77 @@ class ActMyInformation : AppCompatActivity()
             // Getting Post failed, log a message
 
             // ...
+
+            progressBar.visibility = View.GONE
         }
     }
     /*********************** User Function ***********************/
+    //--------------------------------------------------------------
+    //
+    fun setInitLayout()
+    {
+        tv_TopTitle.text = m_Context!!.resources.getString(R.string.str_msg_30)
+    }
+    //--------------------------------------------------------------------
+    //show share dialog
+    fun onClickSahre(view:View)
+    {
+        showSahreViewDialog()
+    }
+
+    //----------------------------------------------------------
+    //showing dialog
+    fun showSahreViewDialog()
+    {
+        m_ShareViewDialog = showShareViewDialog {
+            cancelable = true
+
+            //iv_DlgPhoto!!.setImageDrawable(drawable!!)
+            closeIconClickListener {
+                m_ShareViewDialog!!.dismiss()
+            }
+
+            shareCopyClickListener {
+                shareCopy()
+            }
+
+            shareKakaoClickListener {
+                shareKakao()
+            }
+
+            shareSmsClickListener{
+                shareSms()
+            }
+
+        }
+        //  and showing
+        m_ShareViewDialog?.show()
+    }
 
     //--------------------------------------------------------------------
-    // on click copy button
-    fun copyKey(view: View)
+    //copy
+    fun shareCopy()
     {
         m_Clip = ClipData.newPlainText("text", tv_UserKey.text)
         m_Clipboard?.primaryClip = m_Clip
-        Toast.makeText(this, m_Context!!.resources!!.getString(R.string.str_msg_34), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, m_Context!!.resources!!.getString(R.string.str_msg_34), Toast.LENGTH_LONG).show()
+
+        if(m_ShareViewDialog != null)
+            m_ShareViewDialog!!.dismiss()
     }
+    //--------------------------------------------------------------------
+    //kakao
+    fun shareKakao()
+    {
+        if(m_ShareViewDialog != null)
+            m_ShareViewDialog!!.dismiss()
+    }
+    //--------------------------------------------------------------------
+    //sms
+    fun shareSms()
+    {
+        if(m_ShareViewDialog != null)
+            m_ShareViewDialog!!.dismiss()
+    }
+
 }

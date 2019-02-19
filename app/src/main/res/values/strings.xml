@@ -1,23 +1,23 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="google_maps_key">AIzaSyDtbMkveLaoHDA18vK7GZKFK8E7IW3Wi6M</string>
     <string name="facebook_app_id" translatable="false">1698683040237300</string>
     <string name="fb_login_protocol_scheme" translatable="false">fb1698683040237300</string>
     <string name="twitter_consumer_key" translatable="false">1Gqkat9htRhTfHP31DG64F1LK</string>
     <string name="twitter_consumer_secret" translatable="false">desMpaNzISR5xtGXAADUFm2xeckH1fWGQLFn1XHmqPHIIzlEox</string>
 
-    <string name="app_name">SecretPlace</string>
-    <string name="navigation_drawer_open">Navigation Drawer Is Open</string>
-    <string name="navigation_drawer_close">Navigation Drawer Is Close</string>
+    <string name="app_name" >SecretPlace</string>
+    <string name="navigation_drawer_open" >Navigation Drawer Is Open</string>
+    <string name="navigation_drawer_close" >Navigation Drawer Is Close</string>
 
-    <string name="str_login_google">google</string>
-    <string name="str_login_facebook">facebook</string>
-    <string name="str_tab_title_my">내 장소</string>
-    <string name="str_tab_title_group">내 묶음장소</string>
-    <string name="str_tab_title_couple">커플 장소</string>
+    <string name="str_login_google" >google</string>
+    <string name="str_login_facebook" >facebook</string>
+    <string name="str_tab_title_my" >내 장소</string>
+    <string name="str_tab_title_group" >내 묶음장소</string>
+    <string name="str_tab_title_couple" >커플 장소</string>
 
-    <string name="str_ok">예</string>
-    <string name="str_no">아니오</string>
-    <string name="str_cancel">취소</string>
+    <string name="str_ok" >예</string>
+    <string name="str_no" >아니오</string>
+    <string name="str_cancel" >취소</string>
     <string name="str_menu">기타</string>
     <string name="str_msg_1">로그아웃</string>
     <string name="str_msg_2">로그아웃 하시겠습니까?</string>
@@ -47,21 +47,29 @@
     <string name="str_msg_26">회원탈퇴</string>
     <string name="str_msg_27">회원탈퇴 하시겠습니까?\n모든 정보가 삭제됩니다.</string>
     <string name="str_msg_28">그동안 이용해주셔서 감사합니다.</string>
-    <string name="str_msg_29">연인</string>
+    <string name="str_msg_29">커플</string>
     <string name="str_msg_30">내 정보</string>
     <string name="str_msg_31">이름</string>
-    <string name="str_msg_32">고유키</string>
+    <string name="str_msg_32">나의 고유키</string>
     <string name="str_msg_33">복사</string>
-    <string name="str_msg_34">복사가 완료 되었습니다.</string>
+    <string name="str_msg_34">복사가 완료 되었습니다.\n 상대방에게 전달하세요.</string>
     <string name="str_msg_35">상대방의 고유키를 등록하세요.\n수신자가 수락하면 커플이 됩니다.</string>
     <string name="str_msg_36">커플대상의 고유키를 복사하여 입력하세요.</string>
     <string name="str_msg_37">요청하기</string>
     <string name="str_msg_38">나에게 온 요청</string>
-    <string name="str_msg_39">* 요청은 1명에게만 가능합니다</string>
+    <string name="str_msg_39">!!요청은 1명에게만 가능합니다</string>
     <string name="str_msg_40">나에게는 요청할 수 없습니다.</string>
     <string name="str_msg_41">공백은 입력할 수 없습니다.</string>
     <string name="str_msg_42">커플은 1명만 가능합니다.</string>
     <string name="str_msg_43">나에게 커플 요청한 사람이 없습니다.</string>
     <string name="str_msg_44">채팅</string>
-
+    <string name="str_msg_46">채팅할 커플이 없어요.</string>
+    <string name="str_msg_47">메세지를 입력하세요.</string>
+    <string name="str_msg_48">커플 채팅</string>
+    <string name="str_msg_49">고유키를 공유해서 커플을 맺으세요.</string>
+    <string name="str_msg_50">나의 커플</string>
+    <string name="str_msg_51">복사</string>
+    <string name="str_msg_52">카카오톡</string>
+    <string name="str_msg_53">문자</string>
+    <string name="str_msg_54">메세지를 입력하세요.</string>
 </resources>
