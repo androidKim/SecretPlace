@@ -223,4 +223,10 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:buttonStyle">@style/Base.Widget.AppCompat.Button.Colored</item>
     </style>
+
+    <!-- Toolbar Style -->
+    <style name="ToolBarStyle.Base" parent="">
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+    </style>
 </resources>

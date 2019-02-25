@@ -133,7 +133,19 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
         //지도로 좌표보기..
         btn_ShowMap!!.setOnClickListener(View.OnClickListener {
-            goMapDetail()
+            if(m_IfCallback != null)
+            {
+                var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
+                if(bPermissionVal)
+                {
+                    goMapDetail()
+                }
+                else
+                {
+
+                }
+            }
+
         })
 
         settingView()

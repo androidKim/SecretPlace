@@ -6,8 +6,13 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.app.ShareCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
@@ -18,6 +23,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.structure.room.data_user
@@ -27,9 +33,8 @@ import com.midas.secretplace.ui.custom.dlg_share_view
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_myinformation.*
 
-
 /*
-내 정보
+key share..
  */
 class ActMyInformation : AppCompatActivity()
 {
@@ -86,7 +91,6 @@ class ActMyInformation : AppCompatActivity()
             override fun onChanged(t: data_user?) {
                 if(t != null)
                 {
-                    tv_Name.text = t!!.name
                     tv_UserKey.text = t!!.user_key
                 }
             }
@@ -116,7 +120,6 @@ class ActMyInformation : AppCompatActivity()
             if(dataSnapshot!!.exists())
             {
                 var pInfo:user = dataSnapshot!!.getValue(user::class.java)!!
-                tv_Name.text = pInfo!!.name!!
                 tv_UserKey.text = pInfo!!.user_key!!
                 var dataUser:data_user = data_user(0, pInfo!!.img_url!!, pInfo!!.name!!, pInfo!!.sns_key!!, pInfo!!.sns_type!!, pInfo!!.user_key!!)
 
@@ -143,7 +146,61 @@ class ActMyInformation : AppCompatActivity()
     //
     fun setInitLayout()
     {
-        tv_TopTitle.text = m_Context!!.resources.getString(R.string.str_msg_30)
+        toolbar.title = m_Context!!.resources.getString(R.string.str_msg_30)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayUseLogoEnabled(true)
+
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        setToolbarBackgroundColor(strTheme!!)
+
+
+        //share btn click event..
+        ly_Right.setOnClickListener {
+            val shareIntent = ShareCompat.IntentBuilder.from(this)
+                    .setText(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .setType("text/plain")
+                    .createChooserIntent()
+                    .apply {
+                        // https://android-developers.googleblog.com/2012/02/share-with-intents.html
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            // If we're on Lollipop, we can open the intent as a document
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                        } else {
+                            // Else, we will use the old CLEAR_WHEN_TASK_RESET flag
+                            addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                        }
+                    }
+            startActivity(shareIntent)
+        }
+    }
+    //--------------------------------------------------------------
+    //
+    fun setToolbarBackgroundColor(strTheme:String)
+    {
+        when(strTheme)
+        {
+            Constant.THEME_PINK -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkPink))
+            Constant.THEME_RED -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkRed))
+            Constant.THEME_PUPLE -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkPuple))
+            Constant.THEME_DEEPPUPLE -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkDeepPuple))
+            Constant.THEME_INDIGO-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkIndigo))
+            Constant.THEME_BLUE-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkBlue))
+            Constant.THEME_LIGHTBLUE-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkLightBlue))
+            Constant.THEME_CYAN-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkCyan))
+            Constant.THEME_TEAL-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryTeal))
+            Constant.THEME_GREEN-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryGreen))
+            Constant.THEME_LIGHTGREEN-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryLightGreen))
+            Constant.THEME_LIME-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryLime))
+            Constant.THEME_YELLOW-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryYellow))
+            Constant.THEME_AMBER-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryAmber))
+            Constant.THEME_ORANGE-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryOrange))
+            Constant.THEME_DEEPORANGE-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDeepOrange))
+            Constant.THEME_BROWN-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryBrown))
+            Constant.THEME_GRAY-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryGray))
+            Constant.THEME_BLUEGRAY-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryBlueGray))
+            else -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+        }
     }
     //--------------------------------------------------------------------
     //show share dialog

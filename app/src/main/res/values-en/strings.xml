@@ -48,7 +48,7 @@
     <string name="str_msg_27">Do you want Withdraw?\nRemove all your data</string>
     <string name="str_msg_28">Thank you, GoodLuck!</string>
     <string name="str_msg_29">Couple</string>
-    <string name="str_msg_30">My Information</string>
+    <string name="str_msg_30">Key Shares</string>
     <string name="str_msg_31">Name</string>
     <string name="str_msg_32">My privateKey</string>
     <string name="str_msg_33">Copy</string>
@@ -72,4 +72,5 @@
     <string name="str_msg_52">Kakao Talk</string>
     <string name="str_msg_53">SMS</string>
     <string name="str_msg_54">must write message</string>
+    <string name="str_msg_55">Share your key to make a couple</string>
 </resources>

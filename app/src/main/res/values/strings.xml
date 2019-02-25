@@ -48,7 +48,7 @@
     <string name="str_msg_27">회원탈퇴 하시겠습니까?\n모든 정보가 삭제됩니다.</string>
     <string name="str_msg_28">그동안 이용해주셔서 감사합니다.</string>
     <string name="str_msg_29">커플</string>
-    <string name="str_msg_30">내 정보</string>
+    <string name="str_msg_30">키 공유</string>
     <string name="str_msg_31">이름</string>
     <string name="str_msg_32">나의 고유키</string>
     <string name="str_msg_33">복사</string>
@@ -72,4 +72,5 @@
     <string name="str_msg_52">카카오톡</string>
     <string name="str_msg_53">문자</string>
     <string name="str_msg_54">메세지를 입력하세요.</string>
+    <string name="str_msg_55">나의 키를 공유하여 커플을 맺으세요</string>
 </resources>
