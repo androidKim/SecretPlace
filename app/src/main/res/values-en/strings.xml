@@ -53,7 +53,7 @@
     <string name="str_msg_32">My privateKey</string>
     <string name="str_msg_33">Copy</string>
     <string name="str_msg_34">copy complete \n send for someone</string>
-    <string name="str_msg_35">Please register the recipient"'s'" unique key.\nIf the recipient accepts, it becomes a couple.</string>
+    <string name="str_msg_35">Please register the recipient unique key.\nIf the recipient accepts, it becomes a couple.</string>
     <string name="str_msg_36">Copy and enter the unique key of the couples target.</string>
     <string name="str_msg_37">Request</string>
     <string name="str_msg_38">request from me</string>
@@ -65,7 +65,7 @@
     <string name="str_msg_44">Caht</string>
     <string name="str_msg_46">do not have a couple to chat with.</string>
     <string name="str_msg_47">Type your message.</string>
-    <string name="str_msg_48">Couple Chat</string>
+    <string name="str_msg_48">Chat</string>
     <string name="str_msg_49">Share your key and match couple</string>
     <string name="str_msg_50">My Couple</string>
     <string name="str_msg_51">Copy</string>
@@ -73,4 +73,5 @@
     <string name="str_msg_53">SMS</string>
     <string name="str_msg_54">must write message</string>
     <string name="str_msg_55">Share your key to make a couple</string>
+    <string name="str_msg_56">My Places</string>
 </resources>

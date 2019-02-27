@@ -229,4 +229,9 @@
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
+
+    <!-- progressBar style -->
+    <style name="progressBarSytle" parent="">
+        <item name="theme">@style/Widget.AppCompat.ProgressBar</item>
+    </style>
 </resources>

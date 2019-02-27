@@ -5,10 +5,12 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.graphics.drawable.ColorDrawable
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.support.v4.content.ContextCompat
 import android.util.DisplayMetrics
 import android.widget.Toast
 import com.midas.secretplace.R
@@ -78,6 +80,35 @@ class Util
             inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
             val path = MediaStore.Images.Media.insertImage(context.getContentResolver(), inImage, "Title", null)
             return Uri.parse(path)
+        }
+        /****************************** toolbar ******************************/
+        //--------------------------------------------------------------
+        //set theme color
+        fun setToolbarBackgroundColor(pContext:Context, toolbar: android.support.v7.widget.Toolbar, strTheme:String)
+        {
+            when(strTheme)
+            {
+                Constant.THEME_PINK -> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkPink))
+                Constant.THEME_RED -> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkRed))
+                Constant.THEME_PUPLE -> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkPuple))
+                Constant.THEME_DEEPPUPLE -> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkDeepPuple))
+                Constant.THEME_INDIGO-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkIndigo))
+                Constant.THEME_BLUE-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkBlue))
+                Constant.THEME_LIGHTBLUE-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkLightBlue))
+                Constant.THEME_CYAN-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkCyan))
+                Constant.THEME_TEAL-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryTeal))
+                Constant.THEME_GREEN-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryGreen))
+                Constant.THEME_LIGHTGREEN-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryLightGreen))
+                Constant.THEME_LIME-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryLime))
+                Constant.THEME_YELLOW-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryYellow))
+                Constant.THEME_AMBER-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryAmber))
+                Constant.THEME_ORANGE-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryOrange))
+                Constant.THEME_DEEPORANGE-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDeepOrange))
+                Constant.THEME_BROWN-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryBrown))
+                Constant.THEME_GRAY-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryGray))
+                Constant.THEME_BLUEGRAY-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryBlueGray))
+                else -> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDark))
+            }
         }
 
 

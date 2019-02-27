@@ -2,11 +2,13 @@ package com.midas.secretplace.ui.act
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import android.widget.Toolbar
 import com.google.firebase.database.*
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
@@ -68,8 +70,15 @@ class ActCouple : AppCompatActivity()
     //
     fun initLayout()
     {
-        //default UI
-        tv_TopTitle.text = m_Context!!.resources.getString(R.string.str_msg_29)
+        toolbar.title = m_Context!!.resources.getString(R.string.str_msg_29)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayUseLogoEnabled(true)
+
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
+        }
 
         //refresh..
         m_bExistCouple = false
@@ -173,7 +182,7 @@ class ActCouple : AppCompatActivity()
                     else
                     {
                         tv_CurrentRequestUser.text = "내가" + pInfo.responser_key + "님 에게 커플 요청중입니다."
-                        btn_ReqCancel.visibility = View.VISIBLE
+                        ly_Request.visibility = View.VISIBLE
                     }
                 }
                 else if(pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//응답자가 나일떄

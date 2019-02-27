@@ -53,7 +53,7 @@
     <string name="str_msg_32">나의 고유키</string>
     <string name="str_msg_33">복사</string>
     <string name="str_msg_34">복사가 완료 되었습니다.\n 상대방에게 전달하세요.</string>
-    <string name="str_msg_35">상대방의 고유키를 등록하세요.\n수신자가 수락하면 커플이 됩니다.</string>
+    <string name="str_msg_35">상대의 고유키 등록!\n상대가 수락하면 커플입니다.</string>
     <string name="str_msg_36">커플대상의 고유키를 복사하여 입력하세요.</string>
     <string name="str_msg_37">요청하기</string>
     <string name="str_msg_38">나에게 온 요청</string>
@@ -65,7 +65,7 @@
     <string name="str_msg_44">채팅</string>
     <string name="str_msg_46">채팅할 커플이 없어요.</string>
     <string name="str_msg_47">메세지를 입력하세요.</string>
-    <string name="str_msg_48">커플 채팅</string>
+    <string name="str_msg_48">채팅</string>
     <string name="str_msg_49">고유키를 공유해서 커플을 맺으세요.</string>
     <string name="str_msg_50">나의 커플</string>
     <string name="str_msg_51">복사</string>
@@ -73,4 +73,5 @@
     <string name="str_msg_53">문자</string>
     <string name="str_msg_54">메세지를 입력하세요.</string>
     <string name="str_msg_55">나의 키를 공유하여 커플을 맺으세요</string>
+    <string name="str_msg_56">나의 장소들</string>
 </resources>

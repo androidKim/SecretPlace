@@ -1,13 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- textSize -->
+    <dimen name="tv_small">10dp</dimen>
+    <dimen name="tv_mideum">15dp</dimen>
+    <dimen name="tv_large">20dp</dimen>
+
+    <!-- padding -->
+    <dimen name="tv_padding">10dp</dimen>
+    <dimen name="edit_padding">10dp</dimen>
+    <dimen name="layout_padding">10dp</dimen>
+
     <dimen name="padding_left">10dp</dimen>
     <dimen name="padding_right">10dp</dimen>
     <dimen name="padding_top">10dp</dimen>
     <dimen name="padding_bottom">10dp</dimen>
     <dimen name="padding">10dp</dimen>
 
+    <!-- margin -->
+    <dimen name="tv_margin">10dp</dimen>
+    <dimen name="edit_margin">10dp</dimen>
+    <dimen name="layout_margin">10dp</dimen>
 
-    <dimen name="marin_left">10dp</dimen>
+    <dimen name="margin_left">10dp</dimen>
     <dimen name="margin_right">10dp</dimen>
     <dimen name="margin_top">10dp</dimen>
     <dimen name="margin_bottom">10dp</dimen>

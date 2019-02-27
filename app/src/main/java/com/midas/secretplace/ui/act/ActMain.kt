@@ -4,12 +4,11 @@ package com.midas.secretplace.ui.act
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
@@ -39,10 +38,6 @@ import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_main.*
 import kotlinx.android.synthetic.main.dlg_theme_setting.view.*
 import kotlinx.android.synthetic.main.ly_main.*
-
-
-
-
 
 
 class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeColorRvAdapter.ifCallback
@@ -154,42 +149,17 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
     }
     //--------------------------------------------------------------
     //
-    fun setToolbarBackgroundColor(strTheme:String)
-    {
-        when(strTheme)
-        {
-            Constant.THEME_PINK -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkPink))
-            Constant.THEME_RED -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkRed))
-            Constant.THEME_PUPLE -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkPuple))
-            Constant.THEME_DEEPPUPLE -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkDeepPuple))
-            Constant.THEME_INDIGO-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkIndigo))
-            Constant.THEME_BLUE-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkBlue))
-            Constant.THEME_LIGHTBLUE-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkLightBlue))
-            Constant.THEME_CYAN-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDarkCyan))
-            Constant.THEME_TEAL-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryTeal))
-            Constant.THEME_GREEN-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryGreen))
-            Constant.THEME_LIGHTGREEN-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryLightGreen))
-            Constant.THEME_LIME-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryLime))
-            Constant.THEME_YELLOW-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryYellow))
-            Constant.THEME_AMBER-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryAmber))
-            Constant.THEME_ORANGE-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryOrange))
-            Constant.THEME_DEEPORANGE-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDeepOrange))
-            Constant.THEME_BROWN-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryBrown))
-            Constant.THEME_GRAY-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryGray))
-            Constant.THEME_BLUEGRAY-> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryBlueGray))
-            else -> toolbar.background = ColorDrawable(ContextCompat.getColor(this, R.color.colorPrimaryDark))
-        }
-    }
-    //--------------------------------------------------------------
-    //
     fun settingDrawerView()
     {
+        toolbar.title = m_Context!!.resources.getString(R.string.str_msg_56)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.setDisplayUseLogoEnabled(true)
 
         var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
-        setToolbarBackgroundColor(strTheme!!)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
+        }
 
         val toggle = ActionBarDrawerToggle(this,drawer_layout,toolbar,R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
