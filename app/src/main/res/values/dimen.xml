@@ -26,4 +26,8 @@
     <dimen name="margin_top">10dp</dimen>
     <dimen name="margin_bottom">10dp</dimen>
     <dimen name="margin">10dp</dimen>
+
+    <!-- icon -->
+    <dimen name="icon_small_width">24dp</dimen>
+    <dimen name="icon_small_height">24dp</dimen>
 </resources>

@@ -80,9 +80,30 @@ class ActCouple : AppCompatActivity()
             Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
         }
 
+
         //refresh..
         m_bExistCouple = false
         m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
+        m_pCoupleDbRef!!.addValueEventListener(object :ValueEventListener
+        {
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(p0: DataSnapshot?) {
+                if(p0!!.exists())
+                {
+                    ly_RequestStatusOk.visibility = View.VISIBLE
+                    ly_RequestStatusNot.visibility = View.GONE
+                }
+                else
+                {
+                    ly_RequestStatusOk.visibility = View.GONE
+                    ly_RequestStatusNot.visibility = View.VISIBLE
+                }
+            }
+
+        })
         m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
     }
     /*********************** Listener ***********************/
@@ -120,7 +141,8 @@ class ActCouple : AppCompatActivity()
                 children.forEach {
                     val pInfo: couple = it!!.getValue(couple::class.java)!!
 
-                    if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//내가 요청인 데이터  삭제
+                    if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            || pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//
                     {
                         var dbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key)
                         dbRef!!.removeValue()
@@ -177,11 +199,11 @@ class ActCouple : AppCompatActivity()
                     if(pInfo.accept.equals(couple.APPCET_Y))
                     {
                         m_bExistCouple = true
-                        tv_CurrentRequestUser.text = pInfo.responser_key + "와 커플입니다."
+                        tv_CurrentRequestUser.text = pInfo.responser_key + "\n커플!"
                     }
                     else
                     {
-                        tv_CurrentRequestUser.text = "내가" + pInfo.responser_key + "님 에게 커플 요청중입니다."
+                        tv_CurrentRequestUser.text = pInfo.responser_key + "\n요청중.."
                         ly_Request.visibility = View.VISIBLE
                     }
                 }
@@ -192,7 +214,7 @@ class ActCouple : AppCompatActivity()
                         m_bExistCouple = true
                         ly_RequestStatusOk.visibility = View.VISIBLE
                         ly_RequestStatusNot.visibility = View.GONE
-                        tv_CurrentRequestUser.text = pInfo.requester_key + "와 커플입니다."
+                        tv_CurrentRequestUser.text = pInfo.requester_key + "\n커플!"
                     }
                     else
                     {

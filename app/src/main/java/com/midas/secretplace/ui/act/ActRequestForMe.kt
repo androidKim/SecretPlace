@@ -2,6 +2,7 @@ package com.midas.secretplace.ui.act
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
@@ -169,6 +170,17 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback, S
     //
     fun settingView()
     {
+        toolbar.title = m_Context!!.resources.getString(R.string.str_msg_60)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayUseLogoEnabled(true)
+
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
+        }
+
+
         m_Adapter = RequestForMeRvAdapter(m_Context!!, m_arrRequest!!, this)
         recyclerView!!.adapter = m_Adapter!!
 

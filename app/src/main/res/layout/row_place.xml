@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/color_white">
 
     <android.support.v7.widget.CardView
@@ -33,9 +33,9 @@
                     android:gravity="left|center"
                     android:maxLines="1"
                     android:padding="15dp"
-                    tools:text="hellohellohellohellohellohellohellohellohellohellohellohello"
                     android:textColor="@color/color_black"
-                    android:textSize="15dp" />
+                    android:textSize="15dp"
+                    tools:text="hellohellohellohellohellohellohellohellohellohellohellohello" />
             </RelativeLayout>
 
 
@@ -50,8 +50,8 @@
                 android:paddingRight="10dp">
 
                 <ImageView
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
+                    android:layout_width="@dimen/icon_small_width"
+                    android:layout_height="@dimen/icon_small_height"
                     android:background="@drawable/baseline_delete_black_18dp" />
             </LinearLayout>
 

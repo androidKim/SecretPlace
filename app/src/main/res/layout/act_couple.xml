@@ -23,8 +23,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+
             <LinearLayout
-                android:id="@+id/ly_Right"
+                android:id="@+id/ly_Fav"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/margin_right"
+                android:layout_toLeftOf="@+id/ly_Chat"
+                android:clickable="true"
+                android:gravity="center"
+                android:onClick="showRequestForMe">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/outline_list_white_36" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/ly_Chat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -33,6 +52,7 @@
                 android:gravity="center"
                 android:onClick="goChatActivity"
                 android:padding="@dimen/padding">
+
 
                 <ImageView
                     android:layout_width="24dp"
@@ -46,7 +66,8 @@
             android:id="@+id/ly_Container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ly_Top">
+            android:layout_below="@+id/ly_Top"
+            android:layout_marginTop="@dimen/margin_top">
 
             <LinearLayout
                 android:id="@+id/ly_RequestStatusNot"
@@ -56,50 +77,53 @@
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <TextView
-                    android:id="@+id/textView"
-                    style="@style/TextViewMedium"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:text="@string/str_msg_35" />
 
-                <EditText
-                    android:id="@+id/edit_UserKey"
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/text_input_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/edit_margin"
-                    android:hint="@string/str_msg_36"
-                    android:paddingTop="@dimen/edit_padding"
-                    android:paddingBottom="@dimen/edit_padding"
-                    android:textSize="15dp" />
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/edit_UserKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/edit_margin"
+                        android:hint="@string/str_msg_36"
+                        android:maxLines="1"
+                        android:paddingTop="@dimen/edit_padding"
+                        android:paddingBottom="@dimen/edit_padding"
+                        android:singleLine="true"
+                        android:textSize="15dp" />
+                </android.support.design.widget.TextInputLayout>
+
 
                 <RelativeLayout
                     android:id="@+id/ly_Request"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="right"
                     android:clickable="true"
                     android:onClick="coupleRequestProc"
-                    android:padding="@dimen/layout_padding">
+                    android:paddingLeft="@dimen/padding_left"
+                    android:paddingRight="@dimen/padding_right">
+
+                    <TextView
+                        android:id="@+id/textview2"
+                        style="@style/TextViewMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/str_msg_57" />
 
                     <android.support.v7.widget.AppCompatImageView
                         android:id="@+id/iv_Icon"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/textview2"
                         android:visibility="visible"
                         app:srcCompat="@drawable/ic_outline_add_box_24px" />
-
-                    <TextView
-                        android:id="@+id/textView4"
-                        style="@style/TextViewMedium"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="@dimen/margin_left"
-                        android:layout_toRightOf="@+id/iv_Icon"
-                        android:text="@string/str_msg_39" />
                 </RelativeLayout>
-
-
             </LinearLayout>
 
             <LinearLayout
@@ -116,51 +140,43 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/textView1"
+                        android:id="@+id/tv_CurrentRequestUser"
+                        style="@style/TextViewMedium"
+                        android:layout_centerVertical="true"
+                        tools:text="SJaksksiw939" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/ly_Cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:clickable="true"
+                    android:onClick="cancelProc"
+                    android:paddingLeft="@dimen/padding_left"
+                    android:paddingRight="@dimen/padding_right">
+
+                    <TextView
+                        android:id="@+id/textview3"
                         style="@style/TextViewMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:text="@string/str_msg_50"
-                        tools:text="@string/str_msg_50" />
+                        android:text="@string/str_msg_58" />
 
-                    <TextView
-                        android:id="@+id/tv_CurrentRequestUser"
-                        style="@style/TextViewMedium"
+                    <android.support.v7.widget.AppCompatImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_centerVertical="true"
-                        android:layout_toRightOf="@+id/textView1"
-                        tools:text="SJaksksiw939" />
+                        android:layout_toRightOf="@+id/textview3"
+                        android:visibility="visible"
+                        app:srcCompat="@drawable/ic_outline_cancel_presentation_24px" />
+
                 </RelativeLayout>
-
-
-                <Button
-                    android:id="@+id/btn_ReqCancel"
-                    style="@style/default_button"
-                    android:layout_marginTop="8dp"
-                    android:onClick="cancelProc"
-                    android:text="@string/str_cancel"
-                    android:visibility="visible"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_CurrentRequestUser"
-                    />
 
             </LinearLayout>
 
         </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/ly_Container"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_RequestForMe"
-                style="@style/default_button"
-                android:layout_weight="1"
-                android:onClick="showRequestForMe"
-                android:text="@string/str_msg_38" />
-        </LinearLayout>
-
     </RelativeLayout>
 
     <ProgressBar
