@@ -21,10 +21,11 @@
 
             <android.support.v7.widget.AppCompatImageView
                 android:id="@+id/btn_ShowMap"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="@dimen/icon_small_width"
+                android:layout_height="@dimen/icon_small_height"
                 android:layout_margin="10dp"
                 android:onClick="showMap"
+                android:scaleType="fitXY"
                 android:visibility="visible"
                 app:srcCompat="@drawable/ic_baseline_pin_drop_24px" />
         </LinearLayout>

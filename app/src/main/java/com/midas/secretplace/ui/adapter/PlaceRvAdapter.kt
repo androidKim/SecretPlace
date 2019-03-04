@@ -121,6 +121,17 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var 
             m_IfCallback.deleteProc(pInfo)
     }
 
+    //----------------------------------------------------------------------------
+    //
+    fun removeAt(position: Int) {
+        placeList.removeAt(position)
+        notifyItemRemoved(position)
+
+        var pInfo:place = placeList.get(position)
+        if(m_IfCallback != null)
+            m_IfCallback.deleteProc(pInfo)
+    }
+
     /*********************** Listener ***********************/
     //----------------------------------------------------------------------------
     //onClick Go Deltail

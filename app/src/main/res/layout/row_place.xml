@@ -6,35 +6,31 @@
     android:layout_height="60dp"
     android:background="@color/color_white">
 
-    <android.support.v7.widget.CardView
-        style="@style/CardViewStyle"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/cardview_light_background">
+    <android.support.v7.widget.CardView style="@style/CardViewStyle">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <RelativeLayout
                 android:id="@+id/ly_Row"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/ly_Delete">
 
                 <TextView
+                    android:background="@color/color_none"
                     android:id="@+id/tv_Name"
+                    style="@style/TextViewMedium"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_centerInParent="true"
                     android:ellipsize="end"
                     android:gravity="left|center"
                     android:maxLines="1"
-                    android:padding="15dp"
-                    android:textColor="@color/color_black"
-                    android:textSize="15dp"
                     tools:text="hellohellohellohellohellohellohellohellohellohellohellohello" />
             </RelativeLayout>
 
@@ -47,14 +43,15 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp">
+                android:paddingRight="10dp"
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <ImageView
                     android:layout_width="@dimen/icon_small_width"
                     android:layout_height="@dimen/icon_small_height"
                     android:background="@drawable/baseline_delete_black_18dp" />
             </LinearLayout>
-
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>
