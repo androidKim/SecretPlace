@@ -96,16 +96,14 @@ class RequestForMeRvAdapter(val context: Context, var requestList: ArrayList<cou
     {
         if(pIfCallback != null)
         {
-            pIfCallback.serRequestOnOffProc(pInfo)
+            pIfCallback.setRequestOnOffProc(pInfo)
         }
-
-        notifyDataSetChanged()
     }
 
     /*********************** Listener ***********************/
     /*********************** interface ***********************/
     interface ifCallback
     {
-        fun serRequestOnOffProc(pInfo: couple)
+        fun setRequestOnOffProc(pInfo: couple)
     }
 }

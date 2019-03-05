@@ -11,6 +11,10 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
+import android.text.InputFilter
+import android.text.InputType.TYPE_CLASS_TEXT
+import android.text.InputType.TYPE_TEXT_VARIATION_NORMAL
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,7 +32,10 @@ import com.midas.secretplace.ui.act.ActGroupDetail
 import com.midas.secretplace.ui.act.ActMain
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import kotlinx.android.synthetic.main.frag_group.*
+import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import java.io.Serializable
+
+
 
 
 class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter.ifCallback
@@ -172,6 +179,16 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
             }
         })
 
+        //swipe remove listener..
+        val swipeHandler = object : SwipeToDeleteCallback(m_Context!!) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                //val adapter = recyclerView.adapter as SimpleAdapter
+                m_Adapter!!.removeAt(viewHolder.adapterPosition)
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+
         getGroupListProc("")
     }
     //--------------------------------------------------------------
@@ -301,7 +318,9 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
         val builder = AlertDialog.Builder(m_Context!!)
         builder.setMessage(getString(R.string.str_msg_18))
         var editName: EditText? = EditText(m_Context)
-        editName!!.hint = getString(R.string.str_msg_4)
+        editName!!.inputType = TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_NORMAL//single line..
+        editName!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(30))//maxlength
+        editName!!.hint = getString(com.midas.secretplace.R.string.str_msg_4)
         builder.setView(editName)
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
             pInfo!!.name = editName.text.toString()

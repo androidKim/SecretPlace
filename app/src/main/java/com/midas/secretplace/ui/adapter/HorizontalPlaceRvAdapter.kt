@@ -22,7 +22,7 @@ class HorizontalPlaceRvAdapter(val context: Context, var placeList: ArrayList<pl
     //
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder
     {
-        val view = LayoutInflater.from(context).inflate(R.layout.row_horizontal_place, parent, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.row_place, parent, false)
         val holder:Holder = Holder(view)
         return holder
     }
@@ -45,21 +45,18 @@ class HorizontalPlaceRvAdapter(val context: Context, var placeList: ArrayList<pl
     inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView)
     {
         var ly_Row = itemView?.findViewById<LinearLayout>(R.id.ly_Row)
-        var ly_Delete = itemView?.findViewById<LinearLayout>(R.id.ly_Delete)
+
         var tv_Nmae = itemView?.findViewById<TextView>(R.id.tv_Name)
-        var tv_Lat = itemView?.findViewById<TextView>(R.id.tv_Lat)
-        var tv_Lng = itemView?.findViewById<TextView>(R.id.tv_Lng)
+        //var tv_Lat = itemView?.findViewById<TextView>(R.id.tv_Lat)
+        //var tv_Lng = itemView?.findViewById<TextView>(R.id.tv_Lng)
 
         fun bind (pInfo: place, pContext: Context)
         {
             tv_Nmae!!.text = pInfo.name
-            tv_Lat!!.text = pInfo.lat
-            tv_Lng!!.text = pInfo.lng
+            //tv_Lat!!.text = pInfo.lat
+            //tv_Lng!!.text = pInfo.lng
             ly_Row!!.setTag(pInfo)
             ly_Row!!.setOnClickListener(onClickPlaceItem)
-
-            ly_Delete!!.setTag(pInfo)
-            ly_Delete!!.setOnClickListener(onClickDeleteItem)
         }
     }
 
@@ -135,15 +132,6 @@ class HorizontalPlaceRvAdapter(val context: Context, var placeList: ArrayList<pl
             R.id.ly_Row -> selectPlaceItem(view)
         }
     }
-    //----------------------------------------------------------------------------
-    //delete item
-    val onClickDeleteItem = View.OnClickListener { view ->
-        when(view.getId())
-        {
-            R.id.ly_Delete -> deletePlaceItem(view)
-        }
-    }
-
     /*********************** interface ***********************/
     interface ifCallback
     {

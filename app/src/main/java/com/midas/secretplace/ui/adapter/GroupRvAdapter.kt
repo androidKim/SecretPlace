@@ -52,7 +52,6 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
     inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView)
     {
         var ly_Row = itemView?.findViewById<RelativeLayout>(R.id.ly_Row)
-        var ly_Delete = itemView?.findViewById<LinearLayout>(R.id.ly_Delete)
         var tv_Name = itemView?.findViewById<TextView>(R.id.tv_Name)
 
         fun bind (pInfo: group, pContext: Context)
@@ -60,9 +59,6 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
             tv_Name!!.text = pInfo.name
             ly_Row!!.setTag(pInfo)
             ly_Row!!.setOnClickListener(onClickGoDetail)
-
-            ly_Delete!!.setTag(pInfo)
-            ly_Delete!!.setOnClickListener(onClickDelete)
         }
     }
 
@@ -117,15 +113,13 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
             }
         }
     }
-
     //----------------------------------------------------------------------------
     //
-    fun deleteGroupInfo(pInfo:group)
-    {
-        if(pInfo == null)
-            return
+    fun removeAt(position: Int) {
+        m_arrGroup.removeAt(position)
+        notifyItemRemoved(position)
 
-        //using interface..
+        var pInfo:group = m_arrGroup.get(position)
         if(m_IfCallback != null)
             m_IfCallback.deleteGroupProc(pInfo)
     }
@@ -139,30 +133,6 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
             R.id.ly_Row -> goDetail(view)
         }
     }
-    //----------------------------------------------------------------------------
-    //onClick Delete
-    val onClickDelete = View.OnClickListener{view->
-        val pInfo:group = view.getTag() as group
-
-        val builder = AlertDialog.Builder(m_Context!!)
-        builder.setMessage(m_Context.getString(R.string.str_msg_19))
-        builder.setPositiveButton(m_Context.getString(R.string.str_ok)){dialog, which ->
-            //show dialog..
-            deleteGroupInfo(pInfo)
-        }
-
-        builder.setNegativeButton(m_Context.getString(R.string.str_no)){dialog,which ->
-
-        }
-
-        builder.setNeutralButton(m_Context.getString(R.string.str_cancel)){_,_ ->
-
-        }
-
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
-    }
-
     /*********************** interface ***********************/
     interface ifCallback
     {

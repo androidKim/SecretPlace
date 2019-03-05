@@ -12,6 +12,8 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.text.InputFilter
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -353,6 +355,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         val builder = AlertDialog.Builder(m_Context!!)
         builder.setMessage(getString(R.string.str_msg_3))
         var editName: EditText? = EditText(m_Context)
+        editName!!.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL//singline..
+        editName!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(30))//maxlength
         editName!!.hint = getString(R.string.str_msg_4)
         builder.setView(editName)
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->

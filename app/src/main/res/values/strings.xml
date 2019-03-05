@@ -73,4 +73,7 @@
     <string name="str_msg_58">취소하기</string>
     <string name="str_msg_59">유효하지 않는 사용자 입니다.</string>
     <string name="str_msg_60">나에게 요청한 사람..</string>
+    <string name="str_msg_61">커플을 끊으시겠습니까?</string>
+    <string name="str_msg_62">상태를 바꾸시겠습니까?</string>
+    <string name="str_msg_63">이미 커플이 있다면 자동 취소됩니다.</string>
 </resources>

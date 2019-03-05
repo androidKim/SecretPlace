@@ -4,9 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import android.widget.Toolbar
 import com.google.firebase.database.*
@@ -131,29 +133,44 @@ class ActCouple : AppCompatActivity()
     //요청취소
     fun cancelProc(view: View)
     {
-        ly_RequestStatusOk.visibility = View.GONE
-        ly_RequestStatusNot.visibility = View.VISIBLE
+        //show dialog..
+        val pAlert = AlertDialog.Builder(this@ActCouple).create()
+        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_61))
+        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_ok),{
+            dialogInterface, i ->
 
-        var pCoupleDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
-        pCoupleDbRef!!.addListenerForSingleValueEvent(object :ValueEventListener{
-            override fun onDataChange(p0: DataSnapshot?) {
-                val children = p0!!.children
-                children.forEach {
-                    val pInfo: couple = it!!.getValue(couple::class.java)!!
+            ly_RequestStatusOk.visibility = View.GONE
+            ly_RequestStatusNot.visibility = View.VISIBLE
 
-                    if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey())
-                            || pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//
-                    {
-                        var dbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key)
-                        dbRef!!.removeValue()
+            var pCoupleDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
+            pCoupleDbRef!!.addListenerForSingleValueEvent(object :ValueEventListener{
+                override fun onDataChange(p0: DataSnapshot?) {
+                    val children = p0!!.children
+                    children.forEach {
+                        val pInfo: couple = it!!.getValue(couple::class.java)!!
+
+                        if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey())
+                                || pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//
+                        {
+                            var dbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key)
+                            dbRef!!.removeValue()
+                        }
                     }
                 }
-            }
 
-            override fun onCancelled(p0: DatabaseError?) {
+                override fun onCancelled(p0: DatabaseError?) {
 
-            }
+                }
+            })
+
+            pAlert.dismiss()
         })
+        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_no),{
+            dialogInterface, i ->
+            pAlert.dismiss()
+        })
+        pAlert.show()
+
     }
     //--------------------------------------------------------------
     //

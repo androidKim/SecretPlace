@@ -45,7 +45,6 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var 
     inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView)
     {
         var ly_Row = itemView?.findViewById<RelativeLayout>(R.id.ly_Row)
-        var ly_Delete = itemView?.findViewById<LinearLayout>(R.id.ly_Delete)
         var tv_Name = itemView?.findViewById<TextView>(R.id.tv_Name)
 
         fun bind (pInfo: place, pContext: Context)
@@ -53,9 +52,6 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var 
             tv_Name!!.text = pInfo.name
             ly_Row!!.setTag(pInfo)
             ly_Row!!.setOnClickListener(onClickGoDetail)
-
-            ly_Delete!!.setTag(pInfo)
-            ly_Delete!!.setOnClickListener(onClickDelete)
         }
     }
 
@@ -108,19 +104,6 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var 
             }
         }
     }
-
-    //----------------------------------------------------------------------------
-    //
-    fun deleteInfo(pInfo:place)
-    {
-        if(pInfo == null)
-            return
-
-        //using interface..
-        if(m_IfCallback != null)
-            m_IfCallback.deleteProc(pInfo)
-    }
-
     //----------------------------------------------------------------------------
     //
     fun removeAt(position: Int) {
@@ -141,30 +124,6 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var 
             R.id.ly_Row -> goDetail(view)
         }
     }
-    //----------------------------------------------------------------------------
-    //onClick Delete
-    val onClickDelete = View.OnClickListener{view->
-        val pInfo:place = view.getTag() as place
-
-        val builder = AlertDialog.Builder(context!!)
-        builder.setMessage(context.getString(R.string.str_msg_19))
-        builder.setPositiveButton(context.getString(R.string.str_ok)){dialog, which ->
-            //show dialog..
-            deleteInfo(pInfo)
-        }
-
-        builder.setNegativeButton(context.getString(R.string.str_no)){dialog,which ->
-
-        }
-
-        builder.setNeutralButton(context.getString(R.string.str_cancel)){_,_ ->
-
-        }
-
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
-    }
-
     /*********************** interface ***********************/
     interface ifCallback
     {

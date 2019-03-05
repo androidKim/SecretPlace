@@ -150,10 +150,11 @@
     <style name="CardViewStyle" parent="CardView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="cardCornerRadius">10dp</item>
-        <item name="cardElevation">5dp</item>
+        <item name="android:gravity">center</item>
+        <item name="cardCornerRadius">5dp</item>
+        <item name="cardElevation">2dp</item>
         <item name="cardUseCompatPadding">true</item>
-        <item name="cardBackgroundColor">@color/colorPrimary</item>
+        <item name="cardBackgroundColor">@color/color_white</item>
     </style>
 
 
@@ -175,8 +176,6 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">10dp</item>
         <item name="android:layout_margin">5dp</item>
-        <item name="android:paddingRight">3dp</item>
-        <item name="android:paddingLeft">8dp</item>
         <item name="android:textColor">@color/color_black</item>
         <item name="android:background">@color/color_white</item>
     </style>
@@ -186,8 +185,6 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">15dp</item>
         <item name="android:layout_margin">5dp</item>
-        <item name="android:paddingRight">3dp</item>
-        <item name="android:paddingLeft">8dp</item>
         <item name="android:textColor">@color/color_black</item>
         <item name="android:background">@color/color_white</item>
     </style>
@@ -197,10 +194,32 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">20dp</item>
         <item name="android:layout_margin">5dp</item>
-        <item name="android:paddingRight">3dp</item>
-        <item name="android:paddingLeft">8dp</item>
         <item name="android:textColor">@color/color_black</item>
         <item name="android:background">@color/color_white</item>
+    </style>
+
+    <style name="TextViewCahtYou" parent="@android:style/Widget.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">15dp</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">30dp</item>
+        <item name="android:paddingTop">@dimen/padding</item>
+        <item name="android:paddingBottom">@dimen/padding</item>
+        <item name="android:textColor">@color/color_white</item>
+        <item name="android:background">@color/color_none</item>
+    </style>
+
+    <style name="TextViewCahtMe" parent="@android:style/Widget.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">15dp</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">30dp</item>
+        <item name="android:paddingTop">@dimen/padding</item>
+        <item name="android:paddingBottom">@dimen/padding</item>
+        <item name="android:textColor">@color/color_black</item>
+        <item name="android:background">@color/color_none</item>
     </style>
 
     <style name="TextViewTop" parent="@android:style/Widget.TextView">
