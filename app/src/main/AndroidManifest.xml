@@ -40,11 +40,11 @@
         <activity
             android:name=".ui.act.ActMain"
             android:screenOrientation="unspecified"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActLogin"
             android:screenOrientation="unspecified"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActPlaceDetail"
             android:screenOrientation="unspecified"
@@ -63,10 +63,12 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActCouple"
+            android:parentActivityName=".ui.act.ActMain"
             android:screenOrientation="unspecified"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActMyInformation"
+            android:parentActivityName=".ui.act.ActMain"
             android:screenOrientation="unspecified"
             android:theme="@style/AppTheme" />
         <activity

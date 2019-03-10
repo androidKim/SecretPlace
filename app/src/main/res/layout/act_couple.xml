@@ -22,43 +22,6 @@
                 style="@style/ToolBarStyle.Base"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-
-
-            <LinearLayout
-                android:id="@+id/ly_Fav"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="@dimen/margin_right"
-                android:layout_toLeftOf="@+id/ly_Chat"
-                android:clickable="true"
-                android:gravity="center"
-                android:onClick="showRequestForMe">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:background="@drawable/outline_list_white_36" />
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/ly_Chat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:clickable="true"
-                android:gravity="center"
-                android:onClick="goChatActivity"
-                android:padding="@dimen/padding">
-
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:background="@drawable/outline_chat_white_24dp" />
-            </LinearLayout>
         </RelativeLayout>
 
 
@@ -145,24 +108,86 @@
                         android:layout_centerVertical="true"
                         tools:text="SJaksksiw939" />
                 </RelativeLayout>
+            </LinearLayout>
 
-                <RelativeLayout
-                    android:id="@+id/ly_Cancel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
+            <LinearLayout
+                android:id="@+id/ly_BottomBar"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/color_white"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/ly_Fav"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="@dimen/margin_right"
+                    android:layout_toLeftOf="@+id/ly_Chat"
+                    android:layout_weight="1"
                     android:clickable="true"
-                    android:onClick="cancelProc"
-                    android:paddingLeft="@dimen/padding_left"
-                    android:paddingRight="@dimen/padding_right">
+                    android:gravity="center"
+                    android:onClick="showRequestForMe"
+                    android:orientation="horizontal">
+
+                    <android.support.v7.widget.AppCompatImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/textview3"
+                        android:visibility="visible"
+                        app:srcCompat="@drawable/ic_outline_list_24px" />
 
                     <TextView
-                        android:id="@+id/textview3"
                         style="@style/TextViewMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="@string/str_msg_65" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/ly_Chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:onClick="goChatActivity"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/padding">
+
+
+                    <android.support.v7.widget.AppCompatImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_centerVertical="true"
-                        android:text="@string/str_msg_58" />
+                        android:layout_toRightOf="@+id/textview3"
+                        android:visibility="visible"
+                        app:srcCompat="@drawable/ic_outline_chat_24px" />
+
+
+                    <TextView
+                        style="@style/TextViewMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/str_msg_64" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ly_Cancel"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="@dimen/margin_right"
+                    android:layout_toLeftOf="@+id/ly_Chat"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:onClick="cancelProc"
+                    android:orientation="horizontal">
 
                     <android.support.v7.widget.AppCompatImageView
                         android:layout_width="24dp"
@@ -172,10 +197,16 @@
                         android:visibility="visible"
                         app:srcCompat="@drawable/ic_outline_cancel_presentation_24px" />
 
-                </RelativeLayout>
+                    <TextView
+                        android:id="@+id/textview3"
+                        style="@style/TextViewMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/str_msg_58" />
+                </LinearLayout>
 
             </LinearLayout>
-
         </RelativeLayout>
     </RelativeLayout>
 

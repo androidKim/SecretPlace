@@ -5,15 +5,16 @@
     <string name="twitter_consumer_key" translatable="false">1Gqkat9htRhTfHP31DG64F1LK</string>
     <string name="twitter_consumer_secret" translatable="false">desMpaNzISR5xtGXAADUFm2xeckH1fWGQLFn1XHmqPHIIzlEox</string>
 
-    <string name="app_name">SecretPlace</string>
+    <string name="app_name">LocationLocker</string>
     <string name="navigation_drawer_open">Navigation Drawer Is Open</string>
     <string name="navigation_drawer_close">Navigation Drawer Is Close</string>
 
     <string name="str_login_google">google</string>
     <string name="str_login_facebook">facebook</string>
-    <string name="str_tab_title_my">My</string>
-    <string name="str_tab_title_group">Group</string>
+    <string name="str_tab_title_my">Location</string>
+    <string name="str_tab_title_group">Location Group</string>
     <string name="str_tab_title_couple">Couple</string>
+    <string name="action_share">Share</string>
 
     <string name="str_ok">Yes</string>
     <string name="str_no">No</string>
@@ -76,4 +77,6 @@
     <string name="str_msg_61">Would you quit the couple?</string>
     <string name="str_msg_62">Would you like to change your status?</string>
     <string name="str_msg_63">If there is already a couple, it will be canceled automatically</string>
+    <string name="str_msg_64">Chat</string>
+    <string name="str_msg_65">Request</string>
 </resources>

@@ -18,7 +18,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.SimpleAdapter
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
@@ -137,7 +136,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         })
 
         //지도로 좌표보기..
-        btn_ShowMap!!.setOnClickListener(View.OnClickListener {
+        iBtn_ShowMap!!.setOnClickListener(View.OnClickListener {
             if(m_IfCallback != null)
             {
                 var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
@@ -317,6 +316,11 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 m_bRunning = false
                 ly_MenuContainer.visibility = View.VISIBLE
                 progressBar.visibility = View.GONE
+
+                if(m_Adapter!!.itemCount > 0)
+                    iBtn_ShowMap.visibility = View.VISIBLE
+                else
+                    iBtn_ShowMap.visibility = View.GONE
             }
 
             override fun onCancelled(p0: DatabaseError?)

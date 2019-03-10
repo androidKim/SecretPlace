@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -74,6 +75,8 @@ class ActCouple : AppCompatActivity()
     {
         toolbar.title = m_Context!!.resources.getString(R.string.str_msg_29)
         setSupportActionBar(toolbar)
+        var actionBar: ActionBar = supportActionBar!!
+        actionBar.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.setDisplayUseLogoEnabled(true)
 
@@ -96,11 +99,13 @@ class ActCouple : AppCompatActivity()
                 if(p0!!.exists())
                 {
                     ly_RequestStatusOk.visibility = View.VISIBLE
+                    ly_Cancel.visibility = View.VISIBLE
                     ly_RequestStatusNot.visibility = View.GONE
                 }
                 else
                 {
                     ly_RequestStatusOk.visibility = View.GONE
+                    ly_Cancel.visibility = View.GONE
                     ly_RequestStatusNot.visibility = View.VISIBLE
                 }
             }
@@ -154,6 +159,8 @@ class ActCouple : AppCompatActivity()
                         {
                             var dbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key)
                             dbRef!!.removeValue()
+
+                            ly_Cancel.visibility = View.GONE
                         }
                     }
                 }
@@ -211,6 +218,7 @@ class ActCouple : AppCompatActivity()
                 if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))// 요청자가 나일떄
                 {
                     ly_RequestStatusOk.visibility = View.VISIBLE
+                    ly_Cancel.visibility = View.VISIBLE
                     ly_RequestStatusNot.visibility = View.GONE
 
                     if(pInfo.accept.equals(couple.APPCET_Y))
@@ -230,18 +238,21 @@ class ActCouple : AppCompatActivity()
                     {
                         m_bExistCouple = true
                         ly_RequestStatusOk.visibility = View.VISIBLE
+                        ly_Cancel.visibility = View.VISIBLE
                         ly_RequestStatusNot.visibility = View.GONE
                         tv_CurrentRequestUser.text = pInfo.requester_key + "\n커플!"
                     }
                     else
                     {
                         ly_RequestStatusOk.visibility = View.GONE
+                        ly_Cancel.visibility = View.GONE
                         ly_RequestStatusNot.visibility = View.VISIBLE
                     }
                 }
                 else
                 {
                     ly_RequestStatusOk.visibility = View.GONE
+                    ly_Cancel.visibility = View.GONE
                     ly_RequestStatusNot.visibility = View.VISIBLE
                 }
             }

@@ -151,7 +151,7 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
     //
     fun settingDrawerView()
     {
-        toolbar.title = m_Context!!.resources.getString(R.string.str_msg_56)
+        toolbar.title = m_Context!!.resources.getString(R.string.app_name)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.setDisplayUseLogoEnabled(true)

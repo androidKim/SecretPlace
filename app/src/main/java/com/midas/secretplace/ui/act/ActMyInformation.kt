@@ -11,9 +11,14 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.ShareCompat
+import android.support.v4.view.MenuItemCompat
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.ShareActionProvider
 import android.text.Editable
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.database.DataSnapshot
@@ -53,16 +58,17 @@ class ActMyInformation : AppCompatActivity()
     /*********************** Define ***********************/
 
     /*********************** Member ***********************/
-    var m_App:MyApp? = null
-    var m_Context: Context? = null
+    private var m_App:MyApp? = null
+    private var m_Context: Context? = null
 
-    var m_UserDbRef:DatabaseReference? = null//firebase database
-    var m_UserViewModel: vm_user?= null//mvvm
+    private var m_UserDbRef:DatabaseReference? = null//firebase database
+    private var m_UserViewModel: vm_user?= null//mvvm
 
     //
     private var m_Clipboard: ClipboardManager? = null
     private var m_Clip: ClipData? = null
 
+    private var shareActionProvider:ShareActionProvider? = null
     //
     /*********************** Controller ***********************/
     var m_ShareViewDialog:AlertDialog? = null
@@ -95,6 +101,24 @@ class ActMyInformation : AppCompatActivity()
 
         setInitLayout()
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        var menuItem:MenuItem = menu!!.findItem(R.id.action_share)
+        shareActionProvider = MenuItemCompat.getActionProvider(menuItem) as ShareActionProvider
+        setShareIntent(m_App!!.m_SpCtrl!!.getSpUserKey()+"")
+        return super.onCreateOptionsMenu(menu)
+    }
+    //--------------------------------------------------------------
+    //
+    private fun setShareIntent(text:String) {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, m_Context!!.resources.getString(R.string.app_name))
+        shareIntent.putExtra(Intent.EXTRA_TEXT, text)
+        shareActionProvider?.setShareIntent(shareIntent)
+    }
+
     //--------------------------------------------------------------
     //
     override fun onStart()
@@ -144,7 +168,9 @@ class ActMyInformation : AppCompatActivity()
     fun setInitLayout()
     {
         toolbar.title = m_Context!!.resources.getString(R.string.str_msg_30)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(toolbar)//enable app bar
+        var actionBar:ActionBar = supportActionBar!!
+        actionBar.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.setDisplayUseLogoEnabled(true)
 
@@ -155,6 +181,7 @@ class ActMyInformation : AppCompatActivity()
 
 
         //share btn click event..
+        /*
         ly_Right.setOnClickListener {
             val shareIntent = ShareCompat.IntentBuilder.from(this)
                     .setText(m_App!!.m_SpCtrl!!.getSpUserKey())
@@ -172,6 +199,7 @@ class ActMyInformation : AppCompatActivity()
                     }
             startActivity(shareIntent)
         }
+        */
     }
 
     //--------------------------------------------------------------------

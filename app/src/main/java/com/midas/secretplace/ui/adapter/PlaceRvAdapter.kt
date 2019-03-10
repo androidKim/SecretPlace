@@ -107,12 +107,12 @@ class PlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var 
     //----------------------------------------------------------------------------
     //
     fun removeAt(position: Int) {
-        placeList.removeAt(position)
-        notifyItemRemoved(position)
-
         var pInfo:place = placeList.get(position)
+        placeList.removeAt(position)
         if(m_IfCallback != null)
             m_IfCallback.deleteProc(pInfo)
+
+        notifyItemRemoved(position)
     }
 
     /*********************** Listener ***********************/
