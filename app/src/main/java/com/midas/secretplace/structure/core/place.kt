@@ -10,13 +10,15 @@ class place:Serializable
     var name:String? = ""
     var lat:String? = ""
     var lng:String? = ""
+    var memo:String? = ""
+    var address:String? = ""
     //필수..
     constructor()
     {
 
     }
 
-    constructor(user_key:String, place_key:String,group_key:String, name:String, lat:String, lng:String)
+    constructor(user_key:String, place_key:String,group_key:String, name:String, lat:String, lng:String, memo:String, address:String)
     {
         this.user_key = user_key
         this.place_key = place_key
@@ -24,5 +26,7 @@ class place:Serializable
         this.name = name
         this.lat = lat
         this.lng = lng
+        this.memo = memo
+        this.address = address
     }
 }
