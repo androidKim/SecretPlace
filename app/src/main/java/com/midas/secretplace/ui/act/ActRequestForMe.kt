@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
@@ -189,6 +190,8 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback, S
     {
         toolbar.title = m_Context!!.resources.getString(R.string.str_msg_60)
         setSupportActionBar(toolbar)
+        var actionBar: ActionBar = supportActionBar!!
+        actionBar.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.setDisplayUseLogoEnabled(true)
 

@@ -94,21 +94,54 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/ly_RequestStatusNot"
+                android:layout_centerInParent="true"
+                android:layout_margin="@dimen/margin"
                 android:orientation="vertical"
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <android.support.v7.widget.AppCompatImageView
+                            android:id="@+id/iv_RequestStatus"
+                            android:layout_width="@dimen/icon_small_width"
+                            android:layout_height="@dimen/icon_small_height"
+                            android:visibility="visible"
+                            app:srcCompat="@drawable/baseline_favorite_border_black_48" />
+
+                        <TextView
+                            android:id="@+id/tv_RequestStatus"
+                            style="@style/TextViewMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:gravity="center"
+                            tools:text="요청중 입니다." />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tv_CurrentRequestUser"
                         style="@style/TextViewMedium"
                         android:layout_centerVertical="true"
-                        tools:text="SJaksksiw939" />
-                </RelativeLayout>
+                        android:gravity="center"
+                        tools:text="ABCDEFG(고유키)" />
+                </LinearLayout>
             </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_above="@+id/ly_BottomBar"
+                android:background="@color/color_gray" />
 
             <LinearLayout
                 android:id="@+id/ly_BottomBar"
@@ -147,6 +180,10 @@
                         android:text="@string/str_msg_65" />
                 </LinearLayout>
 
+                <View
+                    android:layout_width="0.5dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/color_gray" />
 
                 <LinearLayout
                     android:id="@+id/ly_Chat"
@@ -175,6 +212,11 @@
                         android:layout_height="wrap_content"
                         android:text="@string/str_msg_64" />
                 </LinearLayout>
+
+                <View
+                    android:layout_width="0.5dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/color_gray" />
 
                 <LinearLayout
                     android:id="@+id/ly_Cancel"

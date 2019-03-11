@@ -73,10 +73,12 @@
     <string name="str_msg_57">Request</string>
     <string name="str_msg_58">Cancel</string>
     <string name="str_msg_59">Invalid user</string>
-    <string name="str_msg_60">The person who asked me..</string>
-    <string name="str_msg_61">Would you quit the couple?</string>
+    <string name="str_msg_60">The person who asked me</string>
+    <string name="str_msg_61">Would you quit the couple(request)?</string>
     <string name="str_msg_62">Would you like to change your status?</string>
     <string name="str_msg_63">If there is already a couple, it will be canceled automatically</string>
     <string name="str_msg_64">Chat</string>
     <string name="str_msg_65">Request</string>
+    <string name="str_msg_66">Requesting.</string>
+    <string name="str_msg_67">Couple</string>
 </resources>
