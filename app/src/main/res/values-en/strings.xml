@@ -81,4 +81,6 @@
     <string name="str_msg_65">Request</string>
     <string name="str_msg_66">Requesting.</string>
     <string name="str_msg_67">Couple</string>
+    <string name="str_latlng_format">Latitude : %s, Longitude : %s</string>
+    <string name="str_share_my_location">Share my location (address, GPS coordinates)</string>
 </resources>

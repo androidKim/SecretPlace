@@ -13,11 +13,14 @@ import android.provider.MediaStore
 import android.support.v4.content.ContextCompat
 import android.util.DisplayMetrics
 import android.widget.Toast
-import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
+import android.location.Geocoder
+import android.location.Address
+import com.midas.secretplace.R
+import java.util.*
 
 
 class Util
@@ -234,11 +237,29 @@ class Util
                 Constant.THEME_BROWN-> theme.applyStyle(R.style.AppThemeBrown, true)
                 Constant.THEME_GRAY-> theme.applyStyle(R.style.AppThemeGray, true)
                 Constant.THEME_BLUEGRAY-> theme.applyStyle(R.style.AppThemeBlueGray, true)
-                else -> theme.applyStyle(R.style.AppTheme, true)
+                else -> theme.applyStyle(com.midas.secretplace.R.style.AppTheme, true)
             }
             return theme
         }
+        //-----------------------------------------------------------------
+        //
+        fun getAddress(pContext:Context, latitude:Double, longitude: Double):String
+        {
+            val geocoder: Geocoder
+            val addresses: List<Address>
+            geocoder = Geocoder(pContext, Locale.getDefault())
 
+            addresses = geocoder.getFromLocation(latitude, longitude, 1) // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+
+            val address = addresses[0].getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+            val city = addresses[0].getLocality()
+            val state = addresses[0].getAdminArea()
+            val country = addresses[0].getCountryName()
+            val postalCode = addresses[0].getPostalCode()
+            val knownName = addresses[0].getFeatureName() // Only if available else return NULL
+
+            return address
+        }
     }
 
     fun Int.dpToPx(displayMetrics: DisplayMetrics): Int = (this * displayMetrics.density).toInt()

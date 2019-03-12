@@ -323,7 +323,7 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         //{
             m_Adapter = PhotoRvAdapter(m_Context!!, m_RequestManager!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
             recyclerView.adapter = m_Adapter
-            //recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))//set recyclerview grid Item spacing
+
             var nSpanCnt = 1
             val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
             recyclerView!!.layoutManager = pLayoutManager
@@ -537,8 +537,6 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         initValue()
         if(m_Adapter != null)
             m_Adapter!!.clearData()
-
-        //recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(-20))//init
 
         ly_SwipeRefresh.isRefreshing = false
         getPlaceInfoProc(m_PlaceInfo!!.place_key!!)
@@ -840,8 +838,8 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
 
                 when(m_nUploadPhotoType)
                 {
-                    REQUEST_SELECT_IMAGE_IN_ALBUM -> uploadCameraPhoto(m_UploadImgFile!!)
-                    REQUEST_TAKE_PHOTO -> uploadAlbumPhoto(m_UploadImgFile!!)
+                    REQUEST_SELECT_IMAGE_IN_ALBUM -> uploadAlbumPhoto(m_UploadImgFile!!)
+                    REQUEST_TAKE_PHOTO -> uploadCameraPhoto(m_UploadImgFile!!)
                 }
 
             }
@@ -873,8 +871,6 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     //update
                     var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
                     pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
-
-                    //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
                     pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot?) {
                             if (dataSnapshot!!.exists()) {
@@ -888,6 +884,23 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                         override fun onCancelled(p0: DatabaseError?) {
                             progressBar.visibility = View.GONE
                             tv_Progress.visibility = View.GONE
+                        }
+                    })
+
+                    //place table update
+                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceInfo!!.place_key)
+                    pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                            if (dataSnapshot!!.exists()) {
+
+                                val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                                pInfo!!.img_url = taskSnapshot.downloadUrl.toString()
+                                pPlaceDb.setValue(pInfo)
+                            }
+                        }
+
+                        override fun onCancelled(p0: DatabaseError?) {
+
                         }
                     })
                 }
@@ -926,8 +939,6 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     //update
                     var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
                     pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
-
-                    //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
                     pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot?) {
                             if (dataSnapshot!!.exists()) {
@@ -941,6 +952,24 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                         override fun onCancelled(p0: DatabaseError?) {
                             progressBar.visibility = View.GONE
                             tv_Progress.visibility = View.GONE
+                        }
+                    })
+
+                    //place table update
+                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceInfo!!.place_key)
+
+                    pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                            if (dataSnapshot!!.exists()) {
+
+                                val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                                pInfo!!.img_url = taskSnapshot.downloadUrl.toString()
+                                pPlaceDb.setValue(pInfo)
+                            }
+                        }
+
+                        override fun onCancelled(p0: DatabaseError?) {
+
                         }
                     })
                 }

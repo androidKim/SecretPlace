@@ -149,12 +149,10 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
         m_Adapter = GroupRvAdapter(m_Context!!, m_arrGroup!!, this)
         m_RecyclerView!!.adapter = m_Adapter
 
-        m_RecyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
-
         var nSpanCnt = 1
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode..
         {
-            nSpanCnt = 3
+            nSpanCnt = 1
         }
 
         val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)

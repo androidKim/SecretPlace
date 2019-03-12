@@ -8,17 +8,18 @@ class place:Serializable
     var place_key:String? = ""
     var group_key:String? = ""
     var name:String? = ""
-    var lat:String? = ""
-    var lng:String? = ""
+    var lat:String? = ""//위도
+    var lng:String? = ""//경도
     var memo:String? = ""
     var address:String? = ""
+    var img_url:String? = ""//최근에 등록한 이미지 1개만 저장됨..
     //필수..
     constructor()
     {
 
     }
 
-    constructor(user_key:String, place_key:String,group_key:String, name:String, lat:String, lng:String, memo:String, address:String)
+    constructor(user_key:String, place_key:String,group_key:String, name:String, lat:String, lng:String, memo:String, address:String, img_url:String)
     {
         this.user_key = user_key
         this.place_key = place_key
@@ -28,5 +29,6 @@ class place:Serializable
         this.lng = lng
         this.memo = memo
         this.address = address
+        this.img_url = img_url
     }
 }

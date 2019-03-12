@@ -303,12 +303,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //event..
         ly_SwipeRefresh.setOnRefreshListener(this)
 
-        m_PlaceAdapter = PlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
+        m_PlaceAdapter = PlaceRvAdapter(m_Context!!, m_RequestManager!!, m_arrPlace!!, this)
         recyclerView!!.adapter = m_PlaceAdapter
 
-        recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
-
-        var nSpanCnt = 2
+        var nSpanCnt = 1
         val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
         recyclerView!!.setHasFixedSize(true)
 
@@ -370,10 +368,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         initValue()
         ly_SwipeRefresh!!.setRefreshing(false)
 
-        m_PlaceAdapter = PlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
+        m_PlaceAdapter = PlaceRvAdapter(m_Context!!, m_RequestManager!!, m_arrPlace!!, this)
         recyclerView!!.adapter = m_PlaceAdapter
 
-        var nSpanCnt = 2
+        var nSpanCnt = 1
         val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
         recyclerView!!.setHasFixedSize(true)
 
@@ -565,7 +563,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         if(bCheckLocation)
         {
-            var pInfo:place = place(m_GroupInfo!!.user_key!!, "", m_GroupInfo!!.group_key!!, "", String.format("%s",mLocation.latitude), String.format("%s",mLocation.longitude), "", "")
+            var pInfo:place = place(m_GroupInfo!!.user_key!!, "", m_GroupInfo!!.group_key!!, "", String.format("%s",mLocation.latitude), String.format("%s",mLocation.longitude), "", "", "")
             showPlaceInputDialog(pInfo)
         }
     }

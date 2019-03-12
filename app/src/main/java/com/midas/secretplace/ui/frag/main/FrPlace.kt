@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.app.ShareCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
@@ -18,6 +20,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
@@ -30,6 +35,7 @@ import com.midas.secretplace.ui.act.ActMain
 import com.midas.secretplace.ui.act.ActMapDetail
 import com.midas.secretplace.ui.act.ActPlaceDetail
 import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
+import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.frag_place.*
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import java.io.Serializable
@@ -44,6 +50,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     var m_Activity:Activity? = null
     var m_App:MyApp? = null
     var m_IfCallback:ifCallback? = null
+    var m_RequestManager: RequestManager? = null
     var m_Adapter:PlaceRvAdapter? = null
     var m_arrPlace:ArrayList<place>? = ArrayList()
 
@@ -66,6 +73,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context!!)
+
+        m_RequestManager = Glide.with(m_Context)
 
         return view
     }
@@ -149,8 +158,43 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
                 }
             }
-
         })
+
+        //나의 위치공유하기
+        iBtnShare!!.setOnClickListener {
+            if(m_IfCallback != null)
+            {
+                var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
+                if(bPermissionVal)
+                {
+                    Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_share_my_location), Toast.LENGTH_SHORT).show()
+
+                    var locationInfo = m_IfCallback!!.getLocation()
+                    var strAddress:String = Util.getAddress(m_Context!!, locationInfo.latitude, locationInfo.longitude)
+                    var strMyLocation:String = String.format("주소 : %s, 위도 : %s, 경도 : %s", strAddress, locationInfo.latitude, locationInfo.longitude)
+
+                    val shareIntent = ShareCompat.IntentBuilder.from(activity)
+                            .setText(strMyLocation)
+                            .setType("text/plain")
+                            .createChooserIntent()
+                            .apply {
+                                // https://android-developers.googleblog.com/2012/02/share-with-intents.html
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    // If we're on Lollipop, we can open the intent as a document
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                                } else {
+                                    // Else, we will use the old CLEAR_WHEN_TASK_RESET flag
+                                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                                }
+                            }
+                    startActivity(shareIntent)
+                }
+                else
+                {
+
+                }
+            }
+        }
 
         settingView()
     }
@@ -175,15 +219,13 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //
     fun settingView()
     {
-        m_Adapter = PlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
+        m_Adapter = PlaceRvAdapter(m_Context!!, m_RequestManager!!, m_arrPlace!!, this)
         m_RecyclerView!!.adapter = m_Adapter
-
-        m_RecyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
 
         var nSpanCnt = 1
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode..
         {
-            nSpanCnt = 3
+            nSpanCnt = 1
         }
 
         val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
@@ -340,8 +382,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             {
                 var locationInfo = m_IfCallback!!.getLocation()
                 var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919...xxx
-
-                var pInfo:place = place(userKey!!, "", "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), "", "")
+                var address:String? = Util.getAddress(m_Context!!, locationInfo.latitude, locationInfo.longitude)
+                var pInfo:place = place(userKey!!, "", "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), "", address!!, "")
                 showPlaceInputDialog(pInfo)
             }
         }
@@ -510,18 +552,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     override fun onRefresh()
     {
         setRefresh()
-    }
-    //----------------------------------------------------------------------
-    //
-    fun showList(view:View)
-    {
-
-    }
-    //----------------------------------------------------------------------
-    //
-    fun showMap(view:View)
-    {
-
     }
     /******************************** callback function ********************************/
     //----------------------------------------------------------------------
