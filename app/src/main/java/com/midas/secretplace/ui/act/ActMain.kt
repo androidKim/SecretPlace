@@ -10,14 +10,18 @@ import android.os.Handler
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
+import android.support.v4.view.MenuItemCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.ShareActionProvider
+import android.view.Menu
 import android.view.MenuItem
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.ImageView
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.firebase.jobdispatcher.Constraint
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
@@ -34,6 +38,8 @@ import com.midas.secretplace.structure.core.*
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.MainPagerAdapter
 import com.midas.secretplace.ui.custom.dlg_theme_setting
+import com.midas.secretplace.ui.frag.main.FrGroup
+import com.midas.secretplace.ui.frag.main.FrPlace
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_main.*
 import kotlinx.android.synthetic.main.dlg_theme_setting.view.*
@@ -60,7 +66,8 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
     /*********************** Member ***********************/
     var m_App: MyApp? = null
     var m_Context: Context? = null
-
+    var m_FragPagerAdapter:MainPagerAdapter? = null
+    var viewPager:ViewPager? = null
     private val mScaleGestureDetector: ScaleGestureDetector? = null
     private val mScaleFactor = 1.0f
     /*********************** Controller ***********************/
@@ -108,6 +115,34 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
             System.exit(0)
         }
     }
+    /*********************** toolbar menu ***********************/
+    //--------------------------------------------------------------
+    //
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        var menuItem1:MenuItem = menu!!.findItem(R.id.action_share).setVisible(false)
+        var menuItem2:MenuItem = menu!!.findItem(R.id.onMainShare).setVisible(true)
+        var menuItem3:MenuItem = menu!!.findItem(R.id.onMainMapShow).setVisible(true)
+        return super.onCreateOptionsMenu(menu)
+    }
+    //--------------------------------------------------------------
+    //
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle presses on the action bar menu items
+        when (item.itemId) {
+            R.id.onMainMapShow -> {
+                var frag: FrPlace = m_FragPagerAdapter!!.instantiateItem(viewPager!!,MainPagerAdapter.TAB_INDEX_FRPALCE) as FrPlace
+                frag.menuItemShowMap()
+                return true
+            }
+            R.id.onMainShare -> {
+                var frag: FrPlace = m_FragPagerAdapter!!.instantiateItem(viewPager!!,MainPagerAdapter.TAB_INDEX_FRPALCE) as FrPlace
+                frag.menuItemShareLocation()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
     /*********************** User Function ***********************/
     //--------------------------------------------------------------
     //
@@ -125,11 +160,11 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
     //
     fun initLayout()
     {
-        val viewPager: ViewPager = findViewById(R.id.viewPager)
+        viewPager = findViewById(R.id.viewPager)
         if (viewPager != null)
         {
-            val adapter = MainPagerAdapter(m_Context!!, supportFragmentManager)
-            viewPager.adapter = adapter
+            m_FragPagerAdapter = MainPagerAdapter(m_Context!!, supportFragmentManager)
+            viewPager!!.adapter = m_FragPagerAdapter
         }
 
         settingDrawerView()
@@ -782,5 +817,7 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
         m_App!!.m_SpCtrl!!.setSpTheme(pInfo!!.colorName)
         m_App!!.goMain(m_Context!!)
     }
+    /*********************** interface ***********************/
     /*********************** util ***********************/
+
 }

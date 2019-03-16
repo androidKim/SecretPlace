@@ -83,4 +83,6 @@
     <string name="str_msg_67">커플 입니다.</string>
     <string name="str_latlng_format">위도 : %s, 경도 : %s</string>
     <string name="str_share_my_location">나의 위치(주소, GPS좌표)를 공유합니다</string>
+    <string name="str_not_valid_key">유효한 키가 아닙니다.</string>
+    <string name="str_no_exit_location">저장된 위치가 없어요.</string>
 </resources>

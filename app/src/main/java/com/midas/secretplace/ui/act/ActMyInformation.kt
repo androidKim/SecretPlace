@@ -104,8 +104,10 @@ class ActMyInformation : AppCompatActivity()
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
-        var menuItem:MenuItem = menu!!.findItem(R.id.action_share)
-        shareActionProvider = MenuItemCompat.getActionProvider(menuItem) as ShareActionProvider
+        var menuItem1:MenuItem = menu!!.findItem(R.id.action_share).setVisible(true)
+        var menuItem2:MenuItem = menu!!.findItem(R.id.onMainShare).setVisible(false)
+        var menuItem3:MenuItem = menu!!.findItem(R.id.onMainMapShow).setVisible(false)
+        shareActionProvider = MenuItemCompat.getActionProvider(menuItem1) as ShareActionProvider
         setShareIntent(m_App!!.m_SpCtrl!!.getSpUserKey()+"")
         return super.onCreateOptionsMenu(menu)
     }

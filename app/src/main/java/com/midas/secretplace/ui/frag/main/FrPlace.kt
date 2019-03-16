@@ -144,58 +144,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             }
         })
 
-        //지도로 좌표보기..
-        iBtn_ShowMap!!.setOnClickListener(View.OnClickListener {
-            if(m_IfCallback != null)
-            {
-                var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
-                if(bPermissionVal)
-                {
-                    goMapDetail()
-                }
-                else
-                {
-
-                }
-            }
-        })
-
-        //나의 위치공유하기
-        iBtnShare!!.setOnClickListener {
-            if(m_IfCallback != null)
-            {
-                var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
-                if(bPermissionVal)
-                {
-                    Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_share_my_location), Toast.LENGTH_SHORT).show()
-
-                    var locationInfo = m_IfCallback!!.getLocation()
-                    var strAddress:String = Util.getAddress(m_Context!!, locationInfo.latitude, locationInfo.longitude)
-                    var strMyLocation:String = String.format("주소 : %s, 위도 : %s, 경도 : %s", strAddress, locationInfo.latitude, locationInfo.longitude)
-
-                    val shareIntent = ShareCompat.IntentBuilder.from(activity)
-                            .setText(strMyLocation)
-                            .setType("text/plain")
-                            .createChooserIntent()
-                            .apply {
-                                // https://android-developers.googleblog.com/2012/02/share-with-intents.html
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    // If we're on Lollipop, we can open the intent as a document
-                                    addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-                                } else {
-                                    // Else, we will use the old CLEAR_WHEN_TASK_RESET flag
-                                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
-                                }
-                            }
-                    startActivity(shareIntent)
-                }
-                else
-                {
-
-                }
-            }
-        }
-
         settingView()
     }
     //-----------------------------------------------------
@@ -268,37 +216,16 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     {
         progressBar.visibility = View.VISIBLE
         m_bRunning = true
-        //m_App!!.showLoadingDialog(ly_LoadingDialog)
-
-        //var pQuery: Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(seq!!)
-        //pQuery!!.addListenerForSingleValueEvent(listenerForSingleValueEvent)
-        //pQuery!!.addChildEventListener(childEventListener)
-
         var pQuery:Query? = null
-        /*
-        if(!m_strPlaceLastSeq.equals(""))
-        {
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_strPlaceLastSeq).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
-        }
-        else
-        {
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
-        }
-        */
         pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 if(dataSnapshot!!.exists())
                 {
-                    //if(!m_strPlaceLastSeq.equals(dataSnapshot!!.key))
-                    //{
-                        m_bPagingFinish = false
-                        val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                        //m_strPlaceLastSeq = dataSnapshot!!.key
-                        pInfo.place_key = dataSnapshot!!.key
-
-                    //}
+                    m_bPagingFinish = false
+                    val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                    pInfo.place_key = dataSnapshot!!.key
                 }
                 else
                 {
@@ -310,31 +237,22 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
-                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
 
-                // A message has changed
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot?)
             {
-                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
 
-                // A message has been removed
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
-                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
 
-                // A message has changed position
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onCancelled(databaseError: DatabaseError?)
             {
-                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+
             }
         })
 
@@ -343,6 +261,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             {
                 if(dataSnapshot!!.exists())
                 {
+                    m_bPagingFinish = false
                     val children = dataSnapshot!!.children
                     children.forEach {
                         val pInfo:place = it!!.getValue(place::class.java)!!
@@ -356,13 +275,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
 
                 m_bRunning = false
-                ly_MenuContainer.visibility = View.VISIBLE
                 progressBar.visibility = View.GONE
-
-                if(m_Adapter!!.itemCount > 0)
-                    iBtn_ShowMap.visibility = View.VISIBLE
-                else
-                    iBtn_ShowMap.visibility = View.GONE
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -371,6 +284,72 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             }
         })
     }
+    //----------------------------------------------------------------------
+    //
+    fun menuItemShowMap(){
+        if(m_Adapter == null)
+        {
+            Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_no_exit_location), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if(m_Adapter!!.itemCount <= 0)
+        {
+            Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_no_exit_location), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+
+        if(m_IfCallback != null)
+        {
+            var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
+            if(bPermissionVal)
+            {
+                goMapDetail()
+            }
+            else
+            {
+
+            }
+        }
+    }
+    //----------------------------------------------------------------------
+    //
+    fun menuItemShareLocation(){
+        if(m_IfCallback != null)
+        {
+            var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
+            if(bPermissionVal)
+            {
+                Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_share_my_location), Toast.LENGTH_SHORT).show()
+
+                var locationInfo = m_IfCallback!!.getLocation()
+                var strAddress:String = Util.getAddress(m_Context!!, locationInfo.latitude, locationInfo.longitude)
+                var strMyLocation:String = String.format("주소 : %s, 위도 : %s, 경도 : %s", strAddress, locationInfo.latitude, locationInfo.longitude)
+
+                val shareIntent = ShareCompat.IntentBuilder.from(activity)
+                        .setText(strMyLocation)
+                        .setType("text/plain")
+                        .createChooserIntent()
+                        .apply {
+                            // https://android-developers.googleblog.com/2012/02/share-with-intents.html
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                // If we're on Lollipop, we can open the intent as a document
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                            } else {
+                                // Else, we will use the old CLEAR_WHEN_TASK_RESET flag
+                                addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                            }
+                        }
+                startActivity(shareIntent)
+            }
+            else
+            {
+
+            }
+        }
+    }
+
     //--------------------------------------------------------------
     //
     fun seveLocationDialog()

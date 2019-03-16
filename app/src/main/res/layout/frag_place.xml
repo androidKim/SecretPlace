@@ -13,38 +13,6 @@
         android:orientation="vertical"
         tools:ignore="MissingConstraints">
 
-        <LinearLayout
-            android:id="@+id/ly_MenuContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/color_white"
-            android:gravity="right"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/iBtn_ShowMap"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginRight="15dp"
-                android:onClick="showMap"
-                android:scaleType="fitXY"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_map_black_48dp"
-                tools:visibility="visible" />
-
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/iBtnShare"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginRight="@dimen/margin_right"
-                android:scaleType="fitXY"
-                android:visibility="visible"
-                app:srcCompat="@drawable/ic_share_purple_24dp"
-                tools:visibility="visible" />
-        </LinearLayout>
-
         <FrameLayout
             android:layout_marginTop="10dp"
             android:layout_width="match_parent"

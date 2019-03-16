@@ -50,9 +50,20 @@ class ActCouple : AppCompatActivity()
     //
     override fun onStart()
     {
+        super.onStart()
+        progressBar.visibility = View.VISIBLE
         m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
         m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
-        super.onStart()
+        m_pCoupleDbRef!!.addListenerForSingleValueEvent(object: ValueEventListener
+        {
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(p0: DataSnapshot?) {
+                progressBar.visibility = View.GONE
+            }
+        })
     }
 
     //--------------------------------------------------------------
@@ -118,21 +129,41 @@ class ActCouple : AppCompatActivity()
     //커플 요청
     fun coupleRequestProc(view:View)
     {
-        if(edit_UserKey.text.toString().equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
+        var strValue:String = edit_UserKey.text.toString()
+        if(strValue.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
         {
             Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_msg_40), Toast.LENGTH_SHORT).show()
             return
         }
-        else if(edit_UserKey.text.toString().equals(""))
+        else if(strValue.equals(""))
         {
             Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_msg_41), Toast.LENGTH_SHORT).show()
             return
         }
 
-        var pInfo:couple = couple(m_App!!.m_SpCtrl!!.getSpUserKey()!! , edit_UserKey.text.toString(), couple.APPCET_N)
-        m_pCoupleDbRef!!.push().setValue(pInfo!!)
-        m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
+        //firebase db access..
+        var tbUser:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).child(strValue)!!
+        tbUser.addListenerForSingleValueEvent(object :ValueEventListener{
+            override fun onCancelled(p0: DatabaseError?) {
 
+            }
+
+            override fun onDataChange(p0: DataSnapshot?) {
+                if(p0!!.exists())//해당키 유저가 존재하면..
+                {
+                    var pInfo:couple = couple(m_App!!.m_SpCtrl!!.getSpUserKey()!! , strValue, couple.APPCET_N)
+                    m_pCoupleDbRef!!.push().setValue(pInfo!!)
+                    m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
+                }
+                else
+                {
+                    Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_not_valid_key), Toast.LENGTH_SHORT).show()
+                }
+                tbUser.removeEventListener(this)
+                return
+            }
+
+        })
     }
     //--------------------------------------------------------------
     //요청취소
@@ -250,7 +281,6 @@ class ActCouple : AppCompatActivity()
                 if(m_bExistCouple)//if couple
                     return
 
-
                 m_pCoupleDbRef!!.removeEventListener(this)//중복 진입 방지..
                 val pInfo:couple = dataSnapshot!!.getValue(couple::class.java)!!
                 if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))// 요청자가 나일떄
@@ -266,7 +296,6 @@ class ActCouple : AppCompatActivity()
                         tv_RequestStatus.text = m_Context!!.resources.getString(R.string.str_msg_67)
                         iv_RequestStatus.setImageDrawable(resources.getDrawable(R.drawable.baseline_favorite_black_48))
                         removeRequestList()
-                        return
                     }
                     else
                     {
@@ -274,8 +303,8 @@ class ActCouple : AppCompatActivity()
                         tv_RequestStatus.text = m_Context!!.resources.getString(R.string.str_msg_66)
                         iv_RequestStatus.setImageDrawable(resources.getDrawable(R.drawable.baseline_favorite_border_black_48))
                         ly_Request.visibility = View.VISIBLE
-                        return
                     }
+                    return
                 }
                 else if(pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//응답자가 나일떄
                 {
@@ -285,23 +314,20 @@ class ActCouple : AppCompatActivity()
                         ly_RequestStatusOk.visibility = View.VISIBLE
                         ly_Cancel.visibility = View.VISIBLE
                         ly_RequestStatusNot.visibility = View.GONE
+
                         tv_CurrentRequestUser.text = pInfo.requester_key
                         tv_RequestStatus.text = m_Context!!.resources.getString(R.string.str_msg_67)
                         iv_RequestStatus.setImageDrawable(resources.getDrawable(R.drawable.baseline_favorite_black_48))
                         removeRequestList()
-                        return
                     }
                     else
                     {
 
                     }
                 }
-                else//응답자, 요청자 모두 아닐때..
+                else//
                 {
-                    ly_RequestStatusOk.visibility = View.GONE
-                    ly_Cancel.visibility = View.GONE
-                    ly_RequestStatusNot.visibility = View.VISIBLE
-                    return
+
                 }
             }
         }

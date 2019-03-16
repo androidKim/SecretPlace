@@ -83,4 +83,6 @@
     <string name="str_msg_67">Couple</string>
     <string name="str_latlng_format">Latitude : %s, Longitude : %s</string>
     <string name="str_share_my_location">Share my location (address, GPS coordinates)</string>
+    <string name="str_not_valid_key">It is not a valid key.</string>
+    <string name="str_no_exit_location">There are no saved locations.</string>
 </resources>
