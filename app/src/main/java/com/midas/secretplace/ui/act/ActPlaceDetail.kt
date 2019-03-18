@@ -400,41 +400,29 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         progressBar.visibility = View.VISIBLE
         //image list..
         var pQuery:Query?= null
-
-        //if(m_strImgLastSeq != null)
-            //pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child("place_key").startAt(m_PlaceInfo!!.place_key).limitToFirst(ReqBase.ITEM_COUNT)
-        //else
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").orderByKey()//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_PlaceInfo!!.place_key).orderByKey()
 
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 // A new message has been added
-                // onChildAdded() will be called for each node at the first time
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
-
-                // A message has changed
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot?)
             {
                 //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
-
-                // A message has been removed
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
-
-                // A message has changed position
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onCancelled(databaseError: DatabaseError?)
@@ -832,7 +820,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             //val uri = taskSnapshot.downloadUrl
 
             //img table update
-            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
+            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .child(m_PlaceInfo!!.place_key).push()//where
             pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
 
             //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
@@ -853,7 +842,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             })
 
             //place table update
-            var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceInfo!!.place_key)
+            var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .child(m_PlaceInfo!!.place_key)
 
             pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot?) {
@@ -901,7 +891,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         fileRef.putBytes(byteArr)
         .addOnSuccessListener { taskSnapshot ->
             //update
-            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
+            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .child(m_PlaceInfo!!.place_key).push()//where
+
             pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot?) {
@@ -920,7 +913,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             })
 
             //place table update
-            var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceInfo!!.place_key)
+            var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .child(m_PlaceInfo!!.place_key)
+
             pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot?) {
                     if (dataSnapshot!!.exists()) {

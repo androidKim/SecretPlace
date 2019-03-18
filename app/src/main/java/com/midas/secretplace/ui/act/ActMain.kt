@@ -417,7 +417,9 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
     fun deletePlaceTableData()
     {
         var pQuery: Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)
+                .orderByKey().equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())
+
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
@@ -463,14 +465,19 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
                     children.forEach {
                         var pInfo:place = it.getValue(place::class.java)!!
 
-                        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
+                        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                                .child(pInfo.place_key)//where
                         pDbRef!!.removeValue()
 
                         //file storage remove
                         storageDeleteItemProc(pInfo.place_key!!)
 
                         //file data remove
-                        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
+                        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                                .child(pInfo.place_key)//where
+
                         pDbRef!!.removeValue()
                     }
                 }
@@ -492,7 +499,9 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
     fun deleteGroupPlaceTableData()
     {
         var pQuery: Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)
+                .orderByKey().equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())
+
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
@@ -539,14 +548,19 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
                     children.forEach {
                         var pInfo:place = it.getValue(place::class.java)!!
 
-                        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.child(pInfo.place_key)//where
+                        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                                .child(pInfo.place_key)//where
                         pDbRef!!.removeValue()
 
                         //file storage remove
                         storageDeleteItemProc(pInfo.place_key!!)
 
                         //file data remove
-                        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
+                        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                                .child(pInfo.place_key)//where
+
                         pDbRef!!.removeValue()
                     }
                 }
@@ -567,7 +581,9 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
     fun deleteGroupTableData()
     {
         var pQuery: Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
+                .orderByKey().equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())
+
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
@@ -613,7 +629,10 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
                     children.forEach {
                         var pInfo:group = it.getValue(group::class.java)!!
 
-                        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!.child(pInfo.group_key)//where
+                        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                                .child(pInfo.group_key)//where
+
                         pDbRef!!.removeValue()
 
                     }
@@ -637,7 +656,10 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
         val storageRef = FirebaseStorage.getInstance(Constant.FIRE_STORE_URL)
 
         var pQuery:Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(placeKey).child("img_list")//where
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(placeKey).orderByKey()
+
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
@@ -721,7 +743,9 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
     fun deleteUserTableData()
     {
         var pQuery: Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).child(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+
         pQuery.removeValue()
     }
     //--------------------------------------------------------------

@@ -217,7 +217,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         progressBar.visibility = View.VISIBLE
         m_bRunning = true
         var pQuery:Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_App!!.m_SpCtrl!!.getSpUserKey()).orderByKey()
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
@@ -388,16 +388,18 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             pInfo!!.name = editName.text.toString()
 
             var pDbRef:DatabaseReference? = null
-            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.push()//insert..
+            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())!!.push()!!//insert..
             pDbRef!!.setValue(pInfo!!)//insert
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(dataSnapshot: DataSnapshot?)
                 {
                     if (dataSnapshot!!.exists())
                     {
-                        //m_strPlaceLastSeq = dataSnapshot!!.key
-                        pInfo!!.place_key = dataSnapshot!!.key
-                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(dataSnapshot!!.key)!!.setValue(pInfo)//update..
+                        //key update
+                        var key = dataSnapshot!!.key
+                        pInfo.place_key = key;
+                        pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())!!.child(key)!!//
+                        pDbRef!!.setValue(pInfo)//insert
                         m_Adapter!!.addData(pInfo!!)
                     }
                 }
@@ -441,7 +443,10 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         val storageRef = FirebaseStorage.getInstance(Constant.FIRE_STORE_URL)
 
         var pQuery:Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(placeKey).child("img_list")//where
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(placeKey).orderByKey()
+
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
@@ -538,14 +543,19 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     override fun deleteProc(pInfo: place)
     {
         //place data remove
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(pInfo.place_key)//where
         pDbRef!!.removeValue()
 
         //file storage remove
         storageDeleteItemProc(pInfo.place_key!!)
 
         //file data remove
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(pInfo.place_key)//where
+
         pDbRef!!.removeValue()
 
         //refresh

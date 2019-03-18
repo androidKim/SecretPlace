@@ -386,7 +386,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         val storageRef = FirebaseStorage.getInstance(Constant.FIRE_STORE_URL)
 
         var pQuery:Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(placeKey).child("img_list")//where
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(placeKey).orderByKey()
+
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
@@ -478,14 +481,16 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //image list..
         var pQuery:Query?= null
 
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE).orderByChild("group_key").equalTo(m_GroupInfo!!.group_key)//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .orderByChild("group_key")
+                .equalTo(m_GroupInfo!!.group_key)
+
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 // A new message has been added
-                // onChildAdded() will be called for each node at the first time
                 val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                //m_strPlaceLastSeq = dataSnapshot!!.key
                 pInfo.place_key = dataSnapshot!!.key
                 m_arrPlace!!.add(pInfo!!)
                 m_PlaceAdapter!!.notifyDataSetChanged()
@@ -501,7 +506,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 Log.e("TAG", "onChildRemoved:" + dataSnapshot!!.key)
 
                 // A message has been removed
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -509,7 +513,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 Log.e("TAG", "onChildMoved:" + dataSnapshot!!.key)
 
                 // A message has changed position
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onCancelled(databaseError: DatabaseError?)
@@ -583,7 +586,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             pInfo!!.name = editName.text.toString()
 
             var pDbRef:DatabaseReference? = null
-            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.push()//insert..
+            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()).push()//insert..
+
             pDbRef!!.setValue(pInfo!!)//insert
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -593,7 +598,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                         m_bModify = true
 
                         pInfo!!.place_key = dataSnapshot!!.key
-                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.child(dataSnapshot!!.key).setValue(pInfo)//update..
+                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                                .child(dataSnapshot!!.key).setValue(pInfo)//update..
+
                         setRefresh()
                     }
                 }

@@ -45,6 +45,17 @@ RecyclerView.Adapter<PlaceRvAdapter.ViewHolder>()
     override fun onBindViewHolder(holder: ViewHolder, position: Int)
     {
         var pInfo: place = placeList[position]
+
+        if(!pInfo.group_key.equals(""))//그룹 위치 리스트
+        {
+
+        }
+        else//단일 위치리스트..
+        {
+
+        }
+
+        //..
         if(!pInfo.img_url.equals(""))
         {
             requestManager
@@ -71,7 +82,6 @@ RecyclerView.Adapter<PlaceRvAdapter.ViewHolder>()
             requestManager.clear(holder.ivThumbnail)
             holder.ivThumbnail!!.setBackgroundResource(R.drawable.ic_image_black_100dp)
         }
-
 
         if(!pInfo.name.equals(""))//위치명
         {

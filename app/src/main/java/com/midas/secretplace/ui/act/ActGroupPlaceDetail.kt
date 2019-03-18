@@ -399,7 +399,9 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
     fun getPlaceInfoProc(seq:String)
     {
         //place Object
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.child(seq)//where
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(seq)//where
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
         {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -437,40 +439,29 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         //image list..
         var pQuery:Query?= null
 
-        //if(m_strImgLastSeq != null)
-            //pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child("place_key").startAt(m_PlaceInfo!!.place_key).limitToFirst(ReqBase.ITEM_COUNT)
-        //else
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").orderByKey()//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_PlaceInfo!!.place_key).orderByKey()
 
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 // A new message has been added
-                // onChildAdded() will be called for each node at the first time
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
-
-                // A message has changed
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot?)
             {
                 //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
-
-                // A message has been removed
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
-
-                // A message has changed position
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onCancelled(databaseError: DatabaseError?)
@@ -486,28 +477,8 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                 {
                     val children = dataSnapshot!!.children
                     children.forEach {
-
-                        //if(m_strImgLastSeq != null)
-                        //{
-                            //if(!m_strImgLastSeq.equals(it!!.key))
-                            //{
-                                //m_strImgLastSeq = it!!.key
-
-                                var strUrl:String = it.getValue(String::class.java)!!
-                                m_Adapter!!.addItem(strUrl)
-                            //}
-                            //else//not add same key..
-                            //{
-                                //m_bFinish = true//get lastitem detect
-                            //}
-                        //}
-                        //else
-                        //{
-                            //m_strImgLastSeq = it!!.key
-
-                            //var strUrl:String = it.getValue(String::class.java)!!
-                            //m_Adapter!!.addItem(strUrl)
-                        //}
+                        var strUrl:String = it.getValue(String::class.java)!!
+                        m_Adapter!!.addItem(strUrl)
                     }
                 }
                 else
@@ -869,7 +840,9 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     //val uri = taskSnapshot.downloadUrl
 
                     //update
-                    var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
+                    var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                            .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            .child(m_PlaceInfo!!.place_key).push()//where
                     pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
                     pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot?) {
@@ -888,7 +861,10 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     })
 
                     //place table update
-                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceInfo!!.place_key)
+                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+                            .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            .child(m_PlaceInfo!!.place_key)
+
                     pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot?) {
                             if (dataSnapshot!!.exists()) {
@@ -937,7 +913,9 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     //val uri = taskSnapshot.downloadUrl
 
                     //update
-                    var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
+                    var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                            .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            .child(m_PlaceInfo!!.place_key).push()//where
                     pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
                     pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot?) {
@@ -956,7 +934,9 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     })
 
                     //place table update
-                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_PlaceInfo!!.place_key)
+                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+                            .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            .child(m_PlaceInfo!!.place_key)
 
                     pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot?) {
@@ -980,7 +960,6 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     // progress percentage
                     val progress = 100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
 
-                    // percentage in progress dialog
                     val intProgress = progress.toInt()
                     tv_Progress.text = "Uploaded " + intProgress + "%..."
                 }
