@@ -7,19 +7,20 @@ class user
 {
     companion object
     {
-        val SNS_TYPE_GOOGLE:String = "G"
-        val SNS_TYPE_KAKAO:String = "K"
-        val SNS_TYPE_FACEBOOK:String = "F"
-        val SNS_TYPE_TWITTER:String = "T"
-        val SNS_TYPE_NAVER:String = "N"
-        val SNS_TYPE_INSTARGRAM:String = "I"
+        val JOIN_TYPE_ANONY:String = "N"
+        val JOIN_TYPE_GOOGLE:String = "G"
+        val JOIN_TYPE_KAKAO:String = "K"
+        val JOIN_TYPE_FACEBOOK:String = "F"
+        val JOIN_TYPE_TWITTER:String = "T"
+        val JOIN_TYPE_NAVER:String = "N"
+        val JOIN_TYPE_INSTARGRAM:String = "I"
     }
 
-    var sns_type:String? = null
-    var sns_key:String? = null
-    var user_key:String? = null
-    var name:String? = null
-    var img_url:String? = null
+    var sns_type:String? = ""
+    var sns_key:String? = ""
+    var user_key:String? = ""
+    var name:String? = ""
+    var img_url:String? = ""
 
     constructor()
     {

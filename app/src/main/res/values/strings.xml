@@ -19,7 +19,7 @@
     <string name="str_ok" >예</string>
     <string name="str_no" >아니오</string>
     <string name="str_cancel" >취소</string>
-    <string name="str_menu">기타</string>
+    <string name="str_menu">메뉴</string>
     <string name="str_msg_1">로그아웃</string>
     <string name="str_msg_2">로그아웃 하시겠습니까?</string>
     <string name="str_msg_3">현재 장소를 저장하시겠습니까?</string>
@@ -85,4 +85,6 @@
     <string name="str_share_my_location">나의 위치(주소, GPS좌표)를 공유합니다</string>
     <string name="str_not_valid_key">유효한 키가 아닙니다.</string>
     <string name="str_no_exit_location">저장된 위치가 없어요.</string>
+    <string name="str_anonymous_login">익명 로그인</string>
+    <string name="anonymous_login_desc">익명 로그인은 앱을 삭제하거나\n다른방식으로 로그인하면 데이터가 손실됩니다.</string>
 </resources>

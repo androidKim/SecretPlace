@@ -19,7 +19,7 @@
     <string name="str_ok">Yes</string>
     <string name="str_no">No</string>
     <string name="str_cancel">Cancel</string>
-    <string name="str_menu">etc</string>
+    <string name="str_menu">Menu</string>
     <string name="str_msg_1">Logout</string>
     <string name="str_msg_2">Logout?</string>
     <string name="str_msg_3">Save this place?</string>
@@ -85,4 +85,6 @@
     <string name="str_share_my_location">Share my location (address, GPS coordinates)</string>
     <string name="str_not_valid_key">It is not a valid key.</string>
     <string name="str_no_exit_location">There are no saved locations.</string>
+    <string name="str_anonymous_login">Anonymous Login</string>
+    <string name="anonymous_login_desc">Anonymous logins will lose data if you delete apps or sign in differently.</string>
 </resources>

@@ -566,7 +566,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         if(bCheckLocation)
         {
-            var pInfo:place = place(m_GroupInfo!!.user_key!!, "", m_GroupInfo!!.group_key!!, "", String.format("%s",mLocation.latitude), String.format("%s",mLocation.longitude), "", "", "")
+            var address:String? = Util.getAddress(m_Context!!, mLocation.latitude, mLocation.longitude)
+            var pInfo:place = place(m_GroupInfo!!.user_key!!, "", m_GroupInfo!!.group_key!!, "", String.format("%s",mLocation.latitude), String.format("%s",mLocation.longitude), "", address!!, "")
             showPlaceInputDialog(pInfo)
         }
     }
@@ -587,7 +588,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             var pDbRef:DatabaseReference? = null
             pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()).push()//insert..
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .push()//insert..
 
             pDbRef!!.setValue(pInfo!!)//insert
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
@@ -740,7 +742,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         //update
         var pDbRef: DatabaseReference? = null
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP).child(m_GroupInfo!!.group_key)
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_GroupInfo!!.group_key)
+
         pDbRef!!.setValue(m_GroupInfo!!)
 
         pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -836,14 +841,20 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun deleteProc(pInfo: place)
     {
         //place data remove
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.child(pInfo.place_key)//where
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(pInfo.place_key)//where
+
         pDbRef!!.removeValue()
 
         //file storage remove
         storageDeleteItemProc(pInfo.place_key!!)
 
         //file data remove
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(pInfo.place_key)//where
+
         pDbRef!!.removeValue()
 
         //refresh

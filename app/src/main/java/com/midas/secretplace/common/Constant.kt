@@ -6,6 +6,7 @@ class Constant
     {
         //URL
         val FIRE_STORE_URL = "gs://secretplace-29d5e.appspot.com"
+        val TERM_URL = "http://54.180.109.122:8081/terms"
 
         //Intent
         val INTENT_DATA_PLACE_OBJECT:String = "INTENT_DATA_PLACE_OBJECT"

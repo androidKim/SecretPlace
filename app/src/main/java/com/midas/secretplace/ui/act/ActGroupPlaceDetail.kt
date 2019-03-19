@@ -661,7 +661,10 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         m_PlaceInfo!!.name = strName
 
         var pDbRef: DatabaseReference? = null
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE).child(m_PlaceInfo!!.place_key)
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_PlaceInfo!!.place_key)
+
         pDbRef!!.setValue(m_PlaceInfo!!)
 
         pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {

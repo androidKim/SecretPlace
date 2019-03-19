@@ -43,10 +43,17 @@
         <com.google.android.gms.common.SignInButton
             android:id="@+id/google_sign_in_button"
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/facebook_sign_in_button"
             android:layout_marginTop="10dp" />
+
+        <Button
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:id="@+id/btnAnonymousLogin"
+            style="@style/loginButtonStyle"
+            android:text="@string/str_anonymous_login" />
     </LinearLayout>
 
 

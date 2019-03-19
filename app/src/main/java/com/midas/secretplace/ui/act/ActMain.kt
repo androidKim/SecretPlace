@@ -805,6 +805,7 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
 
         when(item.itemId)
         {
+            /*
             R.id.my_information ->//내정보
             {
                 goMyInformationActivity()
@@ -815,6 +816,7 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
                 goCoupleActivity()
                 return true
             }
+            */
             R.id.theme ->//테마설정
             {
                 showThmeSelectDialog()
@@ -825,11 +827,13 @@ class ActMain:ActBase(), NavigationView.OnNavigationItemSelectedListener, ThemeC
                 showLogoutDialog()
                 return true
             }
+            /*
             R.id.delete ->//회원탈퇴
             {
                 showMemberDeleteDialog()
                 return true
             }
+            */
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return result

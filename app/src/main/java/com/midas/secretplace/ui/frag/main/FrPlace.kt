@@ -231,8 +231,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 {
                     m_bPagingFinish = true
                 }
-
-                progressBar.visibility = View.GONE
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -388,7 +386,10 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             pInfo!!.name = editName.text.toString()
 
             var pDbRef:DatabaseReference? = null
-            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())!!.push()!!//insert..
+            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())!!
+                    .push()!!//insert..
+
             pDbRef!!.setValue(pInfo!!)//insert
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -397,8 +398,11 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                     {
                         //key update
                         var key = dataSnapshot!!.key
-                        pInfo.place_key = key;
-                        pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())!!.child(key)!!//
+                        pInfo.place_key = key
+                        pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())!!
+                                .child(key)!!//
+
                         pDbRef!!.setValue(pInfo)//insert
                         m_Adapter!!.addData(pInfo!!)
                     }

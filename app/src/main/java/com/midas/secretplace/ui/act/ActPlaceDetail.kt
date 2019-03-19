@@ -363,7 +363,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun getPlaceInfoProc(seq:String)
     {
         //place Object
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(seq)//where
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(seq)//where
+
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
         {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -642,7 +645,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         m_PlaceInfo!!.name = strName
 
         var pDbRef: DatabaseReference? = null
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_PlaceInfo!!.place_key)
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey()).child(m_PlaceInfo!!.place_key)
         pDbRef!!.setValue(m_PlaceInfo!!)
 
         pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -820,7 +824,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             //val uri = taskSnapshot.downloadUrl
 
             //img table update
-            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
+            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
                     .child(m_PlaceInfo!!.place_key).push()//where
             pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
 
@@ -842,7 +847,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             })
 
             //place table update
-            var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
+            var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
                     .child(m_PlaceInfo!!.place_key)
 
             pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {

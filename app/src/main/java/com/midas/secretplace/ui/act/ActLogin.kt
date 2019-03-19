@@ -29,6 +29,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.firebase.auth.*
 import com.google.firebase.database.*
 import com.midas.secretplace.R
+import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.user
 import com.midas.secretplace.ui.MyApp
@@ -108,7 +109,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     {
         super.onStart()
          // Check if vm_user is signed in (non-null) and update UI accordingly.
-        //FirebaseUser currentUser = mAuth.getCurrentUser();
+        //var currentUser:FirebaseUser  = mAuth!!.currentUser!!
         //updateUI(currentUser);
     }
 
@@ -172,6 +173,53 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         setFacebookSign()
         setGoogleSign()
         getHashKey()
+
+        //익명로그인은 앱을 재설치하면 키가 바뀜..
+        btnAnonymousLogin.setOnClickListener {
+            mAuth!!.signInAnonymously()
+                    .addOnCompleteListener(this) { task ->
+                        if (task.isSuccessful) {
+                            progressBar.visibility = View.VISIBLE
+
+                            val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(currentFirebaseUser!!.uid)
+                            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(p0: DataSnapshot?) {
+                                    val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
+                                    var strUserName: String? = mAuth!!.currentUser!!.displayName
+                                    var strImgUrl: String = ""
+                                    if (p0!!.exists())//exist..
+                                    {
+                                        val pInfo: user = p0!!.getValue(user::class.java)!!
+                                        pInfo.user_key = currentFirebaseUser!!.uid
+                                        pInfo.name = strUserName
+                                        pInfo.img_url = strImgUrl
+                                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pInfo.user_key).setValue(pInfo)//update..
+                                    }
+                                    else
+                                    {
+                                        val pInfo: user = user()
+                                        pInfo.user_key = currentFirebaseUser!!.uid
+                                        pDbRef!!.push().setValue(pInfo!!)//insert
+                                    }
+
+                                    m_App!!.m_SpCtrl!!.setSpUserKey(currentFirebaseUser!!.uid!!)
+                                    m_App!!.m_SpCtrl!!.setSnsType(user.JOIN_TYPE_ANONY)
+                                    progressBar.visibility = View.GONE
+                                    Toast.makeText(m_Context!!, m_Context!!.resources!!.getString(R.string.anonymous_login_desc), Toast.LENGTH_LONG).show()
+                                    m_App!!.goMain(m_Context!!)
+                                }
+
+                                override fun onCancelled(p0: DatabaseError?) {
+                                    progressBar.visibility = View.GONE
+                                }
+                            })
+                        } else {
+
+
+                        }
+                    }
+        }
     }
 
     //-----------------------------------------------
@@ -216,7 +264,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
             }
 
             termsDetailClickListener {
-                val url = "http://54.180.109.122:8081/terms"
+                val url = Constant.TERM_URL
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
             }
 
@@ -224,7 +272,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                 if(m_bCheck)
                 {
                     //join..
-                    if(userInfo.sns_type.equals(user.SNS_TYPE_TWITTER))
+                    if(userInfo.sns_type.equals(user.JOIN_TYPE_TWITTER))
                     {
                         var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!
                         val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
@@ -235,7 +283,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         userInfo.img_url = strImgUrl
                         pDbRef!!.child(userInfo.user_key).setValue(userInfo!!)//insert
                     }
-                    else if(userInfo.sns_type.equals(user.SNS_TYPE_FACEBOOK))
+                    else if(userInfo.sns_type.equals(user.JOIN_TYPE_FACEBOOK))
                     {
                         var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!
                         val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
@@ -246,7 +294,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         userInfo.img_url = strImgUrl
                         pDbRef!!.child(userInfo.user_key).setValue(userInfo!!)//insert
                     }
-                    else if(userInfo.sns_type.equals(user.SNS_TYPE_GOOGLE))
+                    else if(userInfo.sns_type.equals(user.JOIN_TYPE_GOOGLE))
                     {
                         var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!
                         val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
@@ -307,7 +355,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         var strUserName:String? = mAuth!!.currentUser!!.displayName
                         var strImgUrl: String = ""
 
-                        var pInfo: user = user(user.SNS_TYPE_TWITTER, snsKey!!, "", strUserName!!, strImgUrl)
+                        var pInfo: user = user(user.JOIN_TYPE_TWITTER, snsKey!!, "", strUserName!!, strImgUrl)
 
                         var pQuery:Query= m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).orderByChild("sns_key").equalTo(snsKey)
                         pQuery.addChildEventListener(object : ChildEventListener {
@@ -324,7 +372,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                     pRes.img_url = strImgUrl
                                     m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key).setValue(pRes)//update..
                                     m_App!!.m_SpCtrl!!.setSpUserKey(pRes.user_key!!)
-                                    m_App!!.m_SpCtrl!!.setSnsType(user.SNS_TYPE_TWITTER)
+                                    m_App!!.m_SpCtrl!!.setSnsType(user.JOIN_TYPE_TWITTER)
                                     m_App!!.goMain(m_Context!!)
                                 }
                                 else
@@ -434,7 +482,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         if(strImgUrl == null)
                             strImgUrl = ""
 
-                        var pInfo: user = user(user.SNS_TYPE_FACEBOOK, snsKey!!, "", strUserName!!, strImgUrl)
+                        var pInfo: user = user(user.JOIN_TYPE_FACEBOOK, snsKey!!, "", strUserName!!, strImgUrl)
 
                         var pQuery:Query= m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).orderByChild("sns_key").equalTo(snsKey)
                         pQuery.addChildEventListener(object : ChildEventListener {
@@ -451,7 +499,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                     pRes.img_url = strImgUrl
                                     m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key).setValue(pRes)//update..
                                     m_App!!.m_SpCtrl!!.setSpUserKey(pRes.user_key!!)
-                                    m_App!!.m_SpCtrl!!.setSnsType(user.SNS_TYPE_FACEBOOK)
+                                    m_App!!.m_SpCtrl!!.setSnsType(user.JOIN_TYPE_FACEBOOK)
                                     m_App!!.goMain(m_Context!!)
                                 }
                                 else
@@ -547,7 +595,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                 if(strImgUrl == null)
                     strImgUrl = ""
 
-                var pInfo: user = user(user.SNS_TYPE_GOOGLE, snsKey!!, "", strUserName!!, strImgUrl)
+                var pInfo: user = user(user.JOIN_TYPE_GOOGLE, snsKey!!, "", strUserName!!, strImgUrl)
 
                 var pQuery:Query= m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).orderByChild("sns_key").equalTo(snsKey)
                 pQuery.addChildEventListener(object : ChildEventListener {
@@ -560,7 +608,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                             pRes.user_key = currentFirebaseUser!!.uid
                             m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key).setValue(pRes)//update..
                             m_App!!.m_SpCtrl!!.setSpUserKey(pRes.user_key!!)
-                            m_App!!.m_SpCtrl!!.setSnsType(user.SNS_TYPE_GOOGLE)
+                            m_App!!.m_SpCtrl!!.setSnsType(user.JOIN_TYPE_GOOGLE)
                             m_App!!.goMain(m_Context!!)
                         }
                         else

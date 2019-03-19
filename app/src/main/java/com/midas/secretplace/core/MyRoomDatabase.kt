@@ -4,6 +4,7 @@ import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
 import android.content.Context
+import com.midas.secretplace.structure.room.dao_place
 import com.midas.secretplace.structure.room.dao_user
 import com.midas.secretplace.structure.room.data_user
 
@@ -12,6 +13,7 @@ import com.midas.secretplace.structure.room.data_user
 abstract class MyRoomDatabase : RoomDatabase() {
 
     abstract fun userDao(): dao_user
+    abstract fun placeDao(): dao_place
     companion object
     {
 
