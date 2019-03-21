@@ -6,10 +6,11 @@ import android.arch.persistence.room.RoomDatabase
 import android.content.Context
 import com.midas.secretplace.structure.room.dao_place
 import com.midas.secretplace.structure.room.dao_user
+import com.midas.secretplace.structure.room.data_place
 import com.midas.secretplace.structure.room.data_user
 
 
-@Database(entities = [data_user::class], version = 1, exportSchema = false)
+@Database(entities = [data_user::class, data_place::class], version = 1, exportSchema = false)
 abstract class MyRoomDatabase : RoomDatabase() {
 
     abstract fun userDao(): dao_user

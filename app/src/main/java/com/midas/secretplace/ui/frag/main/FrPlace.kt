@@ -1,6 +1,8 @@
 package com.midas.secretplace.ui.frag.main
 
 import android.app.Activity
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -30,6 +32,8 @@ import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.place
+import com.midas.secretplace.structure.room.data_place
+import com.midas.secretplace.structure.vm.vm_place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
 import com.midas.secretplace.ui.act.ActMapDetail
@@ -46,6 +50,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     /**************************** Define ****************************/
 
     /**************************** Member ****************************/
+    private var mViewModelPlace: vm_place?= null//mvvm
     var m_Context: Context? = null
     var m_Activity:Activity? = null
     var m_App:MyApp? = null
@@ -123,8 +128,24 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     }
     //------------------------------------------------------------------------
     //
+    fun setViewModel(){
+        mViewModelPlace = ViewModelProviders.of(this).get(vm_place::class.java)
+        mViewModelPlace?.deleteAll()//init..
+        mViewModelPlace?.placeList?.observe(this, object : Observer<List<data_place>> {
+            override fun onChanged(list: List<data_place>?) {
+                if(list != null)
+                {
+                    return
+                }
+            }
+        })
+    }
+    //------------------------------------------------------------------------
+    //
     fun setInitLayout()
     {
+        setViewModel()
+
         //event..
         ly_SwipeRefresh.setOnRefreshListener(this)
 
@@ -264,6 +285,18 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                     children.forEach {
                         val pInfo:place = it!!.getValue(place::class.java)!!
                         m_Adapter!!.addData(pInfo)
+
+                        var dataPlace:data_place = data_place(0,
+                                pInfo!!.user_key!!,
+                                pInfo!!.place_key!!,
+                                pInfo!!.group_key!!,
+                                pInfo!!.name!!,
+                                pInfo!!.lat!!,
+                                pInfo!!.lng!!,
+                                pInfo!!.memo!!,
+                                pInfo!!.address!!,
+                                pInfo!!.img_url!!)
+                        mViewModelPlace?.insert(dataPlace)//
                     }
                 }
                 else
@@ -405,6 +438,18 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
                         pDbRef!!.setValue(pInfo)//insert
                         m_Adapter!!.addData(pInfo!!)
+
+                        var dataPlace:data_place = data_place(0,
+                                pInfo!!.user_key!!,
+                                pInfo!!.place_key!!,
+                                pInfo!!.group_key!!,
+                                pInfo!!.name!!,
+                                pInfo!!.lat!!,
+                                pInfo!!.lng!!,
+                                pInfo!!.memo!!,
+                                pInfo!!.address!!,
+                                pInfo!!.img_url!!)
+                        mViewModelPlace?.insert(dataPlace)//
                     }
                 }
 

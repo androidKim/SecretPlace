@@ -12,19 +12,24 @@ import com.midas.secretplace.structure.room.data_user
 
 class PlaceRepository(application: Application)
 {
-    var placeDao: dao_place? = null
-    var placeList: MutableLiveData<ArrayList<data_place>>? = null
+    private var placeDao: dao_place? = null
+    private var placeList: LiveData<List<data_place>>? = null
 
 
     init {
         val placeRoomDatabase = MyRoomDatabase.getDatabase(application)
         placeDao = placeRoomDatabase?.placeDao()!!
-        placeList = placeDao?.getPlaceList()
+        placeList = placeDao?.selectAll()
     }
 
 
-    fun getPlaceList():MutableLiveData<ArrayList<data_place>> {
+    fun selectAll():LiveData<List<data_place>> {
         return placeList!!
+    }
+
+    fun deleteAll()
+    {
+        deleteAllAsyncTask(placeDao!!).execute()
     }
 
     fun insert(pInfo: data_place) {
@@ -48,6 +53,14 @@ class PlaceRepository(application: Application)
 
         override fun doInBackground(vararg params: data_place): Void? {
             mAsyncTaskDao.update(params[0])
+            return null
+        }
+    }
+
+    private class deleteAllAsyncTask internal constructor(private val mAsyncTaskDao: dao_place) : AsyncTask<Void, Void, Void>() {
+
+        override fun doInBackground(vararg params: Void): Void? {
+            mAsyncTaskDao.deleteAll()
             return null
         }
     }

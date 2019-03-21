@@ -13,11 +13,11 @@ import com.midas.secretplace.structure.room.data_user
 class vm_place (application: Application) : AndroidViewModel(application) {
 
     var placeRepository: PlaceRepository? = null
-    var placeList: MutableLiveData<ArrayList<data_user>>? = null
+    var placeList: LiveData<List<data_place>>? = null
 
     init {
         placeRepository = PlaceRepository(application)
-        placeList = placeRepository!!.getPlaceList()
+        placeList = placeRepository!!.selectAll()
     }
 
     fun insert(pInfo: data_place) {
@@ -28,7 +28,11 @@ class vm_place (application: Application) : AndroidViewModel(application) {
         placeRepository!!.update(pInfo)
     }
 
+    fun deleteAll(){
+        placeRepository!!.deleteAll()
+    }
+
     fun select() {
-        placeRepository!!.getPlaceList()
+        placeRepository!!.selectAll()
     }
 }

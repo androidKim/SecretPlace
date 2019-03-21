@@ -1,11 +1,6 @@
 package com.midas.secretplace.structure.room
-
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.Query
-import android.arch.persistence.room.Update
+import android.arch.persistence.room.*
 
 @Dao
 interface dao_place {
@@ -19,5 +14,5 @@ interface dao_place {
     fun deleteAll()
 
     @Query("SELECT * FROM tb_place")
-    fun getPlaceList(): MutableLiveData<ArrayList<data_place>>
+    fun selectAll(): LiveData<List<data_place>>
 }
