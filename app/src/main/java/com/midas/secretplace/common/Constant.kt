@@ -47,5 +47,10 @@ class Constant
         val THEME_GRAY:String = "THEME_GRAY"
         val THEME_BLUEGRAY:String = "THEME_BLUEGRAY"
         //Define..
+
+        //image
+        val IMAGE_DIRECTORY = "/scplace"
+        val REQUEST_TAKE_PHOTO = 1001
+        val REQUEST_SELECT_IMAGE_IN_ALBUM = 1002
     }
 }

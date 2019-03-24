@@ -194,13 +194,13 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                         pInfo.user_key = currentFirebaseUser!!.uid
                                         pInfo.name = strUserName
                                         pInfo.img_url = strImgUrl
-                                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pInfo.user_key).setValue(pInfo)//update..
+                                        pDbRef!!.setValue(pInfo)//update..
                                     }
                                     else
                                     {
                                         val pInfo: user = user()
                                         pInfo.user_key = currentFirebaseUser!!.uid
-                                        pDbRef!!.push().setValue(pInfo!!)//insert
+                                        pDbRef!!.setValue(pInfo!!)//insert
                                     }
 
                                     m_App!!.m_SpCtrl!!.setSpUserKey(currentFirebaseUser!!.uid!!)

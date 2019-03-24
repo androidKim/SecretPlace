@@ -258,9 +258,10 @@
         <item name="android:background">@drawable/shape_btn_round</item>
     </style>
     <!-- Toolbar Style -->
-    <style name="ToolBarStyle.Base" parent="">
+    <style name="ToolBarStyle.Base" parent="Base.Theme.AppCompat.Light.DarkActionBar">
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="actionMenuTextColor">@color/color_black</item>
     </style>
 
     <!-- progressBar style -->

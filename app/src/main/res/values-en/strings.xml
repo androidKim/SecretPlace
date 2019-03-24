@@ -14,12 +14,16 @@
     <string name="str_tab_title_my">Location</string>
     <string name="str_tab_title_group">Location Group</string>
     <string name="str_tab_title_couple">Couple</string>
-    <string name="action_share">Share</string>
+    <string name="appbar_menu_1">Share</string>
+    <string name="appbar_menu_2">Share</string>
+    <string name="appbar_menu_3">Map</string>
+    <string name="appbar_menu_4">Edit</string>
+    <string name="appbar_menu_5">Photo</string>
 
     <string name="str_ok">Yes</string>
     <string name="str_no">No</string>
     <string name="str_cancel">Cancel</string>
-    <string name="str_menu">Menu</string>
+    <string name="support">Support</string>
     <string name="str_msg_1">Logout</string>
     <string name="str_msg_2">Logout?</string>
     <string name="str_msg_3">Save this place?</string>
@@ -87,4 +91,10 @@
     <string name="str_no_exit_location">There are no saved locations.</string>
     <string name="str_anonymous_login">Anonymous Login</string>
     <string name="anonymous_login_desc">Anonymous logins will lose data if you delete apps or sign in differently.</string>
+    <string name="share_location">ShareLocation</string>
+    <string name="people">People</string>
+    <string name="poular_location">PoularLocation</string>
+    <string name="setting">Settings</string>
+    <string name="add_profile_img">Try adding a profile image.</string>
+    <string name="gallery_file_error">Could not load photo file.</string>
 </resources>

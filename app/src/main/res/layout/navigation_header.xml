@@ -1,27 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="200dp"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:background="@color/color_white">
 
 
     <ImageView
         android:id="@+id/iv_Profile"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/color_white"
         android:scaleType="fitXY"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:visibility="visible" />
 
-    <ImageView
-        tools:visibility="visible"
-        android:id="@+id/iv_None"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+
+    <LinearLayout
+        android:id="@+id/lyNoneProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:background="@drawable/baseline_face_black_48"
-        android:visibility="gone" />
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/baseline_face_black_48"
+            tools:visibility="visible" />
+
+        <TextView
+            style="@style/TextViewMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/add_profile_img"
+            tools:text="프로필 이미지를 추가해보세요."
+            tools:visibility="visible" />
+    </LinearLayout>
+
 
     <View
+        android:id="@+id/line"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_alignParentBottom="true"

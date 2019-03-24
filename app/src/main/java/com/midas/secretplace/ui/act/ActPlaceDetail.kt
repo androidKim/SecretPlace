@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -19,12 +20,16 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.view.menu.MenuBuilder
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.AbsListView
@@ -81,14 +86,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }.create()
 
     /*********************** Define ***********************/
-    //-------------------------------------------------------------
-    //
-    companion object
-    {
-        private val IMAGE_DIRECTORY = "/scplace"
-        private val REQUEST_TAKE_PHOTO = 1001
-        private val REQUEST_SELECT_IMAGE_IN_ALBUM = 1002
-    }
     /*********************** Member ***********************/
     var m_App: MyApp? = null
     var m_Context: Context? = null
@@ -151,11 +148,11 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)//Intent?  <-- null이 올수도있다
     {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM)//select gallery
+        if(requestCode == Constant.REQUEST_SELECT_IMAGE_IN_ALBUM)//select gallery
         {
             if (data != null) {
                 m_bitmapRotateBitmap = null
-                m_nUploadPhotoType = REQUEST_SELECT_IMAGE_IN_ALBUM
+                m_nUploadPhotoType = Constant.REQUEST_SELECT_IMAGE_IN_ALBUM
                 val contentURI = data!!.data
                 try {
                     showPhotoFilterDialog(contentURI!!)
@@ -165,18 +162,18 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }
             else
             {
-                Toast.makeText(this, "No File!", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, m_Context!!.resources.getString(R.string.gallery_file_error), Toast.LENGTH_LONG).show()
             }
 
         }
-        else if (requestCode == REQUEST_TAKE_PHOTO)//take photo
+        else if (requestCode == Constant.REQUEST_TAKE_PHOTO)//take photo
         {
             m_bitmapRotateBitmap = null //
             try
             {
                 try
                 {
-                    m_nUploadPhotoType = REQUEST_TAKE_PHOTO
+                    m_nUploadPhotoType = Constant.REQUEST_TAKE_PHOTO
                     selectedImage = imageUri
                 }
                 catch (e: Exception)
@@ -222,6 +219,41 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }
         }
     }
+    //--------------------------------------------------------------
+    //
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        var menuItem1: MenuItem = menu!!.findItem(R.id.action_share).setVisible(false)
+        var menuItem2: MenuItem = menu!!.findItem(R.id.shareMain).setVisible(true)
+        var menuItem3: MenuItem = menu!!.findItem(R.id.showMap).setVisible(true)
+        var menuItem4: MenuItem = menu!!.findItem(R.id.edit).setVisible(true)
+        var menuItem5: MenuItem = menu!!.findItem(R.id.addPhoto).setVisible(true)
+
+        return super.onCreateOptionsMenu(menu)
+    }
+    //--------------------------------------------------------------
+    //
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle presses on the action bar menu items
+        when (item.itemId) {
+            R.id.shareMain -> {
+                return true
+            }
+            R.id.showMap -> {
+                goMapDetail()
+                return true
+            }
+            R.id.edit -> {
+                editContent()
+                return true
+            }
+            R.id.addPhoto -> {
+                addPhoto()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     /*********************** User Function ***********************/
     //--------------------------------------------------------------
@@ -247,26 +279,22 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun initLayout()
     {
+        toolbar.title = ""
+        setSupportActionBar(toolbar)//enable app bar
+        var actionBar: ActionBar = supportActionBar!!
+        actionBar.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayUseLogoEnabled(true)
+
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
+        }
+
         m_LayoutInflater = LayoutInflater.from(m_Context)
 
         //listener..
         ly_SwipeRefresh.setOnRefreshListener(this)//refresh..
-
-
-        //map dialog
-        ly_ShowMap.setOnClickListener(View.OnClickListener {
-            goMapDetail()
-        })
-
-        //addPhoto..
-        ly_AddPhoto.setOnClickListener(View.OnClickListener {
-            addPhoto()
-        })
-
-        //modify name.
-        ly_EditContent.setOnClickListener(View.OnClickListener {
-            editContent()
-        })
         settingView()
     }
     //--------------------------------------------------------------
@@ -281,7 +309,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     fun settingPlaceView()
     {
         //setTitle..
-        tv_Title.text = m_PlaceInfo!!.name
+        toolbar.title = m_PlaceInfo!!.name
 
         //if(m_Adapter == null)
         //{
@@ -584,7 +612,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         pIntent.type = "image/*"
         if (pIntent.resolveActivity(packageManager) != null)
         {
-            startActivityForResult(pIntent, REQUEST_SELECT_IMAGE_IN_ALBUM)
+            startActivityForResult(pIntent, Constant.REQUEST_SELECT_IMAGE_IN_ALBUM)
         }
     }
     //-------------------------------------------------------------
@@ -595,14 +623,14 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         var timestamp:Long = System.currentTimeMillis()
         var fileName:String = String.format("%s_%s",timestamp, "img")
-        val photo = File((Environment.getExternalStorageDirectory()).toString() + IMAGE_DIRECTORY, fileName)
+        val photo = File((Environment.getExternalStorageDirectory()).toString() + Constant.IMAGE_DIRECTORY, fileName)
 
         pIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(m_Context!!, "com.midas.secretplace.fileprovider", photo))
         imageUri = FileProvider.getUriForFile(m_Context!!, "com.midas.secretplace.fileprovider", photo)
 
         if (pIntent.resolveActivity(packageManager) != null)
         {
-            startActivityForResult(pIntent, REQUEST_TAKE_PHOTO)
+            startActivityForResult(pIntent, Constant.REQUEST_TAKE_PHOTO)
         }
     }
     //-------------------------------------------------------------
@@ -611,7 +639,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         val bytes = ByteArrayOutputStream()
         myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-        val wallpaperDirectory = File((Environment.getExternalStorageDirectory()).toString() + IMAGE_DIRECTORY)
+        val wallpaperDirectory = File((Environment.getExternalStorageDirectory()).toString() + Constant.IMAGE_DIRECTORY)
         // have the object build the directory structure, if needed.
         Log.d("fee",wallpaperDirectory.toString())
         if (!wallpaperDirectory.exists())
@@ -793,8 +821,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
                 when(m_nUploadPhotoType)
                 {
-                    REQUEST_SELECT_IMAGE_IN_ALBUM -> uploadAlbumPhoto(m_UploadImgFile!!)
-                    REQUEST_TAKE_PHOTO -> uploadCameraPhoto(m_UploadImgFile!!)
+                    Constant.REQUEST_SELECT_IMAGE_IN_ALBUM -> uploadAlbumPhoto(m_UploadImgFile!!)
+                    Constant.REQUEST_TAKE_PHOTO -> uploadCameraPhoto(m_UploadImgFile!!)
                 }
 
             }

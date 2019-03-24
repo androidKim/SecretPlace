@@ -101,12 +101,15 @@ class ActMyInformation : AppCompatActivity()
 
         setInitLayout()
     }
-
+    //--------------------------------------------------------------
+    //
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
         var menuItem1:MenuItem = menu!!.findItem(R.id.action_share).setVisible(true)
-        var menuItem2:MenuItem = menu!!.findItem(R.id.onMainShare).setVisible(false)
-        var menuItem3:MenuItem = menu!!.findItem(R.id.onMainMapShow).setVisible(false)
+        var menuItem2:MenuItem = menu!!.findItem(R.id.shareMain).setVisible(false)
+        var menuItem3:MenuItem = menu!!.findItem(R.id.showMap).setVisible(false)
+        var menuItem4:MenuItem = menu!!.findItem(R.id.edit).setVisible(false)
+        var menuItem5:MenuItem = menu!!.findItem(R.id.addPhoto).setVisible(false)
         shareActionProvider = MenuItemCompat.getActionProvider(menuItem1) as ShareActionProvider
         setShareIntent(m_App!!.m_SpCtrl!!.getSpUserKey()+"")
         return super.onCreateOptionsMenu(menu)
@@ -175,7 +178,6 @@ class ActMyInformation : AppCompatActivity()
         actionBar.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.setDisplayUseLogoEnabled(true)
-
         var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)

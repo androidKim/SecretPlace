@@ -253,6 +253,7 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         ly_SwipeRefresh.setOnRefreshListener(this)//refresh..
 
 
+        /*
         //map dialog
         ly_ShowMap.setOnClickListener(View.OnClickListener {
             goMapDetail()
@@ -267,31 +268,7 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         ly_EditContent.setOnClickListener(View.OnClickListener {
             editContent()
         })
-
-        //map expand
-        /*
-        ly_MapExpand.setOnClickListener(View.OnClickListener {
-            ly_MapExpand.visibility = View.GONE
-            ly_MapCollapse.visibility = View.VISIBLE
-
-            //expand map..
-            val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = RelativeLayout.LayoutParams.MATCH_PARENT
-            mapFragment!!.getView()!!.setLayoutParams(params)
-        })
-
-        //map collapse
-        ly_MapCollapse.setOnClickListener(View.OnClickListener {
-
-            ly_MapExpand.visibility = View.VISIBLE
-            ly_MapCollapse.visibility = View.GONE
-
-            val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = 0
-            mapFragment!!.getView()!!.setLayoutParams(params)
-        })
         */
-
         settingView()
     }
     //--------------------------------------------------------------
@@ -317,7 +294,7 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
     fun settingPlaceView()
     {
         //setTitle..
-        tv_Title.text = m_PlaceInfo!!.name
+        //tv_Title.text = m_PlaceInfo!!.name
 
         //if(m_Adapter == null)
         //{

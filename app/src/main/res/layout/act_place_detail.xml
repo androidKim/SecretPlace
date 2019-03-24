@@ -14,79 +14,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <RelativeLayout
-            android:id="@+id/ly_Title"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            style="@style/ToolBarStyle.Base"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp">
-
-
-            <LinearLayout
-                android:id="@+id/ly_AddPhoto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="@drawable/outline_add_photo_alternate_black_18dp" />
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/ly_EditContent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/ly_AddPhoto"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="@drawable/baseline_edit_black_18dp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tv_Title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/ly_ShowMap"
-                android:layout_toRightOf="@+id/ly_EditContent"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:padding="10dp"
-                android:textColor="@color/color_black"
-                android:textSize="15dp"
-                android:textStyle="bold"
-                tools:text="TitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitleTitle" />
-
-            <LinearLayout
-                android:id="@+id/ly_ShowMap"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="@drawable/baseline_map_black_24" />
-            </LinearLayout>
-
-
-        </RelativeLayout>
+            android:layout_height="wrap_content" />
     </RelativeLayout>
+
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/ly_SwipeRefresh"
@@ -134,7 +68,8 @@
         android:textColor="@color/color_black"
         android:textSize="13dp"
         android:visibility="gone"
-        tools:text="60%.." />
+        tools:text="60%.."
+        tools:visibility="visible" />
 
     <ProgressBar
         android:id="@+id/progressBar"
