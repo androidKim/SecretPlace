@@ -91,10 +91,11 @@
     <string name="str_no_exit_location">There are no saved locations.</string>
     <string name="str_anonymous_login">Anonymous Login</string>
     <string name="anonymous_login_desc">Anonymous logins will lose data if you delete apps or sign in differently.</string>
-    <string name="share_location">ShareLocation</string>
+    <string name="open_location">OpenLocation</string>
     <string name="people">People</string>
     <string name="poular_location">PoularLocation</string>
     <string name="setting">Settings</string>
     <string name="add_profile_img">Try adding a profile image.</string>
     <string name="gallery_file_error">Could not load photo file.</string>
+    <string name="share_place_location">Share this location information.</string>
 </resources>

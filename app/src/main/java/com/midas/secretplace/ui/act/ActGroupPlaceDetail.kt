@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -19,12 +20,15 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.AbsListView
@@ -46,7 +50,7 @@ import com.midas.secretplace.ui.adapter.PhotoRvAdapter
 import com.midas.secretplace.ui.custom.dlg_photo_filter
 import com.midas.secretplace.ui.custom.dlg_photo_view
 import com.midas.secretplace.util.Util
-import kotlinx.android.synthetic.main.act_place_detail.*
+import kotlinx.android.synthetic.main.act_group_place_detail.*
 import kotlinx.android.synthetic.main.dlg_photo_filter.view.*
 import kotlinx.android.synthetic.main.dlg_photo_view.view.*
 import java.io.*
@@ -188,7 +192,6 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
             }
         }
     }
-
     //--------------------------------------------------------------
     //permission checking callback
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
@@ -222,7 +225,43 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
             }
         }
     }
+    /*********************** Menu Function ***********************/
+    //--------------------------------------------------------------
+    //
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        var menuItem1: MenuItem = menu!!.findItem(R.id.action_share).setVisible(false)
+        var menuItem2: MenuItem = menu!!.findItem(R.id.share_location).setVisible(true)
+        var menuItem3: MenuItem = menu!!.findItem(R.id.show_map).setVisible(true)
+        var menuItem4: MenuItem = menu!!.findItem(R.id.edit).setVisible(true)
+        var menuItem5: MenuItem = menu!!.findItem(R.id.add_photo).setVisible(true)
 
+        return super.onCreateOptionsMenu(menu)
+    }
+    //--------------------------------------------------------------
+    //
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle presses on the action bar menu items
+        when (item.itemId) {
+            R.id.share_location -> {
+                Util.sharePlaceLocationInfo(this, this, m_PlaceInfo!!)
+                return true
+            }
+            R.id.show_map -> {
+                goMapDetail()
+                return true
+            }
+            R.id.edit -> {
+                editContent()
+                return true
+            }
+            R.id.add_photo -> {
+                addPhoto()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
     /*********************** User Function ***********************/
     //--------------------------------------------------------------
     //
@@ -247,28 +286,22 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
     //
     fun initLayout()
     {
+        toolbar.title = m_PlaceInfo!!.name
+        setSupportActionBar(toolbar)//enable app bar
+        var actionBar: ActionBar = supportActionBar!!
+        actionBar.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayUseLogoEnabled(true)
+        toolbar.setNavigationOnClickListener { view -> onBackPressed() }
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
+        }
+
         m_LayoutInflater = LayoutInflater.from(m_Context)
 
         //listener..
         ly_SwipeRefresh.setOnRefreshListener(this)//refresh..
-
-
-        /*
-        //map dialog
-        ly_ShowMap.setOnClickListener(View.OnClickListener {
-            goMapDetail()
-        })
-
-        //addPhoto..
-        ly_AddPhoto.setOnClickListener(View.OnClickListener {
-            addPhoto()
-        })
-
-        //modify name.
-        ly_EditContent.setOnClickListener(View.OnClickListener {
-            editContent()
-        })
-        */
         settingView()
     }
     //--------------------------------------------------------------
@@ -277,95 +310,75 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
     {
         ly_NoData.visibility = View.GONE
 
-        //map..
-        /*
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
-        mapFragment!!.getMapAsync(mapFragment)
-        val mArgs = Bundle()
-        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo!!)
-        mapFragment.arguments = mArgs
-        */
-
-        //getPlaceInfoProc(m_PlaceInfo!!.seq!!)
         settingPlaceView()
     }
     //--------------------------------------------------------------
     //
     fun settingPlaceView()
     {
-        //setTitle..
-        //tv_Title.text = m_PlaceInfo!!.name
+        m_Adapter = PhotoRvAdapter(m_Context!!, m_RequestManager!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
+        recyclerView.adapter = m_Adapter
 
-        //if(m_Adapter == null)
-        //{
-            m_Adapter = PhotoRvAdapter(m_Context!!, m_RequestManager!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
-            recyclerView.adapter = m_Adapter
-
-            var nSpanCnt = 1
-            val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
-            recyclerView!!.layoutManager = pLayoutManager
-            recyclerView!!.setHasFixedSize(true)
-            recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
+        var nSpanCnt = 1
+        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
+        recyclerView!!.layoutManager = pLayoutManager
+        recyclerView!!.setHasFixedSize(true)
+        recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
+        {
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
             {
-                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
+                val visibleItemCount = pLayoutManager.childCount
+                val totalItemCount = pLayoutManager.itemCount
+                val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
+
+                if(firstVisible == 0)
                 {
-                    val visibleItemCount = pLayoutManager.childCount
-                    val totalItemCount = pLayoutManager.itemCount
-                    val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
 
-                    if(firstVisible == 0)
-                    {
-
-                    }
-                    else
-                    {
-                        if(m_bScrollTouch)
-                        {
-                            /*
-                            if (dy > 0)
-                                slideUp()    // Scrolling up
-                            else
-                                slideDown()// Scrolling down
-                            */
-
-                            m_bScrollTouch = false
-                        }
-                    }
-
-                    /*
-                    if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//최하단
-                    {
-                        // Call your API to load more items
-                        //if(!m_bFinish!!)
-                            //getImageListProc()
-                    }
-                    */
                 }
+                else
+                {
+                    if(m_bScrollTouch)
+                    {
+                        /*
+                        if (dy > 0)
+                            slideUp()    // Scrolling up
+                        else
+                            slideDown()// Scrolling down
+                        */
 
-                override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-
-                    if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {//손을 떼었지만 움직이는중
-                        // Do something
-                        m_bScrollTouch = true
-                    } else if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {//터치되어있는중
-                        // Do something
-                        m_bScrollTouch = true
-
-                    } else if(newState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE){//정지된상태
-                        m_bScrollTouch = false
-                    }
-                    else {
-                        // Do something
                         m_bScrollTouch = false
                     }
                 }
-            })
-        //}
-        //else//addData
-        //{
-            //m_Adapter!!.addData(null)
-        //}
+
+                /*
+                if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//최하단
+                {
+                    // Call your API to load more items
+                    //if(!m_bFinish!!)
+                        //getImageListProc()
+                }
+                */
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {//손을 떼었지만 움직이는중
+                    // Do something
+                    m_bScrollTouch = true
+                } else if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {//터치되어있는중
+                    // Do something
+                    m_bScrollTouch = true
+
+                } else if(newState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE){//정지된상태
+                    m_bScrollTouch = false
+                }
+                else {
+                    // Do something
+                    m_bScrollTouch = false
+                }
+            }
+        })
 
         if(!m_bRunning!!)
             getImageListProc()//imageList

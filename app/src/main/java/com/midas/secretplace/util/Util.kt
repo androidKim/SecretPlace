@@ -1,25 +1,30 @@
 package com.midas.secretplace.util
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
+import android.location.Address
+import android.location.Geocoder
 import android.media.ExifInterface
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.support.v4.app.ShareCompat
 import android.support.v4.content.ContextCompat
 import android.util.DisplayMetrics
 import android.widget.Toast
+import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
+import com.midas.secretplace.structure.core.place
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
-import android.location.Geocoder
-import android.location.Address
-import com.midas.secretplace.R
 import java.util.*
 
 
@@ -263,6 +268,34 @@ class Util
             else
             {
                 return ""
+            }
+        }
+
+        //----------------------------------------------------------------------
+        //
+        fun sharePlaceLocationInfo(pActivity: Activity, pContext:Context, placeInfo: place){
+            if(placeInfo != null && pContext != null)
+            {
+                Toast.makeText(pContext!!, pContext!!.resources.getString(R.string.share_place_location), Toast.LENGTH_SHORT).show()
+
+                var strMyLocation:String = String.format("위치명 : %s, 주소 : %s, 위도 : %s, 경도 : %s",
+                        placeInfo!!.name, placeInfo!!.address, placeInfo!!.lat, placeInfo!!.lng)
+
+                val shareIntent = ShareCompat.IntentBuilder.from(pActivity)
+                        .setText(strMyLocation)
+                        .setType("text/plain")
+                        .createChooserIntent()
+                        .apply {
+                            // https://android-developers.googleblog.com/2012/02/share-with-intents.html
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                // If we're on Lollipop, we can open the intent as a document
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                            } else {
+                                // Else, we will use the old CLEAR_WHEN_TASK_RESET flag
+                                addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                            }
+                        }
+                pContext!!.startActivity(shareIntent)
             }
         }
     }

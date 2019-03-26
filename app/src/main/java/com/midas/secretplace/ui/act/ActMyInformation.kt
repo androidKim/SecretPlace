@@ -10,7 +10,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.app.ShareCompat
 import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
@@ -106,10 +105,10 @@ class ActMyInformation : AppCompatActivity()
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
         var menuItem1:MenuItem = menu!!.findItem(R.id.action_share).setVisible(true)
-        var menuItem2:MenuItem = menu!!.findItem(R.id.shareMain).setVisible(false)
-        var menuItem3:MenuItem = menu!!.findItem(R.id.showMap).setVisible(false)
+        var menuItem2:MenuItem = menu!!.findItem(R.id.share_location).setVisible(false)
+        var menuItem3:MenuItem = menu!!.findItem(R.id.show_map).setVisible(false)
         var menuItem4:MenuItem = menu!!.findItem(R.id.edit).setVisible(false)
-        var menuItem5:MenuItem = menu!!.findItem(R.id.addPhoto).setVisible(false)
+        var menuItem5:MenuItem = menu!!.findItem(R.id.add_photo).setVisible(false)
         shareActionProvider = MenuItemCompat.getActionProvider(menuItem1) as ShareActionProvider
         setShareIntent(m_App!!.m_SpCtrl!!.getSpUserKey()+"")
         return super.onCreateOptionsMenu(menu)

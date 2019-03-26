@@ -8,14 +8,14 @@
         app:showAsAction="ifRoom"
         app:actionProviderClass="android.support.v7.widget.ShareActionProvider" />
 
-    <item android:id="@+id/shareMain"
+    <item android:id="@+id/share_location"
         android:title="@string/appbar_menu_2"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_share_white_24dp"
         />
 
-    <item android:id="@+id/showMap"
+    <item android:id="@+id/show_map"
         android:title="@string/appbar_menu_3"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
@@ -27,13 +27,13 @@
         android:title="@string/appbar_menu_4"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_map_white_24dp"
+        android:icon="@drawable/ic_edit_white_24dp"
         />
     <item
-        android:id="@+id/addPhoto"
+        android:id="@+id/add_photo"
         android:title="@string/appbar_menu_5"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_map_white_24dp"
+        android:icon="@drawable/ic_add_a_photo_white_24dp"
         />
 </menu>

@@ -10,6 +10,7 @@
         style="@style/CardViewStyle">
 
             <RelativeLayout
+                android:padding="@dimen/padding"
                 android:layout_gravity="center"
                 android:layout_margin="@dimen/margin"
                 android:id="@+id/ly_Row"

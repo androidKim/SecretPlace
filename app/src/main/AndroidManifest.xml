@@ -47,12 +47,10 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActPlaceDetail"
-            android:parentActivityName=".ui.act.ActMain"
             android:screenOrientation="unspecified"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActGroupPlaceDetail"
-            android:parentActivityName=".ui.act.ActMain"
             android:screenOrientation="unspecified"
             android:theme="@style/AppTheme" />
         <activity

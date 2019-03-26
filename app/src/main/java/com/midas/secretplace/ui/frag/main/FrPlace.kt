@@ -38,7 +38,6 @@ import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
 import com.midas.secretplace.ui.act.ActMapDetail
 import com.midas.secretplace.ui.act.ActPlaceDetail
-import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.frag_place.*
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
@@ -541,7 +540,10 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 {
                     val children = dataSnapshot!!.children
                     children.forEach {
-                        var fileNm:String = it!!.getValue(String::class.java)!!
+                        var hashMap = it.value as HashMap<Object, String>
+                        var fileNm:String = hashMap.values.toString()
+                        fileNm = fileNm.replace("[","")
+                        fileNm = fileNm.replace("]","")
 
                         //split ?
                         var arrTemp:List<String> = fileNm.split("?")
@@ -551,7 +553,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                         fileNm = arrTemp.get(arrTemp.size - 1)
 
                         // Create a reference to the file to delete
-                        var desertRef = storageRef.reference.child(fileNm)//test..
+                        var desertRef = storageRef.reference.child(fileNm)//
                         // Delete the file
                         desertRef.delete().addOnSuccessListener {
                             // File deleted successfully

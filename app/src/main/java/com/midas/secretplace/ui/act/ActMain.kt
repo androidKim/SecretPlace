@@ -24,13 +24,11 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.support.v4.view.GravityCompat
-import android.support.v4.view.MenuItemCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.ShareActionProvider
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -329,10 +327,10 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
         var menuItem1:MenuItem = menu!!.findItem(R.id.action_share).setVisible(false)
-        var menuItem2:MenuItem = menu!!.findItem(R.id.shareMain).setVisible(true)
-        var menuItem3:MenuItem = menu!!.findItem(R.id.showMap).setVisible(true)
+        var menuItem2:MenuItem = menu!!.findItem(R.id.share_location).setVisible(true)
+        var menuItem3:MenuItem = menu!!.findItem(R.id.show_map).setVisible(true)
         var menuItem4: MenuItem = menu!!.findItem(R.id.edit).setVisible(false)
-        var menuItem5: MenuItem = menu!!.findItem(R.id.addPhoto).setVisible(false)
+        var menuItem5: MenuItem = menu!!.findItem(R.id.add_photo).setVisible(false)
         return super.onCreateOptionsMenu(menu)
     }
     //--------------------------------------------------------------
@@ -340,12 +338,12 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle presses on the action bar menu items
         when (item.itemId) {
-            R.id.showMap -> {
+            R.id.show_map -> {
                 var frag: FrPlace = m_FragPagerAdapter!!.instantiateItem(viewPager!!,MainPagerAdapter.TAB_INDEX_FRPALCE) as FrPlace
                 frag.menuItemShowMap()
                 return true
             }
-            R.id.shareMain -> {
+            R.id.share_location -> {
                 var frag: FrPlace = m_FragPagerAdapter!!.instantiateItem(viewPager!!,MainPagerAdapter.TAB_INDEX_FRPALCE) as FrPlace
                 frag.menuItemShareLocation()
                 return true
@@ -1370,7 +1368,10 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 {
                     val children = dataSnapshot!!.children
                     children.forEach {
-                        var fileNm:String = it!!.getValue(String::class.java)!!
+                        var hashMap = it.value as HashMap<Object, String>
+                        var fileNm:String = hashMap.values.toString()
+                        fileNm = fileNm.replace("[","")
+                        fileNm = fileNm.replace("]","")
 
                         //split ?
                         var arrTemp:List<String> = fileNm.split("?")
@@ -1380,7 +1381,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                         fileNm = arrTemp.get(arrTemp.size - 1)
 
                         // Create a reference to the file to delete
-                        var desertRef = storageRef.reference.child(fileNm)//test..
+                        var desertRef = storageRef.reference.child(fileNm)//
                         // Delete the file
                         desertRef.delete().addOnSuccessListener {
                             // File deleted successfully

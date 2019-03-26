@@ -91,10 +91,11 @@
     <string name="str_no_exit_location">저장된 위치가 없어요.</string>
     <string name="str_anonymous_login">익명 로그인</string>
     <string name="anonymous_login_desc">익명 로그인은 앱을 삭제하거나\n다른방식으로 로그인하면 데이터가 손실됩니다.</string>
-    <string name="share_location">공유 위치</string>
+    <string name="open_location">공개 위치</string>
     <string name="people">피플</string>
     <string name="poular_location">인기 위치</string>
     <string name="setting">설정</string>
     <string name="add_profile_img">프로필 이미지를 추가해보세요.</string>
     <string name="gallery_file_error">사진 파일을 불러오지 못했습니다.</string>
+    <string name="share_place_location">이 위치정보를 공유합니다.</string>
 </resources>

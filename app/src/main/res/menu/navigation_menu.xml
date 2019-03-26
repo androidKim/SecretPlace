@@ -5,7 +5,7 @@
 
         <item
             android:icon="@drawable/ic_screen_share_black_24dp"
-            android:title="@string/share_location"/>
+            android:title="@string/open_location"/>
 
         <item
             android:icon="@drawable/ic_stars_black_24dp"

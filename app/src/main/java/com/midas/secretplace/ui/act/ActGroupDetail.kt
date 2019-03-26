@@ -7,22 +7,23 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.location.Location
 import android.location.LocationManager
-import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import com.bumptech.glide.Glide
@@ -40,11 +41,10 @@ import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.group
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
-import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.ui.custom.dlg_photo_view
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_group_detail.*
-import java.io.*
+import java.io.Serializable
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -231,7 +231,53 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 }
             }
         }
+    }
+    /*********************** Menu Function ***********************/
+    //--------------------------------------------------------------
+    //
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        var menuItem1: MenuItem = menu!!.findItem(R.id.action_share).setVisible(false)
+        var menuItem2: MenuItem = menu!!.findItem(R.id.share_location).setVisible(false)
+        var menuItem3: MenuItem = menu!!.findItem(R.id.show_map).setVisible(false)
+        var menuItem4: MenuItem = menu!!.findItem(R.id.edit).setVisible(true)
+        var menuItem5: MenuItem = menu!!.findItem(R.id.add_photo).setVisible(false)
 
+        return super.onCreateOptionsMenu(menu)
+    }
+    //--------------------------------------------------------------
+    //
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle presses on the action bar menu items
+        when (item.itemId) {
+            R.id.edit -> {
+                showEditDialog()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+    //--------------------------------------------------------------
+    //
+    private fun showEditDialog(){
+        //show dialog..
+        val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
+        pAlert.setTitle("["+m_GroupInfo!!.name+"]"+m_Context!!.resources.getString(R.string.str_msg_16))
+        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
+        var editName: EditText? = EditText(m_Context)
+        editName!!.hint = getString(R.string.str_msg_4)
+        pAlert.setView(editName)
+        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_ok),{
+            dialogInterface, i ->
+            var name:String = editName.text.toString()
+            editGroupName(name)
+            pAlert.dismiss()
+        })
+        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_no),{
+            dialogInterface, i ->
+            pAlert.dismiss()
+        })
+        pAlert.show()
     }
     /*********************** Location Function ***********************/
     //--------------------------------------------------------------
@@ -297,6 +343,19 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun initLayout()
     {
+        toolbar.title = ""
+        setSupportActionBar(toolbar)//enable app bar
+        var actionBar: ActionBar = supportActionBar!!
+        actionBar.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayUseLogoEnabled(true)
+        toolbar.setNavigationOnClickListener { view -> onBackPressed() }
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
+        }
+
+
         ly_NoData.visibility = View.GONE
 
         m_LayoutInflater = LayoutInflater.from(m_Context)
@@ -329,32 +388,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         {
             if(m_GroupInfo!!.name != null)
             {
-                tv_GroupName.text = m_GroupInfo!!.name
-
-                //group명변경
-                ly_EditGroupName.setOnClickListener(View.OnClickListener
-                {
-                    //show dialog..
-                    val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
-                    pAlert.setTitle("["+m_GroupInfo!!.name+"]"+m_Context!!.resources.getString(R.string.str_msg_16))
-                    pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
-                    var editName: EditText? = EditText(m_Context)
-                    editName!!.hint = getString(R.string.str_msg_4)
-                    pAlert.setView(editName)
-                    pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_ok),{
-                        dialogInterface, i ->
-                        var name:String = editName.text.toString()
-                        editGroupName(name)
-                        pAlert.dismiss()
-                    })
-                    pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_no),{
-                        dialogInterface, i ->
-                        pAlert.dismiss()
-                    })
-                    pAlert.show()
-
-
-                })
+                //setTitle..
+                toolbar.title = m_GroupInfo!!.name
             }
         }
 
@@ -435,7 +470,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 {
                     val children = dataSnapshot!!.children
                     children.forEach {
-                        var fileNm:String = it!!.getValue(String::class.java)!!
+                        var hashMap = it.value as HashMap<Object, String>
+                        var fileNm:String = hashMap.values.toString()
+                        fileNm = fileNm.replace("[","")
+                        fileNm = fileNm.replace("]","")
 
                         //split ?
                         var arrTemp:List<String> = fileNm.split("?")
@@ -445,7 +483,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                         fileNm = arrTemp.get(arrTemp.size - 1)
 
                         // Create a reference to the file to delete
-                        var desertRef = storageRef.reference.child(fileNm)//test..
+                        var desertRef = storageRef.reference.child(fileNm)
                         // Delete the file
                         desertRef.delete().addOnSuccessListener {
                             // File deleted successfully
@@ -727,14 +765,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         dialog.show()
     }
     //-------------------------------------------------------------
-    //add local image filename
-    /*
-    fun addPhoto()
-    {
-
-    }
-    */
-    //-------------------------------------------------------------
     //
     fun editGroupName(strName:String)
     {
@@ -758,7 +788,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     val pInfo: group = dataSnapshot!!.getValue(group::class.java)!!
                     if(pInfo != null)
                     {
-                        tv_GroupName!!.text = pInfo!!.name
+                        toolbar!!.title = pInfo!!.name
                         m_GroupInfo = pInfo
                     }
                 }
@@ -771,38 +801,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         })
     }
 
-    //-------------------------------------------------------------
-    //
-    fun saveImage(myBitmap: Bitmap):String
-    {
-        val bytes = ByteArrayOutputStream()
-        myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-        val wallpaperDirectory = File((Environment.getExternalStorageDirectory()).toString() + IMAGE_DIRECTORY)
-        // have the object build the directory structure, if needed.
-        Log.d("fee",wallpaperDirectory.toString())
-        if (!wallpaperDirectory.exists())
-        {
-            wallpaperDirectory.mkdirs()
-        }
-
-        try
-        {
-            Log.d("heel",wallpaperDirectory.toString())
-            val pFile = File(wallpaperDirectory, ((Calendar.getInstance().getTimeInMillis()).toString() + ".jpg"))
-            pFile.createNewFile()
-            val fo = FileOutputStream(pFile)
-            fo.write(bytes.toByteArray())
-            MediaScannerConnection.scanFile(this, arrayOf(pFile.getPath()), arrayOf("image/jpeg"), null)
-            fo.close()
-            Log.d("TAG", "File Saved::--->" + pFile.getAbsolutePath())
-            return pFile.getAbsolutePath()
-        }
-        catch (e1: IOException)
-        {
-            e1.printStackTrace()
-        }
-        return ""
-    }
     /************************* listener *************************/
     //--------------------------------------------------------------------
     //

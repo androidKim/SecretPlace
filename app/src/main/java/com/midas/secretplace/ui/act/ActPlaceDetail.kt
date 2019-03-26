@@ -23,7 +23,6 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.view.menu.MenuBuilder
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -224,10 +223,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
         var menuItem1: MenuItem = menu!!.findItem(R.id.action_share).setVisible(false)
-        var menuItem2: MenuItem = menu!!.findItem(R.id.shareMain).setVisible(true)
-        var menuItem3: MenuItem = menu!!.findItem(R.id.showMap).setVisible(true)
+        var menuItem2: MenuItem = menu!!.findItem(R.id.share_location).setVisible(true)
+        var menuItem3: MenuItem = menu!!.findItem(R.id.show_map).setVisible(true)
         var menuItem4: MenuItem = menu!!.findItem(R.id.edit).setVisible(true)
-        var menuItem5: MenuItem = menu!!.findItem(R.id.addPhoto).setVisible(true)
+        var menuItem5: MenuItem = menu!!.findItem(R.id.add_photo).setVisible(true)
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -236,10 +235,11 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle presses on the action bar menu items
         when (item.itemId) {
-            R.id.shareMain -> {
+            R.id.share_location -> {
+                Util.sharePlaceLocationInfo(this, this, m_PlaceInfo!!)
                 return true
             }
-            R.id.showMap -> {
+            R.id.show_map -> {
                 goMapDetail()
                 return true
             }
@@ -247,7 +247,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 editContent()
                 return true
             }
-            R.id.addPhoto -> {
+            R.id.add_photo -> {
                 addPhoto()
                 return true
             }
@@ -285,7 +285,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         actionBar.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.setDisplayUseLogoEnabled(true)
-
+        toolbar.setNavigationOnClickListener { view -> onBackPressed() }
         var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
