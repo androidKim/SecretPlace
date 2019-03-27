@@ -1,6 +1,7 @@
 package com.midas.mytimeline.ui.adapter
 
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.support.v7.app.AlertDialog
@@ -19,6 +20,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.place
+import java.lang.Exception
 
 
 class PlaceRvAdapter(val context: Context, var requestManager:RequestManager, var placeList: ArrayList<place>, var m_IfCallback:ifCallback) :
@@ -65,7 +67,6 @@ RecyclerView.Adapter<PlaceRvAdapter.ViewHolder>()
                         override fun onLoadFailed(p0: GlideException?, p1: Any?, p2: com.bumptech.glide.request.target.Target<Drawable>?, p3: Boolean): Boolean
                         {
                             holder.ivThumbnail!!.setBackgroundResource(R.drawable.ic_image_black_100dp)
-                            requestManager.clear(holder.ivThumbnail)
                             return false
                         }
                         override fun onResourceReady(p0: Drawable?, p1: Any?, p2: com.bumptech.glide.request.target.Target<Drawable>?, p3: DataSource?, p4: Boolean): Boolean

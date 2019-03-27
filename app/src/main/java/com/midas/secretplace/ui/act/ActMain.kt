@@ -1162,7 +1162,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
     fun deleteGroupPlaceTableData()
     {
         var pQuery: Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
                 .orderByKey().equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())
 
         pQuery.addChildEventListener(object : ChildEventListener {
@@ -1211,9 +1211,12 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                     children.forEach {
                         var pInfo:place = it.getValue(place::class.java)!!
 
-                        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+                        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
                                 .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                                .child(pInfo.group_key)
+                                .child("place_list")
                                 .child(pInfo.place_key)//where
+
                         pDbRef!!.removeValue()
 
                         //file storage remove
@@ -1368,10 +1371,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 {
                     val children = dataSnapshot!!.children
                     children.forEach {
-                        var hashMap = it.value as HashMap<Object, String>
-                        var fileNm:String = hashMap.values.toString()
-                        fileNm = fileNm.replace("[","")
-                        fileNm = fileNm.replace("]","")
+                        var fileNm:String = it.value as String
 
                         //split ?
                         var arrTemp:List<String> = fileNm.split("?")

@@ -540,11 +540,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 {
                     val children = dataSnapshot!!.children
                     children.forEach {
-                        var hashMap = it.value as HashMap<Object, String>
-                        var fileNm:String = hashMap.values.toString()
-                        fileNm = fileNm.replace("[","")
-                        fileNm = fileNm.replace("]","")
-
+                        var fileNm:String = it.value as String
                         //split ?
                         var arrTemp:List<String> = fileNm.split("?")
                         fileNm = arrTemp.get(0)

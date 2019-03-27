@@ -22,7 +22,6 @@ import android.widget.EditText
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.GroupRvAdapter
-import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.group
@@ -33,8 +32,8 @@ import com.midas.secretplace.ui.act.ActMain
 import kotlinx.android.synthetic.main.frag_group.*
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import java.io.Serializable
-
-
+import com.google.firebase.database.DataSnapshot
+import com.midas.secretplace.R
 
 
 class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter.ifCallback
@@ -49,10 +48,8 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
     var m_IfCallback:ifCallback? = null
     var m_Adapter:GroupRvAdapter? = null
     var m_arrGroup:ArrayList<group>? = null
-
-    var m_strGroupSeq:String? = ""//group key
     var m_bRunning:Boolean = false
-    var m_bPagingFinish:Boolean = false
+    //var m_bPagingFinish:Boolean = false
 
     /**************************** Controller ****************************/
     var m_RecyclerView:RecyclerView? = null
@@ -112,7 +109,6 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
     //
     fun initValue()
     {
-        m_strGroupSeq = ""
         m_arrGroup = ArrayList<group>()
     }
     //------------------------------------------------------------------------
@@ -170,8 +166,8 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
                 if(!m_bRunning && (visibleItemCount + firstVisible) >= totalItemCount)
                 {
                     // Call your API to load more items
-                    if(!m_bPagingFinish)
-                        getGroupListProc(m_strGroupSeq!!)
+                    //if(!m_bPagingFinish)
+                        //getGroupListProc()
                 }
             }
         })
@@ -186,71 +182,19 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        getGroupListProc("")
+        getGroupListProc()
     }
     //--------------------------------------------------------------
     //
-    fun getGroupListProc(seq:String)
+    fun getGroupListProc()
     {
         m_bRunning = true
         progressBar.visibility = View.VISIBLE
 
-        var pQuery:Query? = null
-        if(!m_strGroupSeq.equals(""))
-        {
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                    .child(m_strGroupSeq)
-                    .orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())
-        }
-        else
-        {
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                    .orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())
-        }
+        var tbGroup:DatabaseReference? = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
 
-        pQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                if(dataSnapshot!!.exists())
-                {
-                    if(!m_strGroupSeq.equals(dataSnapshot!!.key))
-                    {
-                        m_bPagingFinish = false
-                        val pInfo:group = dataSnapshot!!.getValue(group::class.java)!!
-                        m_strGroupSeq = dataSnapshot!!.key
-                        pInfo.group_key = dataSnapshot!!.key
-                    }
-                }
-                else
-                {
-                    m_bPagingFinish = true
-                }
-            }
-
-            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
-            }
-
-            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
-            {
-                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
-            }
-
-            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
-            }
-
-            override fun onCancelled(databaseError: DatabaseError?)
-            {
-                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
-            }
-        })
-
-        pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+        tbGroup!!.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
             {
                 if(dataSnapshot!!.exists())
@@ -260,10 +204,12 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
                         val pInfo:group = it!!.getValue(group::class.java)!!
                         m_Adapter!!.addData(pInfo)
                     }
+
+                    tbGroup.removeEventListener(this)
                 }
                 else
                 {
-                    m_bPagingFinish = true
+
                 }
 
                 m_bRunning = false
@@ -322,7 +268,6 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
                 {
                     if (dataSnapshot!!.exists())
                     {
-                        m_strGroupSeq = dataSnapshot!!.key
                         pInfo!!.group_key = dataSnapshot!!.key
                         m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
                                 .child(m_App!!.m_SpCtrl!!.getSpUserKey())
@@ -340,7 +285,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
             })
         }
 
-        builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
+        builder.setNegativeButton(getString(R.string.str_no)){ dialog, which ->
 
         }
 
@@ -356,50 +301,60 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
     //
     fun setRefresh()
     {
-        m_strGroupSeq = ""
         m_arrGroup = ArrayList<group>()
         if(m_Adapter != null)
             m_Adapter!!.clearData()
 
         ly_SwipeRefresh.setRefreshing(false)
 
-        getGroupListProc("")
+        getGroupListProc()
     }
 
     //----------------------------------------------------------------------
     //
-    fun selectGroupPlaceList(pInfo:group)
+    fun deleteGroupRow(pInfo:group)
     {
-        var tbGroupPlace:DatabaseReference? = null
-        tbGroupPlace = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)
-        tbGroupPlace.orderByChild("group_key").equalTo(pInfo.group_key)
-        tbGroupPlace!!.addListenerForSingleValueEvent(object:ValueEventListener{
-        override fun onCancelled(p0: DatabaseError?) {
+        //group place file remove
+        var tbGroupQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(pInfo.group_key)
+                .child("place_list").orderByKey()
 
-        }
+        tbGroupQuery.addListenerForSingleValueEvent(object:ValueEventListener
+        {
+            override fun onDataChange(p0: DataSnapshot?) {
 
-        override fun onDataChange(p0: DataSnapshot?) {
-            if(p0!!.exists())
-            {
-                val pInfo:place = p0!!.getValue(place::class.java)!!
+                if(p0!!.exists())
+                {
+                    val children = p0!!.children
+                    children.forEach {
+                        var placeInfo:place = it.getValue(place::class.java)!!
+                        //file storage remove
+                        deleteGroupPlaceFileList(placeInfo!!)
+                    }
+                }
+                else
+                {
 
-                //delete place db
-                var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
-                        .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                        .child(pInfo.place_key)//where
-
-                pDbRef!!.removeValue()
-
-                //delete storage img
-                deleteGroupPlaceFileList(pInfo)
+                }
             }
-            else
-            {
+
+            override fun onCancelled(p0: DatabaseError?) {
 
             }
-        }
 
-    })
+        })
+
+        //group row remove
+        var tbGroupDb:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(pInfo.group_key)
+
+        tbGroupDb.removeValue()
+
+
+        progressBar.visibility = View.GONE
+        setRefresh()
     }
     //----------------------------------------------------------------------
     //
@@ -420,10 +375,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
                     val children = dataSnapshot!!.children
                     children.forEach {
                         //delete img list..
-                        var hashMap = it.value as HashMap<Object, String>
-                        var fileNm:String = hashMap.values.toString()
-                        fileNm = fileNm.replace("[","")
-                        fileNm = fileNm.replace("]","")
+                        var fileNm:String = it.value as String
 
                         //split ?
                         var arrTemp:List<String> = fileNm.split("?")
@@ -455,16 +407,6 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
                         .child(pInfo.place_key)//where
 
                 pDbRef!!.removeValue()
-
-                //group data remove
-                pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
-                        .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                        .child(pInfo.group_key)//where
-
-                pDbRef!!.removeValue()
-
-                progressBar.visibility = View.GONE
-                setRefresh()
             }
 
             override fun onCancelled(p0: DatabaseError?)
@@ -488,7 +430,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
         progressBar.visibility = View.VISIBLE
 
         //delete group item in place list & img list
-        selectGroupPlaceList(pInfo)
+        deleteGroupRow(pInfo)
     }
     //----------------------------------------------------------------------
     //listAdapter callback

@@ -389,9 +389,12 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
     fun getPlaceInfoProc(seq:String)
     {
         //place Object
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
                 .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_PlaceInfo!!.group_key)
+                .child("place_list")
                 .child(seq)//where
+
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
         {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -651,8 +654,10 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         m_PlaceInfo!!.name = strName
 
         var pDbRef: DatabaseReference? = null
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
                 .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_PlaceInfo!!.group_key)
+                .child("place_list")
                 .child(m_PlaceInfo!!.place_key)
 
         pDbRef!!.setValue(m_PlaceInfo!!)
@@ -854,8 +859,10 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     })
 
                     //place table update
-                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
                             .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            .child(m_PlaceInfo!!.group_key)
+                            .child("place_list")
                             .child(m_PlaceInfo!!.place_key)
 
                     pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -927,8 +934,10 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     })
 
                     //place table update
-                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
                             .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            .child(m_PlaceInfo!!.group_key)
+                            .child("place_list")
                             .child(m_PlaceInfo!!.place_key)
 
                     pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {

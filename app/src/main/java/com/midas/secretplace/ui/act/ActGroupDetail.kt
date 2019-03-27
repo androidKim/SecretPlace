@@ -425,44 +425,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 .child(m_App!!.m_SpCtrl!!.getSpUserKey())
                 .child(placeKey).orderByKey()
 
-        pQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                if(dataSnapshot!!.exists())
-                {
-
-                }
-                else
-                {
-
-                }
-            }
-
-            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
-
-            }
-
-            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
-            {
-                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
-
-            }
-
-            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
-
-
-            }
-
-            override fun onCancelled(databaseError: DatabaseError?)
-            {
-                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
-            }
-        })
-
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
             {
@@ -470,10 +432,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 {
                     val children = dataSnapshot!!.children
                     children.forEach {
-                        var hashMap = it.value as HashMap<Object, String>
-                        var fileNm:String = hashMap.values.toString()
-                        fileNm = fileNm.replace("[","")
-                        fileNm = fileNm.replace("]","")
+                        var fileNm:String = it.value as String
 
                         //split ?
                         var arrTemp:List<String> = fileNm.split("?")
@@ -519,19 +478,23 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //image list..
         var pQuery:Query?= null
 
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
                 .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                .orderByChild("group_key")
-                .equalTo(m_GroupInfo!!.group_key)
+                .child(m_GroupInfo!!.group_key)
+                .child("place_list")
+                .orderByKey()
 
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
-                // A new message has been added
-                val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                pInfo.place_key = dataSnapshot!!.key
-                m_arrPlace!!.add(pInfo!!)
-                m_PlaceAdapter!!.notifyDataSetChanged()
+                if(dataSnapshot!!.exists())
+                {
+                    // A new message has been added
+                    val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                    pInfo.place_key = dataSnapshot!!.key
+                    m_arrPlace!!.add(pInfo!!)
+                    m_PlaceAdapter!!.notifyDataSetChanged()
+                }
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -579,7 +542,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 }
 
 
-
                 if(m_PlaceAdapter!!.itemCount > 0)//
                     ly_NoData.visibility = View.GONE
                 else
@@ -625,8 +587,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             pInfo!!.name = editName.text.toString()
 
             var pDbRef:DatabaseReference? = null
-            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
                     .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .child(m_GroupInfo!!.group_key)
+                    .child("place_list")
                     .push()//insert..
 
             pDbRef!!.setValue(pInfo!!)//insert
@@ -638,8 +602,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                         m_bModify = true
 
                         pInfo!!.place_key = dataSnapshot!!.key
-                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
                                 .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                                .child(m_GroupInfo!!.group_key)
+                                .child("place_list")
                                 .child(dataSnapshot!!.key).setValue(pInfo)//update..
 
                         setRefresh()
@@ -838,22 +804,51 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //listAdapter callback
     override fun deleteProc(pInfo: place)
     {
-        //place data remove
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!
+        //group place list remove
+        var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
                 .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                .child(pInfo.place_key)//where
+                .child(m_GroupInfo!!.group_key)
+                .child("place_list").orderByKey()
 
-        pDbRef!!.removeValue()
+        pQuery.addListenerForSingleValueEvent(object:ValueEventListener
+        {
+            override fun onDataChange(p0: DataSnapshot?) {
 
-        //file storage remove
-        storageDeleteItemProc(pInfo.place_key!!)
+                if(p0!!.exists())
+                {
+                    var tbGorup:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
+                        .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                        .child(m_GroupInfo!!.group_key)
+                        .child("place_list")
 
-        //file data remove
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                .child(pInfo.place_key)//where
+                    val children = p0!!.children
+                    children.forEach {
 
-        pDbRef!!.removeValue()
+                        var placeInfo:place = it.getValue(place::class.java)!!
+
+                        //file storage remove
+                        storageDeleteItemProc(placeInfo.place_key!!)
+
+
+                        //place Item delete
+                        tbGorup.child(placeInfo.place_key)
+                        tbGorup!!.removeValue()
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+        })
+
+
+
 
         //refresh
         setRefresh()
