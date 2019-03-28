@@ -6,11 +6,18 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.view.MenuItemCompat
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.ShareActionProvider
 import android.text.Editable
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.database.DataSnapshot
@@ -27,9 +34,8 @@ import com.midas.secretplace.ui.custom.dlg_share_view
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_myinformation.*
 
-
 /*
-내 정보
+key share..
  */
 class ActMyInformation : AppCompatActivity()
 {
@@ -51,16 +57,17 @@ class ActMyInformation : AppCompatActivity()
     /*********************** Define ***********************/
 
     /*********************** Member ***********************/
-    var m_App:MyApp? = null
-    var m_Context: Context? = null
+    private var m_App:MyApp? = null
+    private var m_Context: Context? = null
 
-    var m_UserDbRef:DatabaseReference? = null//firebase database
-    var m_UserViewModel: vm_user?= null//mvvm
+    private var m_UserDbRef:DatabaseReference? = null//firebase database
+    private var m_UserViewModel: vm_user?= null//mvvm
 
     //
     private var m_Clipboard: ClipboardManager? = null
     private var m_Clip: ClipData? = null
 
+    private var shareActionProvider:ShareActionProvider? = null
     //
     /*********************** Controller ***********************/
     var m_ShareViewDialog:AlertDialog? = null
@@ -86,7 +93,6 @@ class ActMyInformation : AppCompatActivity()
             override fun onChanged(t: data_user?) {
                 if(t != null)
                 {
-                    tv_Name.text = t!!.name
                     tv_UserKey.text = t!!.user_key
                 }
             }
@@ -94,6 +100,29 @@ class ActMyInformation : AppCompatActivity()
 
         setInitLayout()
     }
+    //--------------------------------------------------------------
+    //
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        var menuItem1:MenuItem = menu!!.findItem(R.id.action_share).setVisible(true)
+        var menuItem2:MenuItem = menu!!.findItem(R.id.share_location).setVisible(false)
+        var menuItem3:MenuItem = menu!!.findItem(R.id.show_map).setVisible(false)
+        var menuItem4:MenuItem = menu!!.findItem(R.id.edit).setVisible(false)
+        var menuItem5:MenuItem = menu!!.findItem(R.id.add_photo).setVisible(false)
+        shareActionProvider = MenuItemCompat.getActionProvider(menuItem1) as ShareActionProvider
+        setShareIntent(m_App!!.m_SpCtrl!!.getSpUserKey()+"")
+        return super.onCreateOptionsMenu(menu)
+    }
+    //--------------------------------------------------------------
+    //
+    private fun setShareIntent(text:String) {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, m_Context!!.resources.getString(R.string.app_name))
+        shareIntent.putExtra(Intent.EXTRA_TEXT, text)
+        shareActionProvider?.setShareIntent(shareIntent)
+    }
+
     //--------------------------------------------------------------
     //
     override fun onStart()
@@ -116,7 +145,6 @@ class ActMyInformation : AppCompatActivity()
             if(dataSnapshot!!.exists())
             {
                 var pInfo:user = dataSnapshot!!.getValue(user::class.java)!!
-                tv_Name.text = pInfo!!.name!!
                 tv_UserKey.text = pInfo!!.user_key!!
                 var dataUser:data_user = data_user(0, pInfo!!.img_url!!, pInfo!!.name!!, pInfo!!.sns_key!!, pInfo!!.sns_type!!, pInfo!!.user_key!!)
 
@@ -143,8 +171,40 @@ class ActMyInformation : AppCompatActivity()
     //
     fun setInitLayout()
     {
-        tv_TopTitle.text = m_Context!!.resources.getString(R.string.str_msg_30)
+        toolbar.title = m_Context!!.resources.getString(R.string.str_msg_30)
+        setSupportActionBar(toolbar)//enable app bar
+        var actionBar:ActionBar = supportActionBar!!
+        actionBar.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayUseLogoEnabled(true)
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
+        }
+
+
+        //share btn click event..
+        /*
+        ly_Right.setOnClickListener {
+            val shareIntent = ShareCompat.IntentBuilder.from(this)
+                    .setText(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .setType("text/plain")
+                    .createChooserIntent()
+                    .apply {
+                        // https://android-developers.googleblog.com/2012/02/share-with-intents.html
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            // If we're on Lollipop, we can open the intent as a document
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                        } else {
+                            // Else, we will use the old CLEAR_WHEN_TASK_RESET flag
+                            addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                        }
+                    }
+            startActivity(shareIntent)
+        }
+        */
     }
+
     //--------------------------------------------------------------------
     //show share dialog
     fun onClickSahre(view:View)

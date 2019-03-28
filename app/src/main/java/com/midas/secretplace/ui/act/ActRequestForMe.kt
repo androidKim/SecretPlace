@@ -2,8 +2,11 @@ package com.midas.secretplace.ui.act
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.ActionBar
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -28,51 +31,67 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback, S
 {
     /*********************** Interface Callback ***********************/
     //-------------------------------------------------------------
-    //
-    override fun serRequestOnOffProc(pInfo:couple)
+    //favorite 상태변경..
+    override fun setRequestOnOffProc(pInfo:couple)
     {
-        var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)
-        pDbRef!!.addListenerForSingleValueEvent(object :ValueEventListener{
-            override fun onDataChange(dataSnapshot: DataSnapshot)
-            {
-                // Get Post object and use the values to update the UI
-                if(dataSnapshot!!.exists())
-                {
-                    val children = dataSnapshot!!.children
-                    children.forEach {
-                        val targetInfo:couple = it!!.getValue(couple::class.java)!!
-                        if(pInfo.responser_key.equals(targetInfo.responser_key)
-                            && pInfo.requester_key.equals(targetInfo.requester_key))//선택한 아이템만 변경..
-                        {
-                            //update accept value
-                            if(pInfo.accept.equals(couple.APPCET_Y))
-                                pInfo.accept = couple.APPCET_N
-                            else
-                                pInfo.accept = couple.APPCET_Y
+        //show dialog..
+        val pAlert = AlertDialog.Builder(this@ActRequestForMe).create()
+        pAlert.setTitle(m_Context!!.resources.getString(R.string.str_msg_62))
+        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_63))
+        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_ok),{
+            dialogInterface, i ->
 
-                            m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key).setValue(pInfo)
-                        }
-                        else//선택되지않은아이템..
-                        {
-                            if(targetInfo.accept.equals(couple.APPCET_Y))//커플설정이 된 아이템이 있으면 N으로 변경
+            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)
+            pDbRef!!.addListenerForSingleValueEvent(object :ValueEventListener{
+                override fun onDataChange(dataSnapshot: DataSnapshot)
+                {
+                    // Get Post object and use the values to update the UI
+                    if(dataSnapshot!!.exists())
+                    {
+                        val children = dataSnapshot!!.children
+                        children.forEach {
+                            val targetInfo:couple = it!!.getValue(couple::class.java)!!
+                            if(pInfo.responser_key.equals(targetInfo.responser_key)
+                                    && pInfo.requester_key.equals(targetInfo.requester_key))//선택한 아이템만 변경..
                             {
-                                targetInfo.accept = couple.APPCET_N
-                                m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key).setValue(targetInfo)
+                                //update accept value
+                                if(pInfo.accept.equals(couple.APPCET_Y))
+                                    pInfo.accept = couple.APPCET_N
+                                else
+                                    pInfo.accept = couple.APPCET_Y
+
+                                m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key).setValue(pInfo)
+                            }
+                            else//선택되지않은아이템..
+                            {
+                                if(targetInfo.accept.equals(couple.APPCET_Y))//커플설정이 된 아이템이 있으면 N으로 변경
+                                {
+                                    targetInfo.accept = couple.APPCET_N
+                                    m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key).setValue(targetInfo)
+                                }
                             }
                         }
+                        //ui refresh..
+                        setRefresh()
+                        m_Adapter!!.notifyDataSetChanged()
                     }
-                    //ui refresh..
-                    setRefresh()
                 }
-            }
 
-            override fun onCancelled(databaseError: DatabaseError)
-            {
-                // Getting Post failed, log a message
+                override fun onCancelled(databaseError: DatabaseError)
+                {
+                    // Getting Post failed, log a message
 
-                // ...
-            }
+                    // ...
+                }
+            })
+
+            pAlert.dismiss()
         })
+        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_no),{
+            dialogInterface, i ->
+            pAlert.dismiss()
+        })
+        pAlert.show()
     }
 
     //-------------------------------------------------------------
@@ -169,6 +188,19 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback, S
     //
     fun settingView()
     {
+        toolbar.title = m_Context!!.resources.getString(R.string.str_msg_60)
+        setSupportActionBar(toolbar)
+        var actionBar: ActionBar = supportActionBar!!
+        actionBar.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayUseLogoEnabled(true)
+
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
+        }
+
+
         m_Adapter = RequestForMeRvAdapter(m_Context!!, m_arrRequest!!, this)
         recyclerView!!.adapter = m_Adapter!!
 

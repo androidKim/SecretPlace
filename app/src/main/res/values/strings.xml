@@ -5,20 +5,25 @@
     <string name="twitter_consumer_key" translatable="false">1Gqkat9htRhTfHP31DG64F1LK</string>
     <string name="twitter_consumer_secret" translatable="false">desMpaNzISR5xtGXAADUFm2xeckH1fWGQLFn1XHmqPHIIzlEox</string>
 
-    <string name="app_name" >SecretPlace</string>
+    <string name="app_name" >위치보관</string>
     <string name="navigation_drawer_open" >Navigation Drawer Is Open</string>
     <string name="navigation_drawer_close" >Navigation Drawer Is Close</string>
 
     <string name="str_login_google" >google</string>
     <string name="str_login_facebook" >facebook</string>
-    <string name="str_tab_title_my" >내 장소</string>
-    <string name="str_tab_title_group" >내 묶음장소</string>
-    <string name="str_tab_title_couple" >커플 장소</string>
+    <string name="str_tab_title_my" >위치</string>
+    <string name="str_tab_title_group" >위치 그룹</string>
+    <string name="str_tab_title_couple">커플 장소</string>
+    <string name="appbar_menu_1">공유</string>
+    <string name="appbar_menu_2">공유</string>
+    <string name="appbar_menu_3">지도</string>
+    <string name="appbar_menu_4">수정</string>
+    <string name="appbar_menu_5">사진</string>
 
     <string name="str_ok" >예</string>
     <string name="str_no" >아니오</string>
     <string name="str_cancel" >취소</string>
-    <string name="str_menu">기타</string>
+    <string name="support">지원</string>
     <string name="str_msg_1">로그아웃</string>
     <string name="str_msg_2">로그아웃 하시겠습니까?</string>
     <string name="str_msg_3">현재 장소를 저장하시겠습니까?</string>
@@ -30,7 +35,7 @@
     <string name="str_msg_9">선택하세요.</string>
     <string name="str_msg_10">카메라</string>
     <string name="str_msg_11">앨범</string>
-    <string name="str_msg_12">사진을 추가하시겠습니까?</string>
+    <string name="str_msg_12">새로운 사진을 등록 하시겠습니까?</string>
     <string name="str_msg_13">내용을 변경하시겠습니까?</string>
     <string name="str_msg_14">저장된 사진이 없습니다.\n사진을 추가해보세요.</string>
     <string name="str_msg_15">저장된 장소가 없습니다.\n장소를 추가해보세요.</string>
@@ -48,28 +53,49 @@
     <string name="str_msg_27">회원탈퇴 하시겠습니까?\n모든 정보가 삭제됩니다.</string>
     <string name="str_msg_28">그동안 이용해주셔서 감사합니다.</string>
     <string name="str_msg_29">커플</string>
-    <string name="str_msg_30">내 정보</string>
+    <string name="str_msg_30">키 공유</string>
     <string name="str_msg_31">이름</string>
     <string name="str_msg_32">나의 고유키</string>
     <string name="str_msg_33">복사</string>
     <string name="str_msg_34">복사가 완료 되었습니다.\n 상대방에게 전달하세요.</string>
-    <string name="str_msg_35">상대방의 고유키를 등록하세요.\n수신자가 수락하면 커플이 됩니다.</string>
     <string name="str_msg_36">커플대상의 고유키를 복사하여 입력하세요.</string>
     <string name="str_msg_37">요청하기</string>
-    <string name="str_msg_38">나에게 온 요청</string>
-    <string name="str_msg_39">!!요청은 1명에게만 가능합니다</string>
     <string name="str_msg_40">나에게는 요청할 수 없습니다.</string>
     <string name="str_msg_41">공백은 입력할 수 없습니다.</string>
-    <string name="str_msg_42">커플은 1명만 가능합니다.</string>
     <string name="str_msg_43">나에게 커플 요청한 사람이 없습니다.</string>
     <string name="str_msg_44">채팅</string>
     <string name="str_msg_46">채팅할 커플이 없어요.</string>
     <string name="str_msg_47">메세지를 입력하세요.</string>
-    <string name="str_msg_48">커플 채팅</string>
+    <string name="str_msg_48">채팅</string>
     <string name="str_msg_49">고유키를 공유해서 커플을 맺으세요.</string>
-    <string name="str_msg_50">나의 커플</string>
     <string name="str_msg_51">복사</string>
     <string name="str_msg_52">카카오톡</string>
     <string name="str_msg_53">문자</string>
     <string name="str_msg_54">메세지를 입력하세요.</string>
+    <string name="str_msg_55">나의 키를 공유하여 커플을 맺으세요</string>
+    <string name="str_msg_56">나의 장소들</string>
+    <string name="str_msg_57">요청하기</string>
+    <string name="str_msg_58">취소</string>
+    <string name="str_msg_59">유효하지 않는 사용자 입니다.</string>
+    <string name="str_msg_60">나에게 요청한 사람</string>
+    <string name="str_msg_61">커플(요청)을 끊으시겠습니까?</string>
+    <string name="str_msg_62">상태를 바꾸시겠습니까?</string>
+    <string name="str_msg_63">이미 커플이 있다면 자동 취소됩니다.</string>
+    <string name="str_msg_64">채팅</string>
+    <string name="str_msg_65">요청</string>
+    <string name="str_msg_66">요청 중 입니다.</string>
+    <string name="str_msg_67">커플 입니다.</string>
+    <string name="str_latlng_format">위도 : %s, 경도 : %s</string>
+    <string name="str_share_my_location">나의 위치(주소, GPS좌표)를 공유합니다</string>
+    <string name="str_not_valid_key">유효한 키가 아닙니다.</string>
+    <string name="str_no_exit_location">저장된 위치가 없어요.</string>
+    <string name="str_anonymous_login">익명 로그인</string>
+    <string name="anonymous_login_desc">익명 로그인은 앱을 삭제하거나\n다른방식으로 로그인하면 데이터가 손실됩니다.</string>
+    <string name="open_location">공개 위치</string>
+    <string name="people">피플</string>
+    <string name="poular_location">인기 위치</string>
+    <string name="setting">설정</string>
+    <string name="add_profile_img">프로필 이미지를 추가해보세요.</string>
+    <string name="gallery_file_error">사진 파일을 불러오지 못했습니다.</string>
+    <string name="share_place_location">이 위치정보를 공유합니다.</string>
 </resources>

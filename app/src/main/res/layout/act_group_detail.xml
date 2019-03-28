@@ -3,45 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/color_white">
 
     <RelativeLayout
         android:id="@+id/ly_Top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <RelativeLayout
-            android:id="@+id/ly_Title"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            style="@style/ToolBarStyle.Base"
             android:layout_width="match_parent"
-            android:layout_height="50dp">
-
-            <TextView
-                android:id="@+id/tv_GroupName"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:padding="5dp"
-                android:textColor="@color/color_black"
-                android:textSize="20dp" />
-
-
-            <LinearLayout
-                android:id="@+id/ly_EditGroupName"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:gravity="center"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="@drawable/baseline_edit_black_18dp" />
-            </LinearLayout>
-        </RelativeLayout>
+            android:layout_height="wrap_content" />
     </RelativeLayout>
 
 
@@ -54,8 +28,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            ></android.support.v7.widget.RecyclerView>
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
 
@@ -79,8 +52,8 @@
             android:layout_marginTop="5dp"
             android:gravity="center"
             android:text="@string/str_msg_15"
-            tools:text="@string/str_msg_15"
-            android:textColor="@color/color_black" />
+            android:textColor="@color/color_black"
+            tools:text="@string/str_msg_15" />
     </LinearLayout>
 
 

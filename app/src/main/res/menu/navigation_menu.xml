@@ -4,35 +4,32 @@
     <group android:checkableBehavior="none">
 
         <item
-            android:id="@+id/my_information"
-            android:icon="@drawable/baseline_account_circle_black_48"
-            android:title="@string/str_msg_30" />
+            android:icon="@drawable/ic_screen_share_black_24dp"
+            android:title="@string/open_location"/>
 
         <item
-            android:id="@+id/couple"
-            android:icon="@drawable/baseline_people_black_48"
-            android:title="@string/str_msg_29" />
+            android:icon="@drawable/ic_stars_black_24dp"
+            android:title="@string/poular_location" />
 
         <item
-            android:id="@+id/theme"
-            android:icon="@drawable/baseline_view_comfy_black_48"
-            android:title="@string/str_msg_25" />
+            android:icon="@drawable/ic_people_black_24dp"
+            android:title="@string/people" />
+
     </group>
 
     <item
         android:id="@+id/other_options"
-        android:title="@string/str_menu">
+        android:title="@string/support">
 
         <menu>
             <item
-                android:id="@+id/logout"
-                android:icon="@drawable/baseline_exit_to_app_black_48"
-                android:title="@string/str_msg_1" />
+                android:id="@+id/theme"
+                android:icon="@drawable/ic_view_comfy_black_24dp"
+                android:title="@string/str_msg_25" />
 
             <item
-                android:id="@+id/delete"
-                android:icon="@drawable/baseline_clear_black_48"
-                android:title="@string/str_msg_26" />
+                android:icon="@drawable/ic_settings_black_24dp"
+                android:title="@string/setting" />
         </menu>
     </item>
 </menu>

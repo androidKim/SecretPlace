@@ -1,21 +1,31 @@
 package com.midas.secretplace.util
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.graphics.drawable.ColorDrawable
+import android.location.Address
+import android.location.Geocoder
 import android.media.ExifInterface
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.support.v4.app.ShareCompat
+import android.support.v4.content.ContextCompat
 import android.util.DisplayMetrics
 import android.widget.Toast
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
+import com.midas.secretplace.structure.core.place
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
+import java.util.*
 
 
 class Util
@@ -78,6 +88,35 @@ class Util
             inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
             val path = MediaStore.Images.Media.insertImage(context.getContentResolver(), inImage, "Title", null)
             return Uri.parse(path)
+        }
+        /****************************** toolbar ******************************/
+        //--------------------------------------------------------------
+        //set theme color
+        fun setToolbarBackgroundColor(pContext:Context, toolbar: android.support.v7.widget.Toolbar, strTheme:String)
+        {
+            when(strTheme)
+            {
+                Constant.THEME_PINK -> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkPink))
+                Constant.THEME_RED -> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkRed))
+                Constant.THEME_PUPLE -> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkPuple))
+                Constant.THEME_DEEPPUPLE -> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkDeepPuple))
+                Constant.THEME_INDIGO-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkIndigo))
+                Constant.THEME_BLUE-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkBlue))
+                Constant.THEME_LIGHTBLUE-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkLightBlue))
+                Constant.THEME_CYAN-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDarkCyan))
+                Constant.THEME_TEAL-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryTeal))
+                Constant.THEME_GREEN-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryGreen))
+                Constant.THEME_LIGHTGREEN-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryLightGreen))
+                Constant.THEME_LIME-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryLime))
+                Constant.THEME_YELLOW-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryYellow))
+                Constant.THEME_AMBER-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryAmber))
+                Constant.THEME_ORANGE-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryOrange))
+                Constant.THEME_DEEPORANGE-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDeepOrange))
+                Constant.THEME_BROWN-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryBrown))
+                Constant.THEME_GRAY-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryGray))
+                Constant.THEME_BLUEGRAY-> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryBlueGray))
+                else -> toolbar.background = ColorDrawable(ContextCompat.getColor(pContext, R.color.colorPrimaryDark))
+            }
         }
 
 
@@ -203,15 +242,64 @@ class Util
                 Constant.THEME_BROWN-> theme.applyStyle(R.style.AppThemeBrown, true)
                 Constant.THEME_GRAY-> theme.applyStyle(R.style.AppThemeGray, true)
                 Constant.THEME_BLUEGRAY-> theme.applyStyle(R.style.AppThemeBlueGray, true)
-                else -> theme.applyStyle(R.style.AppTheme, true)
+                else -> theme.applyStyle(com.midas.secretplace.R.style.AppTheme, true)
             }
             return theme
         }
+        //-----------------------------------------------------------------
+        //
+        fun getAddress(pContext:Context, latitude:Double, longitude: Double):String
+        {
+            val geocoder: Geocoder
+            val addresses: List<Address>
+            geocoder = Geocoder(pContext, Locale.getDefault())
 
+            addresses = geocoder.getFromLocation(latitude, longitude, 1) // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+            if(addresses.size > 0)
+            {
+                val address = addresses[0].getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                val city = addresses[0].getLocality()
+                val state = addresses[0].getAdminArea()
+                val country = addresses[0].getCountryName()
+                val postalCode = addresses[0].getPostalCode()
+                val knownName = addresses[0].getFeatureName() // Only if available else return NULL
+                return address
+            }
+            else
+            {
+                return ""
+            }
+        }
+
+        //----------------------------------------------------------------------
+        //
+        fun sharePlaceLocationInfo(pActivity: Activity, pContext:Context, placeInfo: place){
+            if(placeInfo != null && pContext != null)
+            {
+                Toast.makeText(pContext!!, pContext!!.resources.getString(R.string.share_place_location), Toast.LENGTH_SHORT).show()
+
+                var strMyLocation:String = String.format("위치명 : %s, 주소 : %s, 위도 : %s, 경도 : %s",
+                        placeInfo!!.name, placeInfo!!.address, placeInfo!!.lat, placeInfo!!.lng)
+
+                val shareIntent = ShareCompat.IntentBuilder.from(pActivity)
+                        .setText(strMyLocation)
+                        .setType("text/plain")
+                        .createChooserIntent()
+                        .apply {
+                            // https://android-developers.googleblog.com/2012/02/share-with-intents.html
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                // If we're on Lollipop, we can open the intent as a document
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                            } else {
+                                // Else, we will use the old CLEAR_WHEN_TASK_RESET flag
+                                addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                            }
+                        }
+                pContext!!.startActivity(shareIntent)
+            }
+        }
     }
 
     fun Int.dpToPx(displayMetrics: DisplayMetrics): Int = (this * displayMetrics.density).toInt()
     fun Int.pxToDp(displayMetrics: DisplayMetrics): Int = (this / displayMetrics.density).toInt()
-
-
 }

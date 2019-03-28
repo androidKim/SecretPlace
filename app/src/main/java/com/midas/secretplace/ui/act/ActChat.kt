@@ -2,6 +2,7 @@ package com.midas.secretplace.ui.act
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
@@ -53,10 +54,6 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
 
         m_Imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
-        ly_SwipeRefresh.setOnRefreshListener(this)//swife refresh listener
-        tv_TopTitle.text = m_Context!!.resources.getString(R.string.str_msg_48)//TopTitle
-        progressBar.visibility = View.VISIBLE
-
         var pUserQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
         pUserQuery.addListenerForSingleValueEvent(object :ValueEventListener{
             override fun onDataChange(p0: DataSnapshot?) {
@@ -106,6 +103,9 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
 
             }
         })
+
+
+        initLayout()
     }
     //--------------------------------------------------------------
     //
@@ -162,6 +162,22 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
         }
     }
     /*********************** User Function ***********************/
+    //--------------------------------------------------------------
+    //
+    fun initLayout()
+    {
+        ly_SwipeRefresh.setOnRefreshListener(this)//swife refresh listener
+        toolbar.title = m_Context!!.resources.getString(R.string.str_msg_48)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayUseLogoEnabled(true)
+
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
+        }
+    }
+
     //--------------------------------------------------------------
     //
     fun refreshUi()

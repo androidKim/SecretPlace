@@ -7,22 +7,23 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.location.Location
 import android.location.LocationManager
-import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import com.bumptech.glide.Glide
@@ -40,11 +41,10 @@ import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.group
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
-import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
 import com.midas.secretplace.ui.custom.dlg_photo_view
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_group_detail.*
-import java.io.*
+import java.io.Serializable
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -231,7 +231,53 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 }
             }
         }
+    }
+    /*********************** Menu Function ***********************/
+    //--------------------------------------------------------------
+    //
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        var menuItem1: MenuItem = menu!!.findItem(R.id.action_share).setVisible(false)
+        var menuItem2: MenuItem = menu!!.findItem(R.id.share_location).setVisible(false)
+        var menuItem3: MenuItem = menu!!.findItem(R.id.show_map).setVisible(false)
+        var menuItem4: MenuItem = menu!!.findItem(R.id.edit).setVisible(true)
+        var menuItem5: MenuItem = menu!!.findItem(R.id.add_photo).setVisible(false)
 
+        return super.onCreateOptionsMenu(menu)
+    }
+    //--------------------------------------------------------------
+    //
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle presses on the action bar menu items
+        when (item.itemId) {
+            R.id.edit -> {
+                showEditDialog()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+    //--------------------------------------------------------------
+    //
+    private fun showEditDialog(){
+        //show dialog..
+        val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
+        pAlert.setTitle("["+m_GroupInfo!!.name+"]"+m_Context!!.resources.getString(R.string.str_msg_16))
+        pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
+        var editName: EditText? = EditText(m_Context)
+        editName!!.hint = getString(R.string.str_msg_4)
+        pAlert.setView(editName)
+        pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_ok),{
+            dialogInterface, i ->
+            var name:String = editName.text.toString()
+            editGroupName(name)
+            pAlert.dismiss()
+        })
+        pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_no),{
+            dialogInterface, i ->
+            pAlert.dismiss()
+        })
+        pAlert.show()
     }
     /*********************** Location Function ***********************/
     //--------------------------------------------------------------
@@ -297,18 +343,29 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun initLayout()
     {
+        toolbar.title = ""
+        setSupportActionBar(toolbar)//enable app bar
+        var actionBar: ActionBar = supportActionBar!!
+        actionBar.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayUseLogoEnabled(true)
+        toolbar.setNavigationOnClickListener { view -> onBackPressed() }
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
+        }
+
+
         ly_NoData.visibility = View.GONE
 
         m_LayoutInflater = LayoutInflater.from(m_Context)
         //event..
         ly_SwipeRefresh.setOnRefreshListener(this)
 
-        m_PlaceAdapter = PlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
+        m_PlaceAdapter = PlaceRvAdapter(m_Context!!, m_RequestManager!!, m_arrPlace!!, this)
         recyclerView!!.adapter = m_PlaceAdapter
 
-        recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
-
-        var nSpanCnt = 2
+        var nSpanCnt = 1
         val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
         recyclerView!!.setHasFixedSize(true)
 
@@ -331,32 +388,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         {
             if(m_GroupInfo!!.name != null)
             {
-                tv_GroupName.text = m_GroupInfo!!.name
-
-                //group명변경
-                ly_EditGroupName.setOnClickListener(View.OnClickListener
-                {
-                    //show dialog..
-                    val pAlert = AlertDialog.Builder(this@ActGroupDetail).create()
-                    pAlert.setTitle("["+m_GroupInfo!!.name+"]"+m_Context!!.resources.getString(R.string.str_msg_16))
-                    pAlert.setMessage(m_Context!!.resources.getString(R.string.str_msg_17))
-                    var editName: EditText? = EditText(m_Context)
-                    editName!!.hint = getString(R.string.str_msg_4)
-                    pAlert.setView(editName)
-                    pAlert.setButton(AlertDialog.BUTTON_POSITIVE, m_Context!!.resources.getString(R.string.str_ok),{
-                        dialogInterface, i ->
-                        var name:String = editName.text.toString()
-                        editGroupName(name)
-                        pAlert.dismiss()
-                    })
-                    pAlert.setButton(AlertDialog.BUTTON_NEGATIVE, m_Context!!.resources.getString(R.string.str_no),{
-                        dialogInterface, i ->
-                        pAlert.dismiss()
-                    })
-                    pAlert.show()
-
-
-                })
+                //setTitle..
+                toolbar.title = m_GroupInfo!!.name
             }
         }
 
@@ -370,10 +403,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         initValue()
         ly_SwipeRefresh!!.setRefreshing(false)
 
-        m_PlaceAdapter = PlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
+        m_PlaceAdapter = PlaceRvAdapter(m_Context!!, m_RequestManager!!, m_arrPlace!!, this)
         recyclerView!!.adapter = m_PlaceAdapter
 
-        var nSpanCnt = 2
+        var nSpanCnt = 1
         val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
         recyclerView!!.setHasFixedSize(true)
 
@@ -388,44 +421,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         val storageRef = FirebaseStorage.getInstance(Constant.FIRE_STORE_URL)
 
         var pQuery:Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(placeKey).child("img_list")//where
-        pQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                if(dataSnapshot!!.exists())
-                {
-
-                }
-                else
-                {
-
-                }
-            }
-
-            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
-
-            }
-
-            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
-            {
-                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
-
-            }
-
-            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
-
-
-            }
-
-            override fun onCancelled(databaseError: DatabaseError?)
-            {
-                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
-            }
-        })
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(placeKey).orderByKey()
 
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -434,7 +432,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 {
                     val children = dataSnapshot!!.children
                     children.forEach {
-                        var fileNm:String = it!!.getValue(String::class.java)!!
+                        var fileNm:String = it.value as String
 
                         //split ?
                         var arrTemp:List<String> = fileNm.split("?")
@@ -444,7 +442,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                         fileNm = arrTemp.get(arrTemp.size - 1)
 
                         // Create a reference to the file to delete
-                        var desertRef = storageRef.reference.child(fileNm)//test..
+                        var desertRef = storageRef.reference.child(fileNm)
                         // Delete the file
                         desertRef.delete().addOnSuccessListener {
                             // File deleted successfully
@@ -480,17 +478,23 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //image list..
         var pQuery:Query?= null
 
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE).orderByChild("group_key").equalTo(m_GroupInfo!!.group_key)//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_GroupInfo!!.group_key)
+                .child("place_list")
+                .orderByKey()
+
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
-                // A new message has been added
-                // onChildAdded() will be called for each node at the first time
-                val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                //m_strPlaceLastSeq = dataSnapshot!!.key
-                pInfo.place_key = dataSnapshot!!.key
-                m_arrPlace!!.add(pInfo!!)
-                m_PlaceAdapter!!.notifyDataSetChanged()
+                if(dataSnapshot!!.exists())
+                {
+                    // A new message has been added
+                    val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                    pInfo.place_key = dataSnapshot!!.key
+                    m_arrPlace!!.add(pInfo!!)
+                    m_PlaceAdapter!!.notifyDataSetChanged()
+                }
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -503,7 +507,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 Log.e("TAG", "onChildRemoved:" + dataSnapshot!!.key)
 
                 // A message has been removed
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
@@ -511,7 +514,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 Log.e("TAG", "onChildMoved:" + dataSnapshot!!.key)
 
                 // A message has changed position
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onCancelled(databaseError: DatabaseError?)
@@ -540,7 +542,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 }
 
 
-
                 if(m_PlaceAdapter!!.itemCount > 0)//
                     ly_NoData.visibility = View.GONE
                 else
@@ -565,7 +566,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         if(bCheckLocation)
         {
-            var pInfo:place = place(m_GroupInfo!!.user_key!!, "", m_GroupInfo!!.group_key!!, "", String.format("%s",mLocation.latitude), String.format("%s",mLocation.longitude))
+            var address:String? = Util.getAddress(m_Context!!, mLocation.latitude, mLocation.longitude)
+            var pInfo:place = place(m_GroupInfo!!.user_key!!, "", m_GroupInfo!!.group_key!!, "", String.format("%s",mLocation.latitude), String.format("%s",mLocation.longitude), "", address!!, "")
             showPlaceInputDialog(pInfo)
         }
     }
@@ -585,7 +587,12 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             pInfo!!.name = editName.text.toString()
 
             var pDbRef:DatabaseReference? = null
-            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.push()//insert..
+            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .child(m_GroupInfo!!.group_key)
+                    .child("place_list")
+                    .push()//insert..
+
             pDbRef!!.setValue(pInfo!!)//insert
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -595,7 +602,12 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                         m_bModify = true
 
                         pInfo!!.place_key = dataSnapshot!!.key
-                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.child(dataSnapshot!!.key).setValue(pInfo)//update..
+                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                                .child(m_GroupInfo!!.group_key)
+                                .child("place_list")
+                                .child(dataSnapshot!!.key).setValue(pInfo)//update..
+
                         setRefresh()
                     }
                 }
@@ -719,14 +731,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         dialog.show()
     }
     //-------------------------------------------------------------
-    //add local image filename
-    /*
-    fun addPhoto()
-    {
-
-    }
-    */
-    //-------------------------------------------------------------
     //
     fun editGroupName(strName:String)
     {
@@ -734,7 +738,10 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         //update
         var pDbRef: DatabaseReference? = null
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP).child(m_GroupInfo!!.group_key)
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_GroupInfo!!.group_key)
+
         pDbRef!!.setValue(m_GroupInfo!!)
 
         pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -747,7 +754,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     val pInfo: group = dataSnapshot!!.getValue(group::class.java)!!
                     if(pInfo != null)
                     {
-                        tv_GroupName!!.text = pInfo!!.name
+                        toolbar!!.title = pInfo!!.name
                         m_GroupInfo = pInfo
                     }
                 }
@@ -760,38 +767,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         })
     }
 
-    //-------------------------------------------------------------
-    //
-    fun saveImage(myBitmap: Bitmap):String
-    {
-        val bytes = ByteArrayOutputStream()
-        myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-        val wallpaperDirectory = File((Environment.getExternalStorageDirectory()).toString() + IMAGE_DIRECTORY)
-        // have the object build the directory structure, if needed.
-        Log.d("fee",wallpaperDirectory.toString())
-        if (!wallpaperDirectory.exists())
-        {
-            wallpaperDirectory.mkdirs()
-        }
-
-        try
-        {
-            Log.d("heel",wallpaperDirectory.toString())
-            val pFile = File(wallpaperDirectory, ((Calendar.getInstance().getTimeInMillis()).toString() + ".jpg"))
-            pFile.createNewFile()
-            val fo = FileOutputStream(pFile)
-            fo.write(bytes.toByteArray())
-            MediaScannerConnection.scanFile(this, arrayOf(pFile.getPath()), arrayOf("image/jpeg"), null)
-            fo.close()
-            Log.d("TAG", "File Saved::--->" + pFile.getAbsolutePath())
-            return pFile.getAbsolutePath()
-        }
-        catch (e1: IOException)
-        {
-            e1.printStackTrace()
-        }
-        return ""
-    }
     /************************* listener *************************/
     //--------------------------------------------------------------------
     //
@@ -829,16 +804,51 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //listAdapter callback
     override fun deleteProc(pInfo: place)
     {
-        //place data remove
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.child(pInfo.place_key)//where
-        pDbRef!!.removeValue()
+        //group place list remove
+        var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_GroupInfo!!.group_key)
+                .child("place_list").orderByKey()
 
-        //file storage remove
-        storageDeleteItemProc(pInfo.place_key!!)
+        pQuery.addListenerForSingleValueEvent(object:ValueEventListener
+        {
+            override fun onDataChange(p0: DataSnapshot?) {
 
-        //file data remove
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
-        pDbRef!!.removeValue()
+                if(p0!!.exists())
+                {
+                    var tbGorup:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
+                        .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                        .child(m_GroupInfo!!.group_key)
+                        .child("place_list")
+
+                    val children = p0!!.children
+                    children.forEach {
+
+                        var placeInfo:place = it.getValue(place::class.java)!!
+
+                        //file storage remove
+                        storageDeleteItemProc(placeInfo.place_key!!)
+
+
+                        //place Item delete
+                        tbGorup.child(placeInfo.place_key)
+                        tbGorup!!.removeValue()
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+        })
+
+
+
 
         //refresh
         setRefresh()

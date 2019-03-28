@@ -1,17 +1,17 @@
 package com.midas.secretplace.ui.frag
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.place
+import com.midas.secretplace.ui.act.ActPlaceDetail
+import java.io.Serializable
 
 
 class MapFragment : SupportMapFragment(), OnMapReadyCallback
@@ -101,16 +101,24 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
             }
         }
 
+        //marker click
         mMap!!.setOnMarkerClickListener(object : GoogleMap.OnMarkerClickListener {
             override fun onMarkerClick(pMarker: Marker): Boolean {
                 var pInfo:place = pMarker.tag as place
-
-                if(m_IfCallback != null)
-                    m_IfCallback!!.selectPlaceItem(pInfo)
-
                 return false
             }
         })
+
+        //marker text click
+        mMap!!.setOnInfoWindowClickListener(object: GoogleMap.OnInfoWindowClickListener{
+            override fun onInfoWindowClick(p0: Marker?) {
+                var pInfo:place = p0!!.tag as place
+                movePlaceDetail(pInfo)
+                return
+            }
+
+        })
+
 
         mMap!!.setOnMapClickListener(object : GoogleMap.OnMapClickListener {
             override fun onMapClick(latLng: LatLng) {
@@ -133,6 +141,14 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
     fun setIfCallback(pCallback:ifCallback)
     {
         m_IfCallback = pCallback
+    }
+    //------------------------------------------------------------
+    //
+    fun movePlaceDetail(pInfo:place)
+    {
+        var pIntent = Intent(activity, ActPlaceDetail::class.java)
+        pIntent.putExtra(Constant.INTENT_DATA_PLACE_OBJECT, pInfo as Serializable)
+        startActivityForResult(pIntent, 0)
     }
     /********************** interface **********************/
     //------------------------------------------------------------

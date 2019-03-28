@@ -1,20 +1,30 @@
 package com.midas.secretplace.ui.frag.main
 
 import android.app.Activity
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.app.ShareCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
+import android.text.InputFilter
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
@@ -22,12 +32,15 @@ import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.place
+import com.midas.secretplace.structure.room.data_place
+import com.midas.secretplace.structure.vm.vm_place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
 import com.midas.secretplace.ui.act.ActMapDetail
 import com.midas.secretplace.ui.act.ActPlaceDetail
-import com.midas.secretplace.ui.custom.SimpleDividerItemDecoration
+import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.frag_place.*
+import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import java.io.Serializable
 
 
@@ -36,10 +49,12 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     /**************************** Define ****************************/
 
     /**************************** Member ****************************/
+    private var mViewModelPlace: vm_place?= null//mvvm
     var m_Context: Context? = null
     var m_Activity:Activity? = null
     var m_App:MyApp? = null
     var m_IfCallback:ifCallback? = null
+    var m_RequestManager: RequestManager? = null
     var m_Adapter:PlaceRvAdapter? = null
     var m_arrPlace:ArrayList<place>? = ArrayList()
 
@@ -62,6 +77,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         m_App = MyApp()
         if(m_App!!.m_binit == false)
             m_App!!.init(m_Context!!)
+
+        m_RequestManager = Glide.with(m_Context)
 
         return view
     }
@@ -110,8 +127,24 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     }
     //------------------------------------------------------------------------
     //
+    fun setViewModel(){
+        mViewModelPlace = ViewModelProviders.of(this).get(vm_place::class.java)
+        mViewModelPlace?.deleteAll()//init..
+        mViewModelPlace?.placeList?.observe(this, object : Observer<List<data_place>> {
+            override fun onChanged(list: List<data_place>?) {
+                if(list != null)
+                {
+                    return
+                }
+            }
+        })
+    }
+    //------------------------------------------------------------------------
+    //
     fun setInitLayout()
     {
+        setViewModel()
+
         //event..
         ly_SwipeRefresh.setOnRefreshListener(this)
 
@@ -129,11 +162,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
                 }
             }
-        })
-
-        //지도로 좌표보기..
-        btn_ShowMap!!.setOnClickListener(View.OnClickListener {
-            goMapDetail()
         })
 
         settingView()
@@ -159,15 +187,13 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //
     fun settingView()
     {
-        m_Adapter = PlaceRvAdapter(m_Context!!, m_arrPlace!!, this)
+        m_Adapter = PlaceRvAdapter(m_Context!!, m_RequestManager!!, m_arrPlace!!, this)
         m_RecyclerView!!.adapter = m_Adapter
-
-        m_RecyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))
 
         var nSpanCnt = 1
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)//landspace mode..
         {
-            nSpanCnt = 3
+            nSpanCnt = 1
         }
 
         val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
@@ -191,6 +217,17 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             }
         })
 
+        //swipe remove listener..
+        val swipeHandler = object : SwipeToDeleteCallback(m_Context!!) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                //val adapter = recyclerView.adapter as SimpleAdapter
+                m_Adapter!!.removeAt(viewHolder.adapterPosition)
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+
+
         getPlaceListProc("")
     }
     //--------------------------------------------------------------
@@ -199,73 +236,41 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     {
         progressBar.visibility = View.VISIBLE
         m_bRunning = true
-        //m_App!!.showLoadingDialog(ly_LoadingDialog)
-
-        //var pQuery: Query = m_App!!.m_FirebaseDbCtrl!!.getPlaceList(seq!!)
-        //pQuery!!.addListenerForSingleValueEvent(listenerForSingleValueEvent)
-        //pQuery!!.addChildEventListener(childEventListener)
-
         var pQuery:Query? = null
-        /*
-        if(!m_strPlaceLastSeq.equals(""))
-        {
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_strPlaceLastSeq).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
-        }
-        else
-        {
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
-        }
-        */
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).orderByChild("user_key").equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_App!!.m_SpCtrl!!.getSpUserKey()).orderByKey()
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 if(dataSnapshot!!.exists())
                 {
-                    //if(!m_strPlaceLastSeq.equals(dataSnapshot!!.key))
-                    //{
-                        m_bPagingFinish = false
-                        val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                        //m_strPlaceLastSeq = dataSnapshot!!.key
-                        pInfo.place_key = dataSnapshot!!.key
-
-                    //}
+                    m_bPagingFinish = false
+                    val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                    pInfo.place_key = dataSnapshot!!.key
                 }
                 else
                 {
                     m_bPagingFinish = true
                 }
-
-                progressBar.visibility = View.GONE
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
-                //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
 
-                // A message has changed
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot?)
             {
-                //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
 
-                // A message has been removed
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
-                //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
 
-                // A message has changed position
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onCancelled(databaseError: DatabaseError?)
             {
-                //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
+
             }
         })
 
@@ -274,10 +279,23 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             {
                 if(dataSnapshot!!.exists())
                 {
+                    m_bPagingFinish = false
                     val children = dataSnapshot!!.children
                     children.forEach {
                         val pInfo:place = it!!.getValue(place::class.java)!!
                         m_Adapter!!.addData(pInfo)
+
+                        var dataPlace:data_place = data_place(0,
+                                pInfo!!.user_key!!,
+                                pInfo!!.place_key!!,
+                                pInfo!!.group_key!!,
+                                pInfo!!.name!!,
+                                pInfo!!.lat!!,
+                                pInfo!!.lng!!,
+                                pInfo!!.memo!!,
+                                pInfo!!.address!!,
+                                pInfo!!.img_url!!)
+                        mViewModelPlace?.insert(dataPlace)//
                     }
                 }
                 else
@@ -287,7 +305,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
 
                 m_bRunning = false
-                ly_MenuContainer.visibility = View.VISIBLE
                 progressBar.visibility = View.GONE
             }
 
@@ -297,6 +314,72 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             }
         })
     }
+    //----------------------------------------------------------------------
+    //
+    fun menuItemShowMap(){
+        if(m_Adapter == null)
+        {
+            Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_no_exit_location), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if(m_Adapter!!.itemCount <= 0)
+        {
+            Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_no_exit_location), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+
+        if(m_IfCallback != null)
+        {
+            var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
+            if(bPermissionVal)
+            {
+                goMapDetail()
+            }
+            else
+            {
+
+            }
+        }
+    }
+    //----------------------------------------------------------------------
+    //
+    fun menuItemShareLocation(){
+        if(m_IfCallback != null)
+        {
+            var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
+            if(bPermissionVal)
+            {
+                Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_share_my_location), Toast.LENGTH_SHORT).show()
+
+                var locationInfo = m_IfCallback!!.getLocation()
+                var strAddress:String = Util.getAddress(m_Context!!, locationInfo.latitude, locationInfo.longitude)
+                var strMyLocation:String = String.format("주소 : %s, 위도 : %s, 경도 : %s", strAddress, locationInfo.latitude, locationInfo.longitude)
+
+                val shareIntent = ShareCompat.IntentBuilder.from(activity)
+                        .setText(strMyLocation)
+                        .setType("text/plain")
+                        .createChooserIntent()
+                        .apply {
+                            // https://android-developers.googleblog.com/2012/02/share-with-intents.html
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                // If we're on Lollipop, we can open the intent as a document
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                            } else {
+                                // Else, we will use the old CLEAR_WHEN_TASK_RESET flag
+                                addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                            }
+                        }
+                startActivity(shareIntent)
+            }
+            else
+            {
+
+            }
+        }
+    }
+
     //--------------------------------------------------------------
     //
     fun seveLocationDialog()
@@ -308,8 +391,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             {
                 var locationInfo = m_IfCallback!!.getLocation()
                 var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919...xxx
-
-                var pInfo:place = place(userKey!!, "", "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude))
+                var address:String? = Util.getAddress(m_Context!!, locationInfo.latitude, locationInfo.longitude)
+                var pInfo:place = place(userKey!!, "", "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), "", address!!, "")
                 showPlaceInputDialog(pInfo)
             }
         }
@@ -327,23 +410,45 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         val builder = AlertDialog.Builder(m_Context!!)
         builder.setMessage(getString(R.string.str_msg_3))
         var editName: EditText? = EditText(m_Context)
+        editName!!.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL//singline..
+        editName!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(30))//maxlength
         editName!!.hint = getString(R.string.str_msg_4)
         builder.setView(editName)
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
             pInfo!!.name = editName.text.toString()
 
             var pDbRef:DatabaseReference? = null
-            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.push()//insert..
+            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())!!
+                    .push()!!//insert..
+
             pDbRef!!.setValue(pInfo!!)//insert
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(dataSnapshot: DataSnapshot?)
                 {
                     if (dataSnapshot!!.exists())
                     {
-                        //m_strPlaceLastSeq = dataSnapshot!!.key
-                        pInfo!!.place_key = dataSnapshot!!.key
-                        m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(dataSnapshot!!.key)!!.setValue(pInfo)//update..
+                        //key update
+                        var key = dataSnapshot!!.key
+                        pInfo.place_key = key
+                        pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())!!
+                                .child(key)!!//
+
+                        pDbRef!!.setValue(pInfo)//insert
                         m_Adapter!!.addData(pInfo!!)
+
+                        var dataPlace:data_place = data_place(0,
+                                pInfo!!.user_key!!,
+                                pInfo!!.place_key!!,
+                                pInfo!!.group_key!!,
+                                pInfo!!.name!!,
+                                pInfo!!.lat!!,
+                                pInfo!!.lng!!,
+                                pInfo!!.memo!!,
+                                pInfo!!.address!!,
+                                pInfo!!.img_url!!)
+                        mViewModelPlace?.insert(dataPlace)//
                     }
                 }
 
@@ -386,7 +491,10 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         val storageRef = FirebaseStorage.getInstance(Constant.FIRE_STORE_URL)
 
         var pQuery:Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(placeKey).child("img_list")//where
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(placeKey).orderByKey()
+
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
@@ -432,8 +540,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 {
                     val children = dataSnapshot!!.children
                     children.forEach {
-                        var fileNm:String = it!!.getValue(String::class.java)!!
-
+                        var fileNm:String = it.value as String
                         //split ?
                         var arrTemp:List<String> = fileNm.split("?")
                         fileNm = arrTemp.get(0)
@@ -442,7 +549,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                         fileNm = arrTemp.get(arrTemp.size - 1)
 
                         // Create a reference to the file to delete
-                        var desertRef = storageRef.reference.child(fileNm)//test..
+                        var desertRef = storageRef.reference.child(fileNm)//
                         // Delete the file
                         desertRef.delete().addOnSuccessListener {
                             // File deleted successfully
@@ -477,32 +584,25 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     {
         setRefresh()
     }
-    //----------------------------------------------------------------------
-    //
-    fun showList(view:View)
-    {
-
-    }
-    //----------------------------------------------------------------------
-    //
-    fun showMap(view:View)
-    {
-
-    }
     /******************************** callback function ********************************/
     //----------------------------------------------------------------------
     //listAdapter callback
     override fun deleteProc(pInfo: place)
     {
         //place data remove
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!.child(pInfo.place_key)//where
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(pInfo.place_key)//where
         pDbRef!!.removeValue()
 
         //file storage remove
         storageDeleteItemProc(pInfo.place_key!!)
 
         //file data remove
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(pInfo.place_key)//where
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(pInfo.place_key)//where
+
         pDbRef!!.removeValue()
 
         //refresh

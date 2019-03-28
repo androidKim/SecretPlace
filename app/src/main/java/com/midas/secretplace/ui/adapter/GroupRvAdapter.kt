@@ -2,24 +2,13 @@ package com.midas.mytimeline.ui.adapter
 
 
 import android.content.Context
-import android.content.Intent
-import android.support.v7.app.AlertDialog
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
 import com.midas.secretplace.R
-import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.group
-import com.midas.secretplace.structure.core.place
-import com.midas.secretplace.ui.act.ActGroupDetail
-import com.midas.secretplace.ui.act.ActPlaceDetail
-import java.io.Serializable
 
 class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, var m_IfCallback:ifCallback) :
         RecyclerView.Adapter<GroupRvAdapter.Holder>()
@@ -52,7 +41,6 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
     inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView)
     {
         var ly_Row = itemView?.findViewById<RelativeLayout>(R.id.ly_Row)
-        var ly_Delete = itemView?.findViewById<LinearLayout>(R.id.ly_Delete)
         var tv_Name = itemView?.findViewById<TextView>(R.id.tv_Name)
 
         fun bind (pInfo: group, pContext: Context)
@@ -60,9 +48,6 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
             tv_Name!!.text = pInfo.name
             ly_Row!!.setTag(pInfo)
             ly_Row!!.setOnClickListener(onClickGoDetail)
-
-            ly_Delete!!.setTag(pInfo)
-            ly_Delete!!.setOnClickListener(onClickDelete)
         }
     }
 
@@ -117,17 +102,15 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
             }
         }
     }
-
     //----------------------------------------------------------------------------
     //
-    fun deleteGroupInfo(pInfo:group)
-    {
-        if(pInfo == null)
-            return
-
-        //using interface..
+    fun removeAt(position: Int) {
+        var pInfo:group = m_arrGroup.get(position)
+        m_arrGroup.removeAt(position)
         if(m_IfCallback != null)
             m_IfCallback.deleteGroupProc(pInfo)
+
+        notifyItemRemoved(position)
     }
 
     /*********************** Listener ***********************/
@@ -139,30 +122,6 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
             R.id.ly_Row -> goDetail(view)
         }
     }
-    //----------------------------------------------------------------------------
-    //onClick Delete
-    val onClickDelete = View.OnClickListener{view->
-        val pInfo:group = view.getTag() as group
-
-        val builder = AlertDialog.Builder(m_Context!!)
-        builder.setMessage(m_Context.getString(R.string.str_msg_19))
-        builder.setPositiveButton(m_Context.getString(R.string.str_ok)){dialog, which ->
-            //show dialog..
-            deleteGroupInfo(pInfo)
-        }
-
-        builder.setNegativeButton(m_Context.getString(R.string.str_no)){dialog,which ->
-
-        }
-
-        builder.setNeutralButton(m_Context.getString(R.string.str_cancel)){_,_ ->
-
-        }
-
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
-    }
-
     /*********************** interface ***********************/
     interface ifCallback
     {

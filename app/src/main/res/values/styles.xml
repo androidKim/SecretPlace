@@ -148,8 +148,13 @@
 
     <!-- CardView Style. -->
     <style name="CardViewStyle" parent="CardView">
-        <item name="cardCornerRadius">4dp</item>
-        <item name="cardElevation">4dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="cardCornerRadius">5dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardBackgroundColor">@color/color_white</item>
     </style>
 
 
@@ -171,8 +176,6 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">10dp</item>
         <item name="android:layout_margin">5dp</item>
-        <item name="android:paddingRight">3dp</item>
-        <item name="android:paddingLeft">8dp</item>
         <item name="android:textColor">@color/color_black</item>
         <item name="android:background">@color/color_white</item>
     </style>
@@ -182,8 +185,6 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">15dp</item>
         <item name="android:layout_margin">5dp</item>
-        <item name="android:paddingRight">3dp</item>
-        <item name="android:paddingLeft">8dp</item>
         <item name="android:textColor">@color/color_black</item>
         <item name="android:background">@color/color_white</item>
     </style>
@@ -193,10 +194,32 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">20dp</item>
         <item name="android:layout_margin">5dp</item>
-        <item name="android:paddingRight">3dp</item>
-        <item name="android:paddingLeft">8dp</item>
         <item name="android:textColor">@color/color_black</item>
         <item name="android:background">@color/color_white</item>
+    </style>
+
+    <style name="TextViewCahtYou" parent="@android:style/Widget.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">15dp</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">30dp</item>
+        <item name="android:paddingTop">@dimen/padding</item>
+        <item name="android:paddingBottom">@dimen/padding</item>
+        <item name="android:textColor">@color/color_white</item>
+        <item name="android:background">@color/color_none</item>
+    </style>
+
+    <style name="TextViewCahtMe" parent="@android:style/Widget.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">15dp</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">30dp</item>
+        <item name="android:paddingTop">@dimen/padding</item>
+        <item name="android:paddingBottom">@dimen/padding</item>
+        <item name="android:textColor">@color/color_black</item>
+        <item name="android:background">@color/color_none</item>
     </style>
 
     <style name="TextViewTop" parent="@android:style/Widget.TextView">
@@ -222,5 +245,27 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:buttonStyle">@style/Base.Widget.AppCompat.Button.Colored</item>
+    </style>
+
+    <style name="loginButtonStyle" parent="Base.Widget.AppCompat.ActionButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/color_white</item>
+        <item name="android:padding">@dimen/padding</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">15dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/shape_btn_round</item>
+    </style>
+    <!-- Toolbar Style -->
+    <style name="ToolBarStyle.Base" parent="Base.Theme.AppCompat.Light.DarkActionBar">
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="actionMenuTextColor">@color/color_black</item>
+    </style>
+
+    <!-- progressBar style -->
+    <style name="progressBarSytle" parent="">
+        <item name="theme">@style/Widget.AppCompat.ProgressBar</item>
     </style>
 </resources>

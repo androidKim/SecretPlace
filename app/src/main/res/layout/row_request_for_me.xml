@@ -15,42 +15,34 @@
         <RelativeLayout
             android:id="@+id/ly_Row"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding">
 
             <RelativeLayout
                 android:id="@+id/ly_UserKey"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:gravity="center_vertical">
-
-                <ImageView
-                    android:id="@+id/iv_KeyIcon"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_centerVertical="true"
-                    android:background="@drawable/baseline_vpn_key_black_48" />
 
                 <TextView
                     android:id="@+id/tv_RequesterKey"
-                    style="@style/TextViewSmall"
+                    style="@style/TextViewMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="5dp"
-                    android:layout_toRightOf="@id/iv_KeyIcon"
+                    android:layout_marginRight="@dimen/margin_right"
                     tools:text="QIaksdkajdwi2992jsksk" />
 
             </RelativeLayout>
 
             <ImageView
                 android:id="@+id/iv_Accept"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/icon_small_width"
+                android:layout_height="@dimen/icon_small_height"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/ly_UserKey"
                 android:background="@drawable/baseline_favorite_border_black_48" />
-
-
         </RelativeLayout>
 
 

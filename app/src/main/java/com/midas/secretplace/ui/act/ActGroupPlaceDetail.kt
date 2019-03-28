@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -19,12 +20,15 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.AbsListView
@@ -46,7 +50,7 @@ import com.midas.secretplace.ui.adapter.PhotoRvAdapter
 import com.midas.secretplace.ui.custom.dlg_photo_filter
 import com.midas.secretplace.ui.custom.dlg_photo_view
 import com.midas.secretplace.util.Util
-import kotlinx.android.synthetic.main.act_place_detail.*
+import kotlinx.android.synthetic.main.act_group_place_detail.*
 import kotlinx.android.synthetic.main.dlg_photo_filter.view.*
 import kotlinx.android.synthetic.main.dlg_photo_view.view.*
 import java.io.*
@@ -188,7 +192,6 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
             }
         }
     }
-
     //--------------------------------------------------------------
     //permission checking callback
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
@@ -222,7 +225,43 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
             }
         }
     }
+    /*********************** Menu Function ***********************/
+    //--------------------------------------------------------------
+    //
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        var menuItem1: MenuItem = menu!!.findItem(R.id.action_share).setVisible(false)
+        var menuItem2: MenuItem = menu!!.findItem(R.id.share_location).setVisible(true)
+        var menuItem3: MenuItem = menu!!.findItem(R.id.show_map).setVisible(true)
+        var menuItem4: MenuItem = menu!!.findItem(R.id.edit).setVisible(true)
+        var menuItem5: MenuItem = menu!!.findItem(R.id.add_photo).setVisible(true)
 
+        return super.onCreateOptionsMenu(menu)
+    }
+    //--------------------------------------------------------------
+    //
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle presses on the action bar menu items
+        when (item.itemId) {
+            R.id.share_location -> {
+                Util.sharePlaceLocationInfo(this, this, m_PlaceInfo!!)
+                return true
+            }
+            R.id.show_map -> {
+                goMapDetail()
+                return true
+            }
+            R.id.edit -> {
+                editContent()
+                return true
+            }
+            R.id.add_photo -> {
+                addPhoto()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
     /*********************** User Function ***********************/
     //--------------------------------------------------------------
     //
@@ -247,51 +286,22 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
     //
     fun initLayout()
     {
+        toolbar.title = m_PlaceInfo!!.name
+        setSupportActionBar(toolbar)//enable app bar
+        var actionBar: ActionBar = supportActionBar!!
+        actionBar.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayUseLogoEnabled(true)
+        toolbar.setNavigationOnClickListener { view -> onBackPressed() }
+        var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
+        }
+
         m_LayoutInflater = LayoutInflater.from(m_Context)
 
         //listener..
         ly_SwipeRefresh.setOnRefreshListener(this)//refresh..
-
-
-        //map dialog
-        ly_ShowMap.setOnClickListener(View.OnClickListener {
-            goMapDetail()
-        })
-
-        //addPhoto..
-        ly_AddPhoto.setOnClickListener(View.OnClickListener {
-            addPhoto()
-        })
-
-        //modify name.
-        ly_EditContent.setOnClickListener(View.OnClickListener {
-            editContent()
-        })
-
-        //map expand
-        /*
-        ly_MapExpand.setOnClickListener(View.OnClickListener {
-            ly_MapExpand.visibility = View.GONE
-            ly_MapCollapse.visibility = View.VISIBLE
-
-            //expand map..
-            val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = RelativeLayout.LayoutParams.MATCH_PARENT
-            mapFragment!!.getView()!!.setLayoutParams(params)
-        })
-
-        //map collapse
-        ly_MapCollapse.setOnClickListener(View.OnClickListener {
-
-            ly_MapExpand.visibility = View.VISIBLE
-            ly_MapCollapse.visibility = View.GONE
-
-            val params = mapFragment!!.getView()!!.getLayoutParams()
-            params.height = 0
-            mapFragment!!.getView()!!.setLayoutParams(params)
-        })
-        */
-
         settingView()
     }
     //--------------------------------------------------------------
@@ -300,95 +310,75 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
     {
         ly_NoData.visibility = View.GONE
 
-        //map..
-        /*
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as MapFragment
-        mapFragment!!.getMapAsync(mapFragment)
-        val mArgs = Bundle()
-        mArgs.putSerializable(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo!!)
-        mapFragment.arguments = mArgs
-        */
-
-        //getPlaceInfoProc(m_PlaceInfo!!.seq!!)
         settingPlaceView()
     }
     //--------------------------------------------------------------
     //
     fun settingPlaceView()
     {
-        //setTitle..
-        tv_Title.text = m_PlaceInfo!!.name
+        m_Adapter = PhotoRvAdapter(m_Context!!, m_RequestManager!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
+        recyclerView.adapter = m_Adapter
 
-        //if(m_Adapter == null)
-        //{
-            m_Adapter = PhotoRvAdapter(m_Context!!, m_RequestManager!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
-            recyclerView.adapter = m_Adapter
-            //recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(20))//set recyclerview grid Item spacing
-            var nSpanCnt = 1
-            val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
-            recyclerView!!.layoutManager = pLayoutManager
-            recyclerView!!.setHasFixedSize(true)
-            recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
+        var nSpanCnt = 1
+        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
+        recyclerView!!.layoutManager = pLayoutManager
+        recyclerView!!.setHasFixedSize(true)
+        recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
+        {
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
             {
-                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
+                val visibleItemCount = pLayoutManager.childCount
+                val totalItemCount = pLayoutManager.itemCount
+                val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
+
+                if(firstVisible == 0)
                 {
-                    val visibleItemCount = pLayoutManager.childCount
-                    val totalItemCount = pLayoutManager.itemCount
-                    val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
 
-                    if(firstVisible == 0)
-                    {
-
-                    }
-                    else
-                    {
-                        if(m_bScrollTouch)
-                        {
-                            /*
-                            if (dy > 0)
-                                slideUp()    // Scrolling up
-                            else
-                                slideDown()// Scrolling down
-                            */
-
-                            m_bScrollTouch = false
-                        }
-                    }
-
-                    /*
-                    if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//최하단
-                    {
-                        // Call your API to load more items
-                        //if(!m_bFinish!!)
-                            //getImageListProc()
-                    }
-                    */
                 }
+                else
+                {
+                    if(m_bScrollTouch)
+                    {
+                        /*
+                        if (dy > 0)
+                            slideUp()    // Scrolling up
+                        else
+                            slideDown()// Scrolling down
+                        */
 
-                override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-
-                    if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {//손을 떼었지만 움직이는중
-                        // Do something
-                        m_bScrollTouch = true
-                    } else if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {//터치되어있는중
-                        // Do something
-                        m_bScrollTouch = true
-
-                    } else if(newState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE){//정지된상태
-                        m_bScrollTouch = false
-                    }
-                    else {
-                        // Do something
                         m_bScrollTouch = false
                     }
                 }
-            })
-        //}
-        //else//addData
-        //{
-            //m_Adapter!!.addData(null)
-        //}
+
+                /*
+                if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//최하단
+                {
+                    // Call your API to load more items
+                    //if(!m_bFinish!!)
+                        //getImageListProc()
+                }
+                */
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {//손을 떼었지만 움직이는중
+                    // Do something
+                    m_bScrollTouch = true
+                } else if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {//터치되어있는중
+                    // Do something
+                    m_bScrollTouch = true
+
+                } else if(newState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE){//정지된상태
+                    m_bScrollTouch = false
+                }
+                else {
+                    // Do something
+                    m_bScrollTouch = false
+                }
+            }
+        })
 
         if(!m_bRunning!!)
             getImageListProc()//imageList
@@ -399,7 +389,12 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
     fun getPlaceInfoProc(seq:String)
     {
         //place Object
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE)!!.child(seq)//where
+        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_PlaceInfo!!.group_key)
+                .child("place_list")
+                .child(seq)//where
+
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
         {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
@@ -437,40 +432,29 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         //image list..
         var pQuery:Query?= null
 
-        //if(m_strImgLastSeq != null)
-            //pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child("place_key").startAt(m_PlaceInfo!!.place_key).limitToFirst(ReqBase.ITEM_COUNT)
-        //else
-            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").orderByKey()//.limitToFirst(ReqBase.ITEM_COUNT)
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_PlaceInfo!!.place_key).orderByKey()
 
         pQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 // A new message has been added
-                // onChildAdded() will be called for each node at the first time
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
-
-                // A message has changed
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot?)
             {
                 //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
-
-                // A message has been removed
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
             {
                 //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
-
-                // A message has changed position
-                //val message = dataSnapshot.getValue(Message::class.java)
             }
 
             override fun onCancelled(databaseError: DatabaseError?)
@@ -486,28 +470,8 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                 {
                     val children = dataSnapshot!!.children
                     children.forEach {
-
-                        //if(m_strImgLastSeq != null)
-                        //{
-                            //if(!m_strImgLastSeq.equals(it!!.key))
-                            //{
-                                //m_strImgLastSeq = it!!.key
-
-                                var strUrl:String = it.getValue(String::class.java)!!
-                                m_Adapter!!.addItem(strUrl)
-                            //}
-                            //else//not add same key..
-                            //{
-                                //m_bFinish = true//get lastitem detect
-                            //}
-                        //}
-                        //else
-                        //{
-                            //m_strImgLastSeq = it!!.key
-
-                            //var strUrl:String = it.getValue(String::class.java)!!
-                            //m_Adapter!!.addItem(strUrl)
-                        //}
+                        var strUrl:String = it.getValue(String::class.java)!!
+                        m_Adapter!!.addItem(strUrl)
                     }
                 }
                 else
@@ -537,8 +501,6 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         initValue()
         if(m_Adapter != null)
             m_Adapter!!.clearData()
-
-        //recyclerView!!.addItemDecoration(SimpleDividerItemDecoration(-20))//init
 
         ly_SwipeRefresh.isRefreshing = false
         getPlaceInfoProc(m_PlaceInfo!!.place_key!!)
@@ -692,7 +654,12 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         m_PlaceInfo!!.name = strName
 
         var pDbRef: DatabaseReference? = null
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP_PLACE).child(m_PlaceInfo!!.place_key)
+        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_PlaceInfo!!.group_key)
+                .child("place_list")
+                .child(m_PlaceInfo!!.place_key)
+
         pDbRef!!.setValue(m_PlaceInfo!!)
 
         pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -840,8 +807,8 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
 
                 when(m_nUploadPhotoType)
                 {
-                    REQUEST_SELECT_IMAGE_IN_ALBUM -> uploadCameraPhoto(m_UploadImgFile!!)
-                    REQUEST_TAKE_PHOTO -> uploadAlbumPhoto(m_UploadImgFile!!)
+                    REQUEST_SELECT_IMAGE_IN_ALBUM -> uploadAlbumPhoto(m_UploadImgFile!!)
+                    REQUEST_TAKE_PHOTO -> uploadCameraPhoto(m_UploadImgFile!!)
                 }
 
             }
@@ -871,10 +838,10 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     //val uri = taskSnapshot.downloadUrl
 
                     //update
-                    var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
+                    var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                            .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            .child(m_PlaceInfo!!.place_key).push()//where
                     pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
-
-                    //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
                     pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot?) {
                             if (dataSnapshot!!.exists()) {
@@ -888,6 +855,28 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                         override fun onCancelled(p0: DatabaseError?) {
                             progressBar.visibility = View.GONE
                             tv_Progress.visibility = View.GONE
+                        }
+                    })
+
+                    //place table update
+                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
+                            .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            .child(m_PlaceInfo!!.group_key)
+                            .child("place_list")
+                            .child(m_PlaceInfo!!.place_key)
+
+                    pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                            if (dataSnapshot!!.exists()) {
+
+                                val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                                pInfo!!.img_url = taskSnapshot.downloadUrl.toString()
+                                pPlaceDb.setValue(pInfo)
+                            }
+                        }
+
+                        override fun onCancelled(p0: DatabaseError?) {
+
                         }
                     })
                 }
@@ -924,10 +913,10 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     //val uri = taskSnapshot.downloadUrl
 
                     //update
-                    var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!.child(m_PlaceInfo!!.place_key).child("img_list").push()//where
+                    var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                            .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            .child(m_PlaceInfo!!.place_key).push()//where
                     pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
-
-                    //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
                     pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot?) {
                             if (dataSnapshot!!.exists()) {
@@ -943,6 +932,28 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                             tv_Progress.visibility = View.GONE
                         }
                     })
+
+                    //place table update
+                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
+                            .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            .child(m_PlaceInfo!!.group_key)
+                            .child("place_list")
+                            .child(m_PlaceInfo!!.place_key)
+
+                    pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                            if (dataSnapshot!!.exists()) {
+
+                                val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                                pInfo!!.img_url = taskSnapshot.downloadUrl.toString()
+                                pPlaceDb.setValue(pInfo)
+                            }
+                        }
+
+                        override fun onCancelled(p0: DatabaseError?) {
+
+                        }
+                    })
                 }
                 .addOnFailureListener { exception ->
                     Toast.makeText(this, exception.message, Toast.LENGTH_LONG).show()
@@ -951,7 +962,6 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                     // progress percentage
                     val progress = 100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
 
-                    // percentage in progress dialog
                     val intProgress = progress.toInt()
                     tv_Progress.text = "Uploaded " + intProgress + "%..."
                 }

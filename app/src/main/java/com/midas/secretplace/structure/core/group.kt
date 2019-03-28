@@ -2,6 +2,9 @@ package com.midas.secretplace.structure.core
 
 import com.google.firebase.database.Exclude
 import java.io.Serializable
+import android.R.attr.author
+
+
 
 class group:Serializable
 {

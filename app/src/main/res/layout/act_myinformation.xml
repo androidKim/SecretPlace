@@ -7,64 +7,46 @@
     android:background="@color/color_white"
     tools:context=".ui.act.ActMyInformation">
 
-    <LinearLayout
+
+    <RelativeLayout
         android:id="@+id/ly_Top"
-        style="@style/topLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/tv_TopTitle"
-            style="@style/TextViewTop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Top Title" />
-    </LinearLayout>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            style="@style/ToolBarStyle.Base"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
 
     <RelativeLayout
         android:id="@+id/ly_Container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@+id/ly_Top">
 
-        <RelativeLayout
-            android:id="@+id/layout1"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:background="@drawable/baseline_face_black_48"
+                android:paddingTop="@dimen/padding_top"
+                android:paddingBottom="@dimen/padding_bottom" />
 
             <TextView
-                android:id="@+id/textView1"
-                style="@style/TextViewMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="@string/str_msg_31"
-                android:textSize="20dp" />
-
-            <TextView
-                android:id="@+id/tv_Name"
+                android:text="@string/str_msg_55"
                 style="@style/TextViewMedium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/textView1"
-                tools:text="김태준" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/layout2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/layout1">
-
-            <TextView
-                android:id="@+id/textView2"
-                style="@style/TextViewMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="@string/str_msg_32"
-                android:textSize="20dp" />
+                android:gravity="center"
+                tools:text="나의 키를 공유하여 커플을 맺으세요." />
 
             <TextView
                 android:id="@+id/tv_UserKey"
@@ -72,36 +54,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/textView2"
-                tools:text="ABCDEFG" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/layout2">
-
-            <TextView
-                android:id="@+id/tv_Desc"
-                style="@style/TextViewMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
                 android:gravity="center"
-                android:text="@string/str_msg_49" />
-
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/btn_Copy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_Desc"
-                android:layout_toRightOf="@id/tv_Desc"
-                android:layout_centerVertical="true"
-                android:onClick="onClickSahre"
-                app:srcCompat="@drawable/ic_baseline_share_24px" />
-
-        </RelativeLayout>
+                tools:text="ABCDEFG" />
+        </LinearLayout>
 
     </RelativeLayout>
 
