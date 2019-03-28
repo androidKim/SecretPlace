@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_etc"
+        android:key="pref_key_storage_settings">
+
+        <Preference
+            android:key="pref_version"
+            android:title="버전">
+            <intent android:action="android.intent.action.VIEW"
+            android:data="@string/app_url" />
+
+        </Preference>
+        <Preference
+            android:key="pref_logout"
+            android:title="@string/str_msg_1"
+            />
+    </PreferenceCategory>
+
+</PreferenceScreen>

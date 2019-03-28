@@ -165,10 +165,13 @@ RecyclerView.Adapter<PlaceRvAdapter.ViewHolder>()
     //
     fun removeAt(position: Int) {
         var pInfo:place = placeList.get(position)
-        placeList.removeAt(position)
         if(m_IfCallback != null)
-            m_IfCallback.deleteProc(pInfo)
-
+            m_IfCallback.deleteProc(pInfo, position)
+    }
+    //----------------------------------------------------------------------------
+    //
+    fun removeRow(position: Int){
+        placeList.removeAt(position)
         notifyItemRemoved(position)
     }
 
@@ -184,7 +187,7 @@ RecyclerView.Adapter<PlaceRvAdapter.ViewHolder>()
     /*********************** interface ***********************/
     interface ifCallback
     {
-        fun deleteProc(pInfo:place)
+        fun deleteProc(pInfo:place, position:Int)
         fun checkPermission():Boolean
         fun moveDetailActivity(pInfo:place)
     }

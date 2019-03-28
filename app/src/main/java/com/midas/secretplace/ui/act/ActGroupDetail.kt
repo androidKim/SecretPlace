@@ -20,6 +20,8 @@ import android.support.v7.app.ActionBar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -44,6 +46,7 @@ import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.custom.dlg_photo_view
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_group_detail.*
+import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import java.io.Serializable
 import java.util.*
 import kotlin.collections.ArrayList
@@ -368,8 +371,18 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         var nSpanCnt = 1
         val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
         recyclerView!!.setHasFixedSize(true)
-
         recyclerView!!.layoutManager = pLayoutManager
+
+        //swipe remove listener..
+        val swipeHandler = object : SwipeToDeleteCallback(m_Context!!) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                //val adapter = recyclerView.adapter as SimpleAdapter
+                m_PlaceAdapter!!.removeAt(viewHolder.adapterPosition)
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+
 
         fbtn_SaveLocation?.setOnClickListener(View.OnClickListener
         {
@@ -802,56 +815,50 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     }
     //----------------------------------------------------------------------
     //listAdapter callback
-    override fun deleteProc(pInfo: place)
+    override fun deleteProc(pInfo: place, position:Int)
     {
-        //group place list remove
-        var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                .child(m_GroupInfo!!.group_key)
-                .child("place_list").orderByKey()
+        val builder = AlertDialog.Builder(this@ActGroupDetail)
+        builder.setMessage(getString(R.string.msg_question_delete))
+        builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
 
-        pQuery.addListenerForSingleValueEvent(object:ValueEventListener
-        {
-            override fun onDataChange(p0: DataSnapshot?) {
+            m_PlaceAdapter!!.removeRow(position)
 
-                if(p0!!.exists())
-                {
-                    var tbGorup:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
-                        .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                        .child(m_GroupInfo!!.group_key)
-                        .child("place_list")
+            //group place list remove
+            var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .child(m_GroupInfo!!.group_key)
+                    .child("place_list")
+                    .child(pInfo.place_key)
 
-                    val children = p0!!.children
-                    children.forEach {
+            pDbRef!!.removeValue()
 
-                        var placeInfo:place = it.getValue(place::class.java)!!
+            //file storage remove
+            storageDeleteItemProc(pInfo.place_key!!)
 
-                        //file storage remove
-                        storageDeleteItemProc(placeInfo.place_key!!)
+            //file data remove
+            pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .child(pInfo.place_key)//where
 
+            pDbRef!!.removeValue()
 
-                        //place Item delete
-                        tbGorup.child(placeInfo.place_key)
-                        tbGorup!!.removeValue()
-                    }
-                }
-                else
-                {
+            //refresh
+            setRefresh()
+        }
 
-                }
-            }
+        builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
+            m_PlaceAdapter!!.notifyItemChanged(position)
+        }
 
-            override fun onCancelled(p0: DatabaseError?) {
+        builder.setNeutralButton(getString(R.string.str_cancel)){_,_ ->
+            m_PlaceAdapter!!.notifyItemChanged(position)
+        }
 
-            }
-
-        })
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
 
 
 
-
-        //refresh
-        setRefresh()
     }
     //----------------------------------------------------------------------
     //listAdapter callback

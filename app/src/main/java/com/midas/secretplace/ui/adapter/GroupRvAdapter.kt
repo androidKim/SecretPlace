@@ -106,10 +106,13 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
     //
     fun removeAt(position: Int) {
         var pInfo:group = m_arrGroup.get(position)
-        m_arrGroup.removeAt(position)
         if(m_IfCallback != null)
-            m_IfCallback.deleteGroupProc(pInfo)
-
+            m_IfCallback.deleteGroupProc(pInfo, position)
+    }
+    //----------------------------------------------------------------------------
+    //
+    fun removeRow(position:Int){
+        m_arrGroup.removeAt(position)
         notifyItemRemoved(position)
     }
 
@@ -125,7 +128,7 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
     /*********************** interface ***********************/
     interface ifCallback
     {
-        fun deleteGroupProc(pInfo:group)
+        fun deleteGroupProc(pInfo:group, position:Int)
         fun checkPermission():Boolean
         fun moveDetailActivity(pInfo:group)
     }

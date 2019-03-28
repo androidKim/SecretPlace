@@ -425,12 +425,27 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
     /******************************** callback function ********************************/
     //----------------------------------------------------------------------
     //listAdapter callback
-    override fun deleteGroupProc(pInfo: group)
+    override fun deleteGroupProc(pInfo: group, position:Int)
     {
-        progressBar.visibility = View.VISIBLE
+        val builder = AlertDialog.Builder(activity!!)
+        builder.setMessage(getString(R.string.msg_question_delete))
+        builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
+            m_Adapter!!.removeRow(position)
+            progressBar.visibility = View.VISIBLE
+            //delete group item in place list & img list
+            deleteGroupRow(pInfo)
+        }
 
-        //delete group item in place list & img list
-        deleteGroupRow(pInfo)
+        builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
+            m_Adapter!!.notifyItemChanged(position)
+        }
+
+        builder.setNeutralButton(getString(R.string.str_cancel)){_,_ ->
+            m_Adapter!!.notifyItemChanged(position)
+        }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
     //----------------------------------------------------------------------
     //listAdapter callback
