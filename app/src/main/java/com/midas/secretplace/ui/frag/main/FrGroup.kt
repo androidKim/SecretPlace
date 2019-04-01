@@ -22,6 +22,7 @@ import android.widget.EditText
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.GroupRvAdapter
+import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.group
@@ -32,8 +33,6 @@ import com.midas.secretplace.ui.act.ActMain
 import kotlinx.android.synthetic.main.frag_group.*
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import java.io.Serializable
-import com.google.firebase.database.DataSnapshot
-import com.midas.secretplace.R
 
 
 class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter.ifCallback

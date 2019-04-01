@@ -303,7 +303,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                     m_bPagingFinish = true
                 }
 
-
                 m_bRunning = false
                 progressBar.visibility = View.GONE
             }

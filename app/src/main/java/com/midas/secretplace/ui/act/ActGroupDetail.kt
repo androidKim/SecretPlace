@@ -505,8 +505,8 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     // A new message has been added
                     val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
                     pInfo.place_key = dataSnapshot!!.key
-                    m_arrPlace!!.add(pInfo!!)
-                    m_PlaceAdapter!!.notifyDataSetChanged()
+                    m_arrPlace!!.add(0, pInfo!!)
+                    m_PlaceAdapter!!.notifyItemChanged(0)
                 }
             }
 
