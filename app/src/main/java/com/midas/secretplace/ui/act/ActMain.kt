@@ -60,6 +60,7 @@ import com.midas.secretplace.ui.custom.dlg_photo_filter
 import com.midas.secretplace.ui.custom.dlg_theme_setting
 import com.midas.secretplace.ui.frag.main.FrGroup
 import com.midas.secretplace.ui.frag.main.FrPlace
+import com.midas.secretplace.ui.setting.ActSetting
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_main.*
 import kotlinx.android.synthetic.main.dlg_photo_filter.view.*
@@ -1461,7 +1462,13 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                     }
                 }
     }
-
+    //--------------------------------------------------------------
+    //
+    fun goSetting(){
+        Intent(m_Context, ActSetting::class.java).let{
+            startActivity(it)
+        }
+    }
     /*********************** listener ***********************/
     //--------------------------------------------------------------
     //
@@ -1483,11 +1490,34 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 return true
             }
             */
+            /*
+            R.id.open_loaction ->
+            {
+                Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.msg_will_open), Toast.LENGTH_SHORT).show()
+                return true
+            }
+            R.id.popular_location ->
+            {
+                Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.msg_will_open), Toast.LENGTH_SHORT).show()
+                return true
+            }
+            R.id.people ->
+            {
+                Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.msg_will_open), Toast.LENGTH_SHORT).show()
+                return true
+            }
+            */
             R.id.theme ->//테마설정
             {
                 showThmeSelectDialog()
                 return true
             }
+            R.id.setting ->//설정
+            {
+                goSetting()
+                return true
+            }
+
             /*
             R.id.logout ->//로그아웃
             {

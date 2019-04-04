@@ -80,6 +80,10 @@
             android:name=".ui.act.ActChat"
             android:screenOrientation="unspecified"
             android:theme="@style/AppTheme" />
+        <activity
+            android:name=".ui.setting.ActSetting"
+            android:screenOrientation="unspecified"
+            android:theme="@style/AppTheme" />
 
         <service
             android:name=".service.MyJobService"

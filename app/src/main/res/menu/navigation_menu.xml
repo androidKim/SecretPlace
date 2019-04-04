@@ -2,19 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="none">
-
+        <!--
         <item
+            android:id="@+id/open_loaction"
             android:icon="@drawable/ic_screen_share_black_24dp"
             android:title="@string/open_location"/>
 
         <item
+            android:id="@+id/popular_location"
             android:icon="@drawable/ic_stars_black_24dp"
             android:title="@string/poular_location" />
 
         <item
+            android:id="@+id/people"
             android:icon="@drawable/ic_people_black_24dp"
             android:title="@string/people" />
-
+        -->
     </group>
 
     <item
@@ -28,6 +31,7 @@
                 android:title="@string/str_msg_25" />
 
             <item
+                android:id="@+id/setting"
                 android:icon="@drawable/ic_settings_black_24dp"
                 android:title="@string/setting" />
         </menu>

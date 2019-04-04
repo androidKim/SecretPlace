@@ -303,7 +303,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                     m_bPagingFinish = true
                 }
 
-
                 m_bRunning = false
                 progressBar.visibility = View.GONE
             }
@@ -587,26 +586,44 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     /******************************** callback function ********************************/
     //----------------------------------------------------------------------
     //listAdapter callback
-    override fun deleteProc(pInfo: place)
+    override fun deleteProc(pInfo: place, position:Int)
     {
-        //place data remove
-        var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                .child(pInfo.place_key)//where
-        pDbRef!!.removeValue()
+        val builder = AlertDialog.Builder(activity!!)
+        builder.setMessage(getString(R.string.msg_question_delete))
+        builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
 
-        //file storage remove
-        storageDeleteItemProc(pInfo.place_key!!)
+            m_Adapter!!.removeRow(position)
 
-        //file data remove
-        pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                .child(pInfo.place_key)//where
+            //place data remove
+            var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .child(pInfo.place_key)//where
+            pDbRef!!.removeValue()
 
-        pDbRef!!.removeValue()
+            //file storage remove
+            storageDeleteItemProc(pInfo.place_key!!)
 
-        //refresh
-        setRefresh()
+            //file data remove
+            pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                    .child(pInfo.place_key)//where
+
+            pDbRef!!.removeValue()
+
+            //refresh
+            setRefresh()
+        }
+
+        builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
+            m_Adapter!!.notifyItemChanged(position)
+        }
+
+        builder.setNeutralButton(getString(R.string.str_cancel)){_,_ ->
+            m_Adapter!!.notifyItemChanged(position)
+        }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
     //----------------------------------------------------------------------
     //listAdapter callback

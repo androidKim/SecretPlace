@@ -6,6 +6,7 @@
     <string name="twitter_consumer_secret" translatable="false">desMpaNzISR5xtGXAADUFm2xeckH1fWGQLFn1XHmqPHIIzlEox</string>
 
     <string name="app_name">LocationLocker</string>
+    <string name="app_url">https://play.google.com/store/apps/details?id=com.midas.secretplace</string>
     <string name="navigation_drawer_open">Navigation Drawer Is Open</string>
     <string name="navigation_drawer_close">Navigation Drawer Is Close</string>
 
@@ -98,4 +99,7 @@
     <string name="add_profile_img">Try adding a profile image.</string>
     <string name="gallery_file_error">Could not load photo file.</string>
     <string name="share_place_location">Share this location information.</string>
+    <string name="msg_question_delete">Are you sure you want to delete?</string>
+    <string name="msg_will_open">Open scheduled menu.</string>
+    <string name="pref_etc">etc.</string>
 </resources>

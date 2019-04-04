@@ -22,6 +22,7 @@ import android.widget.EditText
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.GroupRvAdapter
+import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.group
@@ -32,8 +33,6 @@ import com.midas.secretplace.ui.act.ActMain
 import kotlinx.android.synthetic.main.frag_group.*
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import java.io.Serializable
-import com.google.firebase.database.DataSnapshot
-import com.midas.secretplace.R
 
 
 class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter.ifCallback
@@ -425,12 +424,27 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
     /******************************** callback function ********************************/
     //----------------------------------------------------------------------
     //listAdapter callback
-    override fun deleteGroupProc(pInfo: group)
+    override fun deleteGroupProc(pInfo: group, position:Int)
     {
-        progressBar.visibility = View.VISIBLE
+        val builder = AlertDialog.Builder(activity!!)
+        builder.setMessage(getString(R.string.msg_question_delete))
+        builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
+            m_Adapter!!.removeRow(position)
+            progressBar.visibility = View.VISIBLE
+            //delete group item in place list & img list
+            deleteGroupRow(pInfo)
+        }
 
-        //delete group item in place list & img list
-        deleteGroupRow(pInfo)
+        builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->
+            m_Adapter!!.notifyItemChanged(position)
+        }
+
+        builder.setNeutralButton(getString(R.string.str_cancel)){_,_ ->
+            m_Adapter!!.notifyItemChanged(position)
+        }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
     //----------------------------------------------------------------------
     //listAdapter callback

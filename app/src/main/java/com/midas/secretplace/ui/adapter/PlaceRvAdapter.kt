@@ -1,16 +1,13 @@
 package com.midas.mytimeline.ui.adapter
 
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.support.v7.app.AlertDialog
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -20,7 +17,6 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.place
-import java.lang.Exception
 
 
 class PlaceRvAdapter(val context: Context, var requestManager:RequestManager, var placeList: ArrayList<place>, var m_IfCallback:ifCallback) :
@@ -120,7 +116,6 @@ RecyclerView.Adapter<PlaceRvAdapter.ViewHolder>()
     }
 
     /*********************** User Function ***********************/
-
     //-----------------------------------------------------------
     //
     fun addData(pInfo:place)
@@ -128,7 +123,7 @@ RecyclerView.Adapter<PlaceRvAdapter.ViewHolder>()
         if(pInfo == null)
             return
 
-        this.placeList.add(pInfo)
+        this.placeList.add(0, pInfo)
         notifyDataSetChanged()
     }
     //-----------------------------------------------------------
@@ -165,10 +160,13 @@ RecyclerView.Adapter<PlaceRvAdapter.ViewHolder>()
     //
     fun removeAt(position: Int) {
         var pInfo:place = placeList.get(position)
-        placeList.removeAt(position)
         if(m_IfCallback != null)
-            m_IfCallback.deleteProc(pInfo)
-
+            m_IfCallback.deleteProc(pInfo, position)
+    }
+    //----------------------------------------------------------------------------
+    //
+    fun removeRow(position: Int){
+        placeList.removeAt(position)
         notifyItemRemoved(position)
     }
 
@@ -184,7 +182,7 @@ RecyclerView.Adapter<PlaceRvAdapter.ViewHolder>()
     /*********************** interface ***********************/
     interface ifCallback
     {
-        fun deleteProc(pInfo:place)
+        fun deleteProc(pInfo:place, position:Int)
         fun checkPermission():Boolean
         fun moveDetailActivity(pInfo:place)
     }

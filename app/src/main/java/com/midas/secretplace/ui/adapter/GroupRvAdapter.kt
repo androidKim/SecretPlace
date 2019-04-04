@@ -6,7 +6,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.RelativeLayout
+import android.widget.TextView
+import android.widget.Toast
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.group
 
@@ -52,7 +54,6 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
     }
 
     /*********************** User Function ***********************/
-
     //-----------------------------------------------------------
     //
     fun addData(pInfo:group)
@@ -60,7 +61,7 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
         if(pInfo == null)
             return
 
-        this.m_arrGroup.add(pInfo)
+        this.m_arrGroup.add(0, pInfo)
         notifyDataSetChanged()
     }
     //-----------------------------------------------------------
@@ -106,10 +107,13 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
     //
     fun removeAt(position: Int) {
         var pInfo:group = m_arrGroup.get(position)
-        m_arrGroup.removeAt(position)
         if(m_IfCallback != null)
-            m_IfCallback.deleteGroupProc(pInfo)
-
+            m_IfCallback.deleteGroupProc(pInfo, position)
+    }
+    //----------------------------------------------------------------------------
+    //
+    fun removeRow(position:Int){
+        m_arrGroup.removeAt(position)
         notifyItemRemoved(position)
     }
 
@@ -125,7 +129,7 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
     /*********************** interface ***********************/
     interface ifCallback
     {
-        fun deleteGroupProc(pInfo:group)
+        fun deleteGroupProc(pInfo:group, position:Int)
         fun checkPermission():Boolean
         fun moveDetailActivity(pInfo:group)
     }
