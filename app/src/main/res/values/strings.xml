@@ -91,7 +91,7 @@
     <string name="str_not_valid_key">유효한 키가 아닙니다.</string>
     <string name="str_no_exit_location">저장된 위치가 없어요.</string>
     <string name="str_anonymous_login">익명 로그인</string>
-    <string name="anonymous_login_desc">익명 로그인은 앱을 삭제하거나\n다른방식으로 로그인하면 데이터가 손실됩니다.</string>
+    <string name="anonymous_login_desc">익명방식은 앱을 삭제하면 \n장소가 손실됩니다.</string>
     <string name="open_location">공개 위치</string>
     <string name="people">피플</string>
     <string name="poular_location">인기 위치</string>
@@ -102,4 +102,6 @@
     <string name="msg_question_delete">삭제 하시겠습니까?</string>
     <string name="msg_will_open">오픈 예정 메뉴입니다.</string>
     <string name="pref_etc">기타</string>
+    <string name="str_add_place_msg">위치를 추가해보세요.</string>
+    <string name="str_add_group_msg">그룹을 추가해보세요.</string>
 </resources>

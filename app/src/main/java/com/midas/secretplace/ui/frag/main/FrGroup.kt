@@ -198,6 +198,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
             {
                 if(dataSnapshot!!.exists())
                 {
+                    ly_Empty.visibility = View.GONE
                     val children = dataSnapshot!!.children
                     children.forEach {
                         val pInfo:group = it!!.getValue(group::class.java)!!
@@ -208,7 +209,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
                 }
                 else
                 {
-
+                    ly_Empty.visibility = View.VISIBLE
                 }
 
                 m_bRunning = false
@@ -274,6 +275,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
                                 .setValue(pInfo)//update..
 
                         m_Adapter!!.addData(pInfo!!)
+                        ly_Empty.visibility = View.GONE
                     }
                 }
 

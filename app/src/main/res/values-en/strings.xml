@@ -91,7 +91,7 @@
     <string name="str_not_valid_key">It is not a valid key.</string>
     <string name="str_no_exit_location">There are no saved locations.</string>
     <string name="str_anonymous_login">Anonymous Login</string>
-    <string name="anonymous_login_desc">Anonymous logins will lose data if you delete apps or sign in differently.</string>
+    <string name="anonymous_login_desc">The anonymous method will \nlose place if you delete the app</string>
     <string name="open_location">OpenLocation</string>
     <string name="people">People</string>
     <string name="poular_location">PoularLocation</string>
@@ -102,4 +102,6 @@
     <string name="msg_question_delete">Are you sure you want to delete?</string>
     <string name="msg_will_open">Open scheduled menu.</string>
     <string name="pref_etc">etc.</string>
+    <string name="str_add_place_msg">Try adding a location.</string>
+    <string name="str_add_group_msg">Try adding a group.</string>
 </resources>

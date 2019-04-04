@@ -580,7 +580,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         if(bCheckLocation)
         {
             var address:String? = Util.getAddress(m_Context!!, mLocation.latitude, mLocation.longitude)
-            var pInfo:place = place(m_GroupInfo!!.user_key!!, "", m_GroupInfo!!.group_key!!, "", String.format("%s",mLocation.latitude), String.format("%s",mLocation.longitude), "", address!!, "")
+            var pInfo:place = place(m_GroupInfo!!.user_key!!, "", m_GroupInfo!!.group_key!!, "", String.format("%s",mLocation.latitude), String.format("%s",mLocation.longitude), "", address!!, "", "N")
             showPlaceInputDialog(pInfo)
         }
     }

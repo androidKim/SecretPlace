@@ -238,48 +238,13 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         m_bRunning = true
         var pQuery:Query? = null
         pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_App!!.m_SpCtrl!!.getSpUserKey()).orderByKey()
-        pQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                if(dataSnapshot!!.exists())
-                {
-                    m_bPagingFinish = false
-                    val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                    pInfo.place_key = dataSnapshot!!.key
-                }
-                else
-                {
-                    m_bPagingFinish = true
-                }
-            }
-
-            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-
-            }
-
-            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
-            {
-
-            }
-
-            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-
-            }
-
-            override fun onCancelled(databaseError: DatabaseError?)
-            {
-
-            }
-        })
-
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
             {
                 if(dataSnapshot!!.exists())
                 {
                     m_bPagingFinish = false
+                    ly_Empty.visibility = View.GONE
                     val children = dataSnapshot!!.children
                     children.forEach {
                         val pInfo:place = it!!.getValue(place::class.java)!!
@@ -300,6 +265,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 }
                 else
                 {
+                    ly_Empty.visibility = View.VISIBLE
                     m_bPagingFinish = true
                 }
 
@@ -391,7 +357,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 var locationInfo = m_IfCallback!!.getLocation()
                 var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919...xxx
                 var address:String? = Util.getAddress(m_Context!!, locationInfo.latitude, locationInfo.longitude)
-                var pInfo:place = place(userKey!!, "", "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), "", address!!, "")
+                var pInfo:place = place(userKey!!, "", "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), "", address!!, "", "N")
                 showPlaceInputDialog(pInfo)
             }
         }
@@ -448,6 +414,9 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                                 pInfo!!.address!!,
                                 pInfo!!.img_url!!)
                         mViewModelPlace?.insert(dataPlace)//
+
+
+                        ly_Empty.visibility = View.GONE
                     }
                 }
 

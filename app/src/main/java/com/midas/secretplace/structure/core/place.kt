@@ -13,13 +13,14 @@ class place:Serializable
     var memo:String? = ""
     var address:String? = ""
     var img_url:String? = ""//최근에 등록한 이미지 1개만 저장됨..
+    var favorite:String? = ""//YN
     //필수..
     constructor()
     {
 
     }
 
-    constructor(user_key:String, place_key:String,group_key:String, name:String, lat:String, lng:String, memo:String, address:String, img_url:String)
+    constructor(user_key:String, place_key:String,group_key:String, name:String, lat:String, lng:String, memo:String, address:String, img_url:String, favorite:String)
     {
         this.user_key = user_key
         this.place_key = place_key
@@ -30,5 +31,6 @@ class place:Serializable
         this.memo = memo
         this.address = address
         this.img_url = img_url
+        this.favorite = favorite
     }
 }
