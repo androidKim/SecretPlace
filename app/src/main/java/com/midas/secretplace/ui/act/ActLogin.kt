@@ -155,7 +155,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
     //
     private fun initValue()
     {
-
+        m_App!!.m_SpCtrl!!.setIsAnonLogin(false)//익명로그인여부 초기화
     }
     //------------------------------------------------
     //
@@ -205,8 +205,8 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
                                     m_App!!.m_SpCtrl!!.setSpUserKey(currentFirebaseUser!!.uid!!)
                                     m_App!!.m_SpCtrl!!.setSnsType(user.JOIN_TYPE_ANONY)
+                                    m_App!!.m_SpCtrl!!.setIsAnonLogin(true)
                                     progressBar.visibility = View.GONE
-                                    Toast.makeText(m_Context!!, m_Context!!.resources!!.getString(R.string.anonymous_login_desc), Toast.LENGTH_LONG).show()
                                     m_App!!.goMain(m_Context!!)
                                 }
 

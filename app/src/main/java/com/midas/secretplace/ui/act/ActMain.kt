@@ -18,6 +18,7 @@ import android.os.Handler
 import android.provider.MediaStore
 import android.provider.Settings
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.multidex.MultiDex
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
@@ -378,6 +379,19 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
 
         settingDrawerView()//navigation drawer
         getUserDataProc()//user info..
+
+
+        //
+        if(m_App!!.m_SpCtrl!!.getIsAnnonLogin())//익명로그인이면..
+        {
+            //show snackbar..
+            var snackbar:Snackbar?=null
+            snackbar = Snackbar.make(ly_Base, m_Context!!.resources.getString(R.string.anonymous_login_desc), 10000)
+                    .setAction(m_Context!!.resources.getString(R.string.str_ok), View.OnClickListener {
+                        snackbar!!.dismiss()
+            })
+            snackbar.show()
+        }
     }
     /*********************** Location Function ***********************/
     //--------------------------------------------------------------
