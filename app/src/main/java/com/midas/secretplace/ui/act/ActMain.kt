@@ -380,10 +380,10 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
         settingDrawerView()//navigation drawer
         getUserDataProc()//user info..
 
-
         //
         if(m_App!!.m_SpCtrl!!.getIsAnnonLogin())//익명로그인이면..
         {
+            m_App!!.m_SpCtrl!!.setIsAnonLogin(false)//스낵바 알림을 띄운 후 초기화
             //show snackbar..
             var snackbar:Snackbar?=null
             snackbar = Snackbar.make(ly_Base, m_Context!!.resources.getString(R.string.anonymous_login_desc), 10000)

@@ -33,4 +33,6 @@ class place:Serializable
         this.img_url = img_url
         this.favorite = favorite
     }
+
+
 }

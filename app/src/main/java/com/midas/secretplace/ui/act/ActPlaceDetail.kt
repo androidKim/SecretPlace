@@ -308,79 +308,81 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun settingPlaceView()
     {
+        if(m_PlaceInfo!! == null)
+            return
+
         //setTitle..
         toolbar.title = m_PlaceInfo!!.name
 
-        //if(m_Adapter == null)
-        //{
-            m_Adapter = PhotoRvAdapter(m_Context!!, m_RequestManager!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
-            recyclerView.adapter = m_Adapter
+        //favorite status
+        if(m_PlaceInfo!!.favorite.equals("Y"))
+            ivFavorite.setImageResource(R.drawable.ic_favorite_black_24dp)
+        else
+            ivFavorite.setImageResource(R.drawable.ic_favorite_border_black_24dp)
 
-            var nSpanCnt = 1
-            val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
-            recyclerView!!.layoutManager = pLayoutManager
-            recyclerView!!.setHasFixedSize(true)
-            recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
+        m_Adapter = PhotoRvAdapter(m_Context!!, m_RequestManager!!, m_PlaceInfo!!, m_arrItem!!, this, supportFragmentManager)
+        recyclerView.adapter = m_Adapter
+
+        var nSpanCnt = 1
+        val pLayoutManager = GridLayoutManager(m_Context, nSpanCnt)
+        recyclerView!!.layoutManager = pLayoutManager
+        recyclerView!!.setHasFixedSize(true)
+        recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
+        {
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
             {
-                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
+                val visibleItemCount = pLayoutManager.childCount
+                val totalItemCount = pLayoutManager.itemCount
+                val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
+
+                if(firstVisible == 0)
                 {
-                    val visibleItemCount = pLayoutManager.childCount
-                    val totalItemCount = pLayoutManager.itemCount
-                    val firstVisible = pLayoutManager.findFirstVisibleItemPosition()
 
-                    if(firstVisible == 0)
-                    {
-
-                    }
-                    else
-                    {
-                        if(m_bScrollTouch)
-                        {
-                            /*
-                            if (dy > 0)
-                                slideUp()    // Scrolling up
-                            else
-                                slideDown()// Scrolling down
-                            */
-
-                            m_bScrollTouch = false
-                        }
-                    }
-
-                    /*
-                    if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//최하단
-                    {
-                        // Call your API to load more items
-                        //if(!m_bFinish!!)
-                            //getImageListProc()
-                    }
-                    */
                 }
+                else
+                {
+                    if(m_bScrollTouch)
+                    {
+                        /*
+                        if (dy > 0)
+                            slideUp()    // Scrolling up
+                        else
+                            slideDown()// Scrolling down
+                        */
 
-                override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-
-                    if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {//손을 떼었지만 움직이는중
-                        // Do something
-                        m_bScrollTouch = true
-                    } else if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {//터치되어있는중
-                        // Do something
-                        m_bScrollTouch = true
-
-                    } else if(newState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE){//정지된상태
-                        m_bScrollTouch = false
-                    }
-                    else {
-                        // Do something
                         m_bScrollTouch = false
                     }
                 }
-            })
-        //}
-        //else//addData
-        //{
-            //m_Adapter!!.addData(null)
-        //}
+
+                /*
+                if(!m_bRunning!! && (visibleItemCount + firstVisible) >= totalItemCount)//최하단
+                {
+                    // Call your API to load more items
+                    //if(!m_bFinish!!)
+                        //getImageListProc()
+                }
+                */
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {//손을 떼었지만 움직이는중
+                    // Do something
+                    m_bScrollTouch = true
+                } else if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {//터치되어있는중
+                    // Do something
+                    m_bScrollTouch = true
+
+                } else if(newState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE){//정지된상태
+                    m_bScrollTouch = false
+                }
+                else {
+                    // Do something
+                    m_bScrollTouch = false
+                }
+            }
+        })
 
         if(!m_bRunning!!)
             getImageListProc()//imageList
@@ -856,8 +858,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     .child(m_App!!.m_SpCtrl!!.getSpUserKey())
                     .child(m_PlaceInfo!!.place_key).push()//where
             pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
-
-            //var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.setPlaceInfo(m_PlaceInfo!!)
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot?) {
                     if (dataSnapshot!!.exists()) {
@@ -983,6 +983,32 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
 
     /************************* listener *************************/
+    //-----------------------------------------------------
+    //좋아요 클릭
+    fun onClickFavorite(view:View){
+        if(m_PlaceInfo!! == null)
+            return
+
+        var strFavoritStatus:String = ""
+        if(m_PlaceInfo!!.favorite.equals("Y"))
+        {
+            strFavoritStatus = "N"
+            ivFavorite.setImageResource(R.drawable.ic_favorite_border_black_24dp)
+        }
+        else
+        {
+            strFavoritStatus = "Y"
+            ivFavorite.setImageResource(R.drawable.ic_favorite_black_24dp)
+        }
+
+        m_PlaceInfo!!.favorite = strFavoritStatus
+
+        //db update..
+        var dbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_PlaceInfo!!.place_key)
+        dbRef!!.setValue(m_PlaceInfo!!)//db update
+    }
 
 
     /************************* callback function *************************/

@@ -50,7 +50,7 @@ class Constant
 
         //image
         val IMAGE_DIRECTORY = "/scplace"
-        val REQUEST_TAKE_PHOTO = 1001
-        val REQUEST_SELECT_IMAGE_IN_ALBUM = 1002
+        val REQUEST_TAKE_PHOTO:Int = 1001
+        val REQUEST_SELECT_IMAGE_IN_ALBUM:Int = 1002
     }
 }
