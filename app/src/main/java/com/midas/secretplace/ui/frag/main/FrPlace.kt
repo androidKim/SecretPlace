@@ -68,6 +68,20 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     /**************************** System Function ****************************/
     //------------------------------------------------------------------------
     //
+    override fun onAttach(pContext: Context?)
+    {
+        super.onAttach(pContext)
+        if (pContext is ActMain)
+        {
+            m_IfCallback = pContext
+        }
+        else
+        {
+            throw RuntimeException(pContext!!.toString() + " must implement FragmentEvent")
+        }
+    }
+    //------------------------------------------------------------------------
+    //
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
         val view = inflater.inflate(R.layout.frag_place, container, false)
@@ -93,18 +107,10 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     }
     //------------------------------------------------------------------------
     //
-    override fun onAttach(pContext: Context?)
-    {
-        super.onAttach(pContext)
-        if (pContext is ActMain)
-        {
-            m_IfCallback = pContext
-        }
-        else
-        {
-            throw RuntimeException(pContext!!.toString() + " must implement FragmentEvent")
-        }
+    override fun onStart() {
+        super.onStart()
     }
+
     //------------------------------------------------------------------------
     //
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
@@ -227,12 +233,11 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-
-        getPlaceListProc("")
+        getPlaceListProc()
     }
     //--------------------------------------------------------------
     //
-    fun getPlaceListProc(seq:String)
+    fun getPlaceListProc()
     {
         progressBar.visibility = View.VISIBLE
         m_bRunning = true
@@ -450,7 +455,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
         ly_SwipeRefresh.isRefreshing = false
 
-        getPlaceListProc("")
+        getPlaceListProc()
     }
     //----------------------------------------------------------------------
     //storage image delete

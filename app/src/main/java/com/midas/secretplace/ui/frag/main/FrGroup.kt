@@ -56,6 +56,20 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
     /**************************** System Function ****************************/
     //------------------------------------------------------------------------
     //
+    override fun onAttach(pContext: Context?)
+    {
+        super.onAttach(pContext)
+        if (pContext is ActMain)
+        {
+            m_IfCallback = pContext
+        }
+        else
+        {
+            throw RuntimeException(pContext!!.toString() + " must implement FragmentEvent")
+        }
+    }
+    //------------------------------------------------------------------------
+    //
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
         val view = inflater.inflate(R.layout.frag_group, container, false)
@@ -79,17 +93,8 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
     }
     //------------------------------------------------------------------------
     //
-    override fun onAttach(pContext: Context?)
-    {
-        super.onAttach(pContext)
-        if (pContext is ActMain)
-        {
-            m_IfCallback = pContext
-        }
-        else
-        {
-            throw RuntimeException(pContext!!.toString() + " must implement FragmentEvent")
-        }
+    override fun onStart() {
+        super.onStart()
     }
     //------------------------------------------------------------------------
     //
@@ -165,8 +170,6 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
                 if(!m_bRunning && (visibleItemCount + firstVisible) >= totalItemCount)
                 {
                     // Call your API to load more items
-                    //if(!m_bPagingFinish)
-                        //getGroupListProc()
                 }
             }
         })

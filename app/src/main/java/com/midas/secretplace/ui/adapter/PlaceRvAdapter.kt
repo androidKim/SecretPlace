@@ -123,7 +123,7 @@ RecyclerView.Adapter<PlaceRvAdapter.ViewHolder>()
         if(pInfo == null)
             return
 
-        this.placeList.add(0, pInfo)
+        this.placeList.add(pInfo)
         notifyDataSetChanged()
     }
     //-----------------------------------------------------------

@@ -61,7 +61,7 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
         if(pInfo == null)
             return
 
-        this.m_arrGroup.add(0, pInfo)
+        this.m_arrGroup.add(pInfo)
         notifyDataSetChanged()
     }
     //-----------------------------------------------------------

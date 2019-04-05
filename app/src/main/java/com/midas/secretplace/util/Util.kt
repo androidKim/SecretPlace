@@ -3,8 +3,6 @@ package com.midas.secretplace.util
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -88,7 +86,7 @@ class Util
         {
             val bytes = ByteArrayOutputStream()
             inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-            val path = MediaStore.Images.Media.insertImage(context.getContentResolver(), inImage, "Title", null)
+            val path = MediaStore.Images.Media.insertImage(context.contentResolver, inImage, "Title", null)
             return Uri.parse(path)
         }
         /****************************** toolbar ******************************/

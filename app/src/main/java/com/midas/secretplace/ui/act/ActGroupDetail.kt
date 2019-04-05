@@ -96,8 +96,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     var m_LayoutInflater:LayoutInflater? = null
     var m_PlaceAdapter:PlaceRvAdapter? = null
     var selectedImage: Uri? = null
-    //var m_strPlaceLastSeq:String? = ""
-    var m_bRunning:Boolean? = false
     var m_bFinish:Boolean? = false
     var m_bModify:Boolean? = false//변경이력여부
     /*********************** Controller ***********************/
@@ -137,9 +135,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         super.onStart()
         if (mGoogleApiClient != null)
-        {
             mGoogleApiClient.connect()
-        }
     }
     //--------------------------------------------------------------
     //
@@ -147,9 +143,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         super.onStop()
         if (mGoogleApiClient.isConnected())
-        {
             mGoogleApiClient.disconnect()
-        }
     }
 
     //---------------------------------------------------------------------------------------------------
@@ -406,7 +400,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             }
         }
 
-        //getplacelist..
         getPlaceListProc()
     }
     //-------------------------------------------------------------
@@ -424,7 +417,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         recyclerView!!.setHasFixedSize(true)
 
         recyclerView!!.layoutManager = pLayoutManager
-
         getPlaceListProc()
     }
     //----------------------------------------------------------------------
@@ -486,81 +478,30 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun getPlaceListProc()
     {
-        m_bRunning = true
         progressBar.visibility = View.VISIBLE
         //image list..
-        var pQuery:Query?= null
-
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
+        var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
                 .child(m_App!!.m_SpCtrl!!.getSpUserKey())
                 .child(m_GroupInfo!!.group_key)
                 .child("place_list")
                 .orderByKey()
-
-        pQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                if(dataSnapshot!!.exists())
-                {
-                    // A new message has been added
-                    val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                    pInfo.place_key = dataSnapshot!!.key
-                    m_arrPlace!!.add(0, pInfo!!)
-                    m_PlaceAdapter!!.notifyItemChanged(0)
-                }
-            }
-
-            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
-            }
-
-            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
-            {
-                Log.e("TAG", "onChildRemoved:" + dataSnapshot!!.key)
-
-                // A message has been removed
-            }
-
-            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
-            {
-                Log.e("TAG", "onChildMoved:" + dataSnapshot!!.key)
-
-                // A message has changed position
-            }
-
-            override fun onCancelled(databaseError: DatabaseError?)
-            {
-                Log.e("TAG", "postMessages:onCancelled", databaseError!!.toException())
-            }
-        })
 
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot?)
             {
                 if(dataSnapshot!!.exists())
                 {
-                    if(m_arrPlace!!.count() > 0)
-                    {
-
-                    }
-                    else
-                    {
-                        initValue()
+                    val children = dataSnapshot!!.children
+                    children.forEach {
+                        val pInfo:place = it!!.getValue(place::class.java)!!
+                        m_PlaceAdapter!!.addData(pInfo)
                     }
                 }
                 else
                 {
-                    initValue()
+                    //ly_Empty.visibility = View.VISIBLE
+
                 }
-
-
-                if(m_PlaceAdapter!!.itemCount > 0)//
-                    ly_NoData.visibility = View.GONE
-                else
-                    ly_NoData.visibility = View.VISIBLE
-
-                m_bRunning = false
                 progressBar.visibility = View.GONE
             }
 
@@ -621,7 +562,9 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                 .child("place_list")
                                 .child(dataSnapshot!!.key).setValue(pInfo)//update..
 
-                        setRefresh()
+
+                        var pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                        m_PlaceAdapter!!.addData(pInfo)
                     }
                 }
 

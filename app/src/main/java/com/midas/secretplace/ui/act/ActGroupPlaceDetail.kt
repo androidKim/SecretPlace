@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -25,7 +24,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -53,7 +51,11 @@ import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_group_place_detail.*
 import kotlinx.android.synthetic.main.dlg_photo_filter.view.*
 import kotlinx.android.synthetic.main.dlg_photo_view.view.*
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.IOException
+import java.io.Serializable
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -100,12 +102,10 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
     var m_PlaceInfo:place? = place()
     var m_LayoutInflater:LayoutInflater? = null
     var m_Adapter: PhotoRvAdapter? = null
-    var selectedImage: Uri? = null
     var imageUri: Uri? = null
     var m_bitmapRotateBitmap:Bitmap? = null
     var m_UploadImgFile:Bitmap? = null
-    var m_strImgpath:String = ""
-    //var m_strImgLastSeq:String? = null
+    var mCurrentPhotoPath:String? = null
     var m_bRunning:Boolean = false
     var m_bFinish:Boolean = false
     var m_bModify:Boolean = false
@@ -174,18 +174,21 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         }
         else if (requestCode == REQUEST_TAKE_PHOTO)//take photo
         {
+            var file:File  = File(mCurrentPhotoPath)
+            var bitmap:Bitmap = MediaStore.Images.Media.getBitmap(m_Context!!.contentResolver, Uri.fromFile(file))
+
+            m_bitmapRotateBitmap = null //
             try
             {
                 try
                 {
-                    m_nUploadPhotoType = REQUEST_TAKE_PHOTO
-                    selectedImage = imageUri
+                    m_nUploadPhotoType = Constant.REQUEST_TAKE_PHOTO
                 }
                 catch (e: Exception)
                 {
                     Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show()
                 }
-                showPhotoFilterDialog(selectedImage!!)
+                showPhotoFilterDialog(imageUri!!)
 
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -302,16 +305,39 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
 
         //listener..
         ly_SwipeRefresh.setOnRefreshListener(this)//refresh..
-        settingView()
+        ly_NoData.visibility = View.GONE
+        getGroupPlaceInfoProc()
     }
     //--------------------------------------------------------------
     //
-    fun settingView()
+    fun getGroupPlaceInfoProc()
     {
-        ly_NoData.visibility = View.GONE
+        var dbQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_PlaceInfo!!.group_key)
+                .child("place_list")
+                .child(m_PlaceInfo!!.place_key)
 
-        settingPlaceView()
+        dbQuery.addListenerForSingleValueEvent(object:ValueEventListener
+        {
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(p0: DataSnapshot?) {
+                if(p0!!.exists())
+                {
+                    m_PlaceInfo = p0!!.getValue(place::class.java)!!
+                    settingPlaceView()
+                }
+                else
+                {
+
+                }
+            }
+        })
     }
+
     //--------------------------------------------------------------
     //
     fun settingPlaceView()
@@ -600,51 +626,40 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
     //
     fun takePhoto()
     {
-        val pIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        var takePictureIntent:Intent  = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(packageManager) != null) {
+            // Create the File where the photo should go
+            var photoFile:File? = null
+            try {
+                photoFile = createFile()
 
-        var timestamp:Long = System.currentTimeMillis()
-        var fileName:String = String.format("%s_%s",timestamp, "img")
-        val photo = File((Environment.getExternalStorageDirectory()).toString() + IMAGE_DIRECTORY, fileName)
+            } catch (ex:IOException ) {
+                // Error occurred while creating the File
 
-        pIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(m_Context!!, "com.midas.secretplace.fileprovider", photo))
-        imageUri = FileProvider.getUriForFile(m_Context!!, "com.midas.secretplace.fileprovider", photo)
-
-        if (pIntent.resolveActivity(packageManager) != null)
-        {
-            startActivityForResult(pIntent, REQUEST_TAKE_PHOTO)
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                imageUri = FileProvider.getUriForFile(m_Context!!,"com.midas.secretplace.fileprovider",photoFile)
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(takePictureIntent, Constant.REQUEST_TAKE_PHOTO);
+            }
         }
     }
     //-------------------------------------------------------------
     //
-    fun saveImage(myBitmap: Bitmap):String
+    fun createFile():File
     {
-        val bytes = ByteArrayOutputStream()
-        myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-        val wallpaperDirectory = File((Environment.getExternalStorageDirectory()).toString() + IMAGE_DIRECTORY)
-        // have the object build the directory structure, if needed.
-        Log.d("fee",wallpaperDirectory.toString())
-        if (!wallpaperDirectory.exists())
-        {
-            wallpaperDirectory.mkdirs()
-        }
-
-        try
-        {
-            Log.d("heel",wallpaperDirectory.toString())
-            val pFile = File(wallpaperDirectory, ((Calendar.getInstance().getTimeInMillis()).toString() + ".jpg"))
-            pFile.createNewFile()
-            val fo = FileOutputStream(pFile)
-            fo.write(bytes.toByteArray())
-            MediaScannerConnection.scanFile(this, arrayOf(pFile.getPath()), arrayOf("image/jpeg"), null)
-            fo.close()
-            Log.d("TAG", "File Saved::--->" + pFile.getAbsolutePath())
-            return pFile.getAbsolutePath()
-        }
-        catch (e1: IOException)
-        {
-            e1.printStackTrace()
-        }
-        return ""
+        // Create an image file name
+        var timeStamp:String  = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        var imageFileName:String  = "JPEG_" + timeStamp + "_";
+        var storageDir:File = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        var image:File = File.createTempFile(imageFileName,  /* prefix */".jpg",         /* suffix */
+                storageDir      /* directory */
+        )
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.absolutePath
+        return image
     }
     //-------------------------------------------------------------
     //
@@ -827,7 +842,7 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
 
         //메모리데이터 업로드 방식
         val baos = ByteArrayOutputStream()
-        bitmap!!.compress(Bitmap.CompressFormat.JPEG, 15, baos)//압축 0~100사이 품질 조절가능
+        bitmap!!.compress(Bitmap.CompressFormat.JPEG, 30, baos)//압축 0~100사이 품질 조절가능
         val byteArr: ByteArray = baos.toByteArray()
         var timestamp: Long = System.currentTimeMillis()
         var fileName: String = String.format("%s_%s", timestamp, "img")
@@ -902,7 +917,7 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
         val imageReference = FirebaseStorage.getInstance(Constant.FIRE_STORE_URL)
         //메모리데이터 업로드 방식
         val baos = ByteArrayOutputStream()
-        bitmap!!.compress(Bitmap.CompressFormat.JPEG, 15, baos)//압축 0~100사이 품질 조절가능
+        bitmap!!.compress(Bitmap.CompressFormat.JPEG, 30, baos)//압축 0~100사이 품질 조절가능
         val byteArr: ByteArray = baos.toByteArray()
         var timestamp: Long = System.currentTimeMillis()
         var fileName: String = String.format("%s_%s", timestamp, "img")
