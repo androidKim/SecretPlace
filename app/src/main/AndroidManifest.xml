@@ -41,51 +41,55 @@
             </intent-filter>
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".ui.act.ActMain"
-            android:screenOrientation="unspecified"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActLogin"
-            android:screenOrientation="unspecified"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActPlaceDetail"
-            android:screenOrientation="unspecified"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActGroupPlaceDetail"
-            android:screenOrientation="unspecified"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActGroupDetail"
-            android:screenOrientation="unspecified"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActMapDetail"
-            android:screenOrientation="unspecified"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActCouple"
             android:parentActivityName=".ui.act.ActMain"
-            android:screenOrientation="unspecified"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActMyInformation"
             android:parentActivityName=".ui.act.ActMain"
-            android:screenOrientation="unspecified"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActRequestForMe"
             android:parentActivityName=".ui.act.ActCouple"
-            android:screenOrientation="unspecified"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActChat"
-            android:screenOrientation="unspecified"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.setting.ActSetting"
-            android:screenOrientation="unspecified"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".ui.act.ActFavorite"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
 
         <service

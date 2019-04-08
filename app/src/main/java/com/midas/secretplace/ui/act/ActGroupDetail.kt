@@ -562,8 +562,6 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                 .child("place_list")
                                 .child(dataSnapshot!!.key).setValue(pInfo)//update..
 
-
-                        var pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
                         m_PlaceAdapter!!.addData(pInfo)
                     }
                 }

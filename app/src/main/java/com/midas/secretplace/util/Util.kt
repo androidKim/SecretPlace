@@ -250,6 +250,9 @@ class Util
         //
         fun getAddress(pContext:Context, latitude:Double, longitude: Double):String
         {
+            if(pContext ==null || latitude<=0.0 || longitude<=0.0)
+                return ""
+
             val geocoder: Geocoder
             val addresses: List<Address>
             geocoder = Geocoder(pContext, Locale.getDefault())

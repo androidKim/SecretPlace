@@ -434,7 +434,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
             }
         })
     }
-    /*********************** User Function ***********************/
+
     //--------------------------------------------------------------
     //
     private fun checkPermissionLocation():Boolean
@@ -1476,13 +1476,6 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                     }
                 }
     }
-    //--------------------------------------------------------------
-    //
-    fun goSetting(){
-        Intent(m_Context, ActSetting::class.java).let{
-            startActivity(it)
-        }
-    }
     /*********************** listener ***********************/
     //--------------------------------------------------------------
     //
@@ -1521,6 +1514,13 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 return true
             }
             */
+            R.id.favorite_place ->//좋아하는장소
+            {
+                Intent(m_Context, ActFavorite::class.java).let{
+                    startActivity(it)
+                }
+                return true
+            }
             R.id.theme ->//테마설정
             {
                 showThmeSelectDialog()
@@ -1528,7 +1528,9 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
             }
             R.id.setting ->//설정
             {
-                goSetting()
+                Intent(m_Context, ActSetting::class.java).let{
+                    startActivity(it)
+                }
                 return true
             }
 

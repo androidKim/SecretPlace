@@ -360,10 +360,29 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             if(bCheckLocation)
             {
                 var locationInfo = m_IfCallback!!.getLocation()
-                var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919...xxx
-                var address:String? = Util.getAddress(m_Context!!, locationInfo.latitude, locationInfo.longitude)
-                var pInfo:place = place(userKey!!, "", "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), "", address!!, "", "N")
-                showPlaceInputDialog(pInfo)
+                if(locationInfo != null)
+                {
+                    if(locationInfo.latitude ==0.0 || locationInfo.longitude == 0.0)
+                    {
+                        //위치정보를 가져오지 못함..
+                        Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.not_call_location), Toast.LENGTH_SHORT).show()
+                        return
+                    }
+                    else
+                    {
+                        var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919...xxx
+                        var address:String? = Util.getAddress(m_Context!!, locationInfo.latitude, locationInfo.longitude)
+                        var pInfo:place = place(userKey!!, "", "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), "", address!!, "", "N")
+                        showPlaceInputDialog(pInfo)
+                        return
+                    }
+                }
+                else
+                {
+                    //위치정보를 가져오지 못함..
+                    Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.not_call_location), Toast.LENGTH_SHORT).show()
+                    return
+                }
             }
         }
     }
