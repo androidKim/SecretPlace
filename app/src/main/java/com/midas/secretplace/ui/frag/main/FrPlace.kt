@@ -49,7 +49,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     /**************************** Define ****************************/
 
     /**************************** Member ****************************/
-    private var mViewModelPlace: vm_place?= null//mvvm
+    //private var mViewModelPlace: vm_place?= null//mvvm
     var m_Context: Context? = null
     var m_Activity:Activity? = null
     var m_App:MyApp? = null
@@ -134,6 +134,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //------------------------------------------------------------------------
     //
     fun setViewModel(){
+        /*
         mViewModelPlace = ViewModelProviders.of(this).get(vm_place::class.java)
         mViewModelPlace?.deleteAll()//init..
         mViewModelPlace?.placeList?.observe(this, object : Observer<List<data_place>> {
@@ -144,6 +145,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 }
             }
         })
+        */
     }
     //------------------------------------------------------------------------
     //
@@ -255,6 +257,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                         val pInfo:place = it!!.getValue(place::class.java)!!
                         m_Adapter!!.addData(pInfo)
 
+                        /*
                         var dataPlace:data_place = data_place(0,
                                 pInfo!!.user_key!!,
                                 pInfo!!.place_key!!,
@@ -266,7 +269,10 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                                 pInfo!!.address!!,
                                 pInfo!!.img_url!!)
                         mViewModelPlace?.insert(dataPlace)//
+                        */
                     }
+
+                    m_Adapter!!.reverseList()
                 }
                 else
                 {
@@ -425,8 +431,9 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                                 .child(key)!!//
 
                         pDbRef!!.setValue(pInfo)//insert
-                        m_Adapter!!.addData(pInfo!!)
+                        m_Adapter!!.addFirst(pInfo!!)
 
+                        /*
                         var dataPlace:data_place = data_place(0,
                                 pInfo!!.user_key!!,
                                 pInfo!!.place_key!!,
@@ -438,7 +445,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                                 pInfo!!.address!!,
                                 pInfo!!.img_url!!)
                         mViewModelPlace?.insert(dataPlace)//
-
+                        */
 
                         ly_Empty.visibility = View.GONE
                     }

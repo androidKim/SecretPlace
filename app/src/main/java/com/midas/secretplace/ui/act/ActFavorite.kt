@@ -225,6 +225,7 @@ class ActFavorite : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,Pl
                         val pInfo:place = it!!.getValue(place::class.java)!!
                         m_PlaceAdapter!!.addData(pInfo)
                     }
+                    m_PlaceAdapter!!.reverseList()
                 }
                 else
                 {

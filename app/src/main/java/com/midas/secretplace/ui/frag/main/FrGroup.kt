@@ -207,7 +207,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
                         val pInfo:group = it!!.getValue(group::class.java)!!
                         m_Adapter!!.addData(pInfo)
                     }
-
+                    m_Adapter!!.reverseList()
                     tbGroup.removeEventListener(this)
                 }
                 else
@@ -277,7 +277,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
                                 .child(dataSnapshot!!.key)
                                 .setValue(pInfo)//update..
 
-                        m_Adapter!!.addData(pInfo!!)
+                        m_Adapter!!.addFirst(pInfo!!)
                         ly_Empty.visibility = View.GONE
                     }
                 }

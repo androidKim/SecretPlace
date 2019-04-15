@@ -124,6 +124,22 @@ RecyclerView.Adapter<PlaceRvAdapter.ViewHolder>()
             return
 
         this.placeList.add(pInfo)
+    }
+    //-----------------------------------------------------------
+    //
+    fun reverseList()
+    {
+        this.placeList.reverse()
+        notifyDataSetChanged()
+    }
+    //-----------------------------------------------------------
+    //
+    fun addFirst(pInfo:place)
+    {
+        if(pInfo == null)
+            return
+
+        this.placeList.add(0, pInfo)
         notifyDataSetChanged()
     }
     //-----------------------------------------------------------
