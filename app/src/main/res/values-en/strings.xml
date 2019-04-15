@@ -104,4 +104,8 @@
     <string name="pref_etc">etc.</string>
     <string name="str_add_place_msg">Try adding a location.</string>
     <string name="str_add_group_msg">Try adding a group.</string>
+    <string name="favorite_place">Favorite Places</string>
+    <string name="msg_add_favorite">Please do like setting.</string>
+    <string name="plz_permission_location">location permission is required.</string>
+    <string name="not_call_location">We have not imported your location yet.</string>
 </resources>

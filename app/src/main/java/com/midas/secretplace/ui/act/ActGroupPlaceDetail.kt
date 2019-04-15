@@ -496,8 +496,15 @@ class ActGroupPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshLis
                 {
                     val children = dataSnapshot!!.children
                     children.forEach {
-                        var strUrl:String = it.getValue(String::class.java)!!
-                        m_Adapter!!.addItem(strUrl)
+                        try
+                        {
+                            var strUrl:String = it.getValue(String::class.java)!!
+                            m_Adapter!!.addItem(strUrl)
+                        }
+                        catch(e:DatabaseException){
+                            e.printStackTrace()
+                        }
+
                     }
                 }
                 else

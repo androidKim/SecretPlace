@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/favorite_place"
+            android:icon="@drawable/ic_favorite_black_24dp"
+            android:title="@string/favorite_place" />
         <!--
         <item
             android:id="@+id/open_loaction"

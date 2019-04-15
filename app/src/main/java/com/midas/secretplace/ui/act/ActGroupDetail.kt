@@ -496,6 +496,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                         val pInfo:place = it!!.getValue(place::class.java)!!
                         m_PlaceAdapter!!.addData(pInfo)
                     }
+                    m_PlaceAdapter!!.reverseList()
                 }
                 else
                 {
@@ -562,9 +563,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                                 .child("place_list")
                                 .child(dataSnapshot!!.key).setValue(pInfo)//update..
 
-
-                        var pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                        m_PlaceAdapter!!.addData(pInfo)
+                        m_PlaceAdapter!!.addFirst(pInfo)
                     }
                 }
 

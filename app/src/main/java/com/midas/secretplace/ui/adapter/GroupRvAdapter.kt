@@ -62,6 +62,20 @@ class GroupRvAdapter(val m_Context: Context, var m_arrGroup: ArrayList<group>, v
             return
 
         this.m_arrGroup.add(pInfo)
+    }
+    //-----------------------------------------------------------
+    //
+    fun addFirst(pInfo:group){
+        if(pInfo == null)
+            return
+
+        this.m_arrGroup.add(0, pInfo)
+        notifyDataSetChanged()
+    }
+    //-----------------------------------------------------------
+    //
+    fun reverseList(){
+        this.m_arrGroup.reverse()
         notifyDataSetChanged()
     }
     //-----------------------------------------------------------
