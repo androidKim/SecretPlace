@@ -75,12 +75,31 @@
             android:layout_marginBottom="@dimen/margin_bottom"
             android:background="@color/color_black" />
 
-        <android.support.v7.widget.AppCompatImageView
-            android:onClick="onClickFavorite"
-            android:id="@+id/ivFavorite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ic_favorite_border_black_24dp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/ivFavorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_favorite_border_black_24dp"
+                android:onClick="onClickFavorite" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:layout_marginLeft="@dimen/margin_left"
+                android:id="@+id/ivMemo"
+                android:layout_toRightOf="@+id/ivFavorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_description_black_24dp"
+                android:onClick="onClickMoveMemo" />
+        </RelativeLayout>
+
 
     </LinearLayout>
 

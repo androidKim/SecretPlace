@@ -1033,7 +1033,14 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         })
     }
 
-
+    //-----------------------------------------------------
+    //메모 클릭
+    fun onClickMoveMemo(view:View)
+    {
+        var pIntent = Intent(m_Context, ActMemo::class.java)
+        pIntent.putExtra(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo as Serializable)
+        startActivityForResult(pIntent, 0)
+    }
     /************************* callback function *************************/
     //-----------------------------------------------------
     //Swipe Refresh Listener

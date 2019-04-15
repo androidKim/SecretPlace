@@ -108,4 +108,7 @@
     <string name="msg_add_favorite">Please do like setting.</string>
     <string name="plz_permission_location">location permission is required.</string>
     <string name="not_call_location">We have not imported your location yet.</string>
+    <string name="title_memo">Memo</string>
+    <string name="msg_no_memo">Please add a note.</string>
+    <string name="str_write">Write notes</string>
 </resources>
