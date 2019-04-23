@@ -1,6 +1,3 @@
-# SecretPlace
-ScretPlace Android
+# 위치보관 안드로이드 앱
 
-https://android.github.io/kotlin-guides/index.html
-https://grokonez.com/android/kotlin-firebase-realtime-database-readwrite-data-example-android
-http://stack07142.tistory.com/282
+https://play.google.com/store/apps/details?id=com.midas.secretplace
