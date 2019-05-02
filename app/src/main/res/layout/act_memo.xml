@@ -25,6 +25,7 @@
         android:id="@+id/ly_Content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_below="@+id/ly_Top"
         android:orientation="vertical"
         tools:visibility="visible">
@@ -38,29 +39,33 @@
             tools:text="가나다라마바사아자차카타파하" />
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
+        android:padding="@dimen/padding"
         android:id="@+id/ly_NoData"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ly_Content"
-        android:gravity="center"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:visibility="gone"
         tools:visibility="visible">
 
         <ImageView
+            android:id="@+id/ivIcon"
             android:layout_width="20dp"
             android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/margin_right"
             android:background="@drawable/outline_info_black_18dp" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/ivIcon"
             android:gravity="center"
             android:text="@string/msg_no_memo"
             android:textColor="@color/color_black" />
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/ly_Edit"
