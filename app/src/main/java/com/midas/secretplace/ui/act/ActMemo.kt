@@ -10,8 +10,13 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
+import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.util.Util
@@ -132,11 +137,14 @@ class ActMemo : AppCompatActivity()
 
             if(m_PlaceInfo!!.memo.equals(""))
             {
+                ly_Content.visibility = View.GONE
                 ly_NoData.visibility = View.VISIBLE
                 ly_Edit.visibility = View.VISIBLE
             }
             else
             {
+                tvMemo.setText(m_PlaceInfo!!.memo+"")
+                ly_Content.visibility = View.VISIBLE
                 ly_NoData.visibility = View.GONE
                 ly_Edit.visibility = View.GONE
             }
@@ -156,6 +164,39 @@ class ActMemo : AppCompatActivity()
         var strTheme:String = m_App!!.m_SpCtrl!!.getSpTheme()!!
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Util.setToolbarBackgroundColor(m_Context!!, this.toolbar, strTheme!!)
+        }
+
+        //메모 업로드 버튼..
+        ivUploadMemo.setOnClickListener {
+            val strMsg:String = editMemo.text.toString().trim()
+            if(!strMsg.equals(""))//입력된 메모가 있으면..
+            {
+                m_PlaceInfo?.memo = strMsg//메모
+                var pDbRef:DatabaseReference? = null
+                pDbRef =  m_App?.m_FirebaseDbCtrl?.m_FirebaseDb?.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                        .child(m_App?.m_SpCtrl?.getSpUserKey())!!
+                        .child(m_PlaceInfo?.place_key)
+
+                pDbRef!!.setValue(m_PlaceInfo)//insert
+                pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onDataChange(dataSnapshot: DataSnapshot?)
+                    {
+                        if (dataSnapshot!!.exists())
+                        {
+                            //update compelte
+                            ly_Edit.visibility = View.GONE
+                            ly_NoData.visibility = View.GONE
+                            ly_Content.visibility = View.VISIBLE
+                            tvMemo.setText(m_PlaceInfo?.memo+"")
+                        }
+                    }
+
+                    override fun onCancelled(p0: DatabaseError?)
+                    {
+
+                    }
+                })
+            }
         }
     }
     /************************* listener *************************/
