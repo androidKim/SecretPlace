@@ -198,6 +198,14 @@ class ActMemo : AppCompatActivity()
                 })
             }
         }
+
+        //메모 수정버튼
+        ivEditIcon.setOnClickListener{
+            ly_Edit.visibility = View.VISIBLE
+            editMemo.setText(m_PlaceInfo?.memo+"")
+            ly_NoData.visibility = View.GONE
+            ly_Content.visibility = View.GONE
+        }
     }
     /************************* listener *************************/
     //--------------------------------------------------------------
