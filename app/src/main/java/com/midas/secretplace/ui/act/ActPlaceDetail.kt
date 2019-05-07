@@ -186,6 +186,14 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 e.printStackTrace()
             }
         }
+        else if(resultCode == Constant.REQUEST_REFRESH_DATA)//새로고침 필요
+        {
+            setRefresh()
+        }
+        else
+        {
+
+        }
     }
     //--------------------------------------------------------------
     //permission checking callback

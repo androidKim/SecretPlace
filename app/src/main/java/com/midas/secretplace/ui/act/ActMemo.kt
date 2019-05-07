@@ -34,6 +34,7 @@ class ActMemo : AppCompatActivity()
     private var m_App: MyApp? = null
     private var m_Context: Context? = null
     private var m_PlaceInfo:place? = null
+    private var mIsChange:Boolean = false//데이터가 변경되었는지 여부
     /*********************** Controller ***********************/
 
     /*********************** System Function ***********************/
@@ -70,7 +71,10 @@ class ActMemo : AppCompatActivity()
     //
     override fun onBackPressed()
     {
-        super.onBackPressed()
+        if(mIsChange)
+            setResult(Constant.REQUEST_REFRESH_DATA)
+
+        finish()
     }
     //---------------------------------------------------------------------------------------------------
     //
@@ -167,7 +171,7 @@ class ActMemo : AppCompatActivity()
         }
 
         //메모 업로드 버튼..
-        ivUploadMemo.setOnClickListener {
+        uploadBtn.setOnClickListener {
             val strMsg:String = editMemo.text.toString().trim()
             if(!strMsg.equals(""))//입력된 메모가 있으면..
             {
@@ -183,6 +187,7 @@ class ActMemo : AppCompatActivity()
                     {
                         if (dataSnapshot!!.exists())
                         {
+                            mIsChange = true
                             //update compelte
                             ly_Edit.visibility = View.GONE
                             ly_NoData.visibility = View.GONE
