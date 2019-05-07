@@ -760,6 +760,7 @@ class ActGroupDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun deleteProc(pInfo: place, position:Int)
     {
         val builder = AlertDialog.Builder(this@ActGroupDetail)
+        builder.setCancelable(false)
         builder.setMessage(getString(R.string.msg_question_delete))
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
 

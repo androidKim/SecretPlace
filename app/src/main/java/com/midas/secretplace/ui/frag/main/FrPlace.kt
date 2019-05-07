@@ -1,8 +1,6 @@
 package com.midas.secretplace.ui.frag.main
 
 import android.app.Activity
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -32,8 +30,6 @@ import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.place
-import com.midas.secretplace.structure.room.data_place
-import com.midas.secretplace.structure.vm.vm_place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
 import com.midas.secretplace.ui.act.ActMapDetail
@@ -589,6 +585,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     override fun deleteProc(pInfo: place, position:Int)
     {
         val builder = AlertDialog.Builder(activity!!)
+        builder.setCancelable(false)
         builder.setMessage(getString(R.string.msg_question_delete))
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
 

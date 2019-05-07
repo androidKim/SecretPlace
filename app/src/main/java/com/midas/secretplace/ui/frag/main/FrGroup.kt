@@ -432,6 +432,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
     override fun deleteGroupProc(pInfo: group, position:Int)
     {
         val builder = AlertDialog.Builder(activity!!)
+        builder.setCancelable(false)
         builder.setMessage(getString(R.string.msg_question_delete))
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
             m_Adapter!!.removeRow(position)
