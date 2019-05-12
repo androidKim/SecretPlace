@@ -4,7 +4,7 @@ class Constant
 {
     companion object
     {
-        //URL
+        //URLL
         val FIRE_STORE_URL = "gs://secretplace-29d5e.appspot.com"
         val TERM_URL = "http://54.180.109.122:8081/terms"
 
