@@ -271,6 +271,8 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         m_arrItem = ArrayList<String>()
         //m_strImgLastSeq = null
+        m_UploadImgFile = null
+        m_bitmapRotateBitmap = null
     }
     //--------------------------------------------------------------
     //
