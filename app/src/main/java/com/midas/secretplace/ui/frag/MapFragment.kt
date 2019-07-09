@@ -2,12 +2,13 @@ package com.midas.secretplace.ui.frag
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.Color
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.act.ActPlaceDetail
@@ -28,7 +29,6 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
         var args = arguments
         var pPlaceInfo:place? = null
         var pPlaceList:ArrayList<place>? = ArrayList()
-
 
         if(args!!.containsKey(Constant.INTENT_DATA_PLACE_OBJECT))//1개장소
             pPlaceInfo = args!!.getSerializable(Constant.INTENT_DATA_PLACE_OBJECT) as place
@@ -98,6 +98,14 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
                 arrLatLng!!.add(pLatLngInfo)
                 var pMarker:Marker = mMap.addMarker(MarkerOptions().position(pLatLngInfo).title(pInfo.name))
                 pMarker!!.tag = pInfo
+
+                if(i ==0)
+                {
+                    //move firtst item
+                    val sydney = LatLng(nLat, nLng)
+                    mMap.addMarker(MarkerOptions().position(sydney).title(pInfo.name))
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, m_nZoomLevel))
+                }
             }
         }
 
@@ -127,6 +135,7 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
         })
 
         //poly line..
+        /*
         if(pLatLngInfo != null && arrLatLng.size > 0)
         {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pLatLngInfo, m_nZoomLevel))
@@ -135,6 +144,7 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
                     .width(5f)
                     .color(Color.RED))
         }
+        */
     }
     //------------------------------------------------------------
     //
@@ -157,6 +167,4 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
     {
         fun selectPlaceItem(pInfo:place)
     }
-
-
 }

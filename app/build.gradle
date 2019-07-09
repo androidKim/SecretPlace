@@ -6,13 +6,13 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.midas.secretplace"
         minSdkVersion 19
-        targetSdkVersion 27
-        versionCode 18
-        versionName "1.9.7"
+        targetSdkVersion 28
+        versionCode 19
+        versionName "1.9.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
