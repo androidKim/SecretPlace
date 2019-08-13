@@ -124,19 +124,7 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
 
         fbtn_SaveLocation?.setOnClickListener(View.OnClickListener
         {
-            if(m_IfCallback != null)
-            {
-                var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
-
-                if(bPermissionVal)
-                {
-                    seveLocationDialog()
-                }
-                else
-                {
-
-                }
-            }
+            seveLocationDialog()
         })
 
         settingView()
@@ -231,15 +219,27 @@ class FrGroup : Fragment(), SwipeRefreshLayout.OnRefreshListener, GroupRvAdapter
     {
         if(m_IfCallback != null)
         {
-            var bCheckLocation:Boolean = m_IfCallback!!.checkLocationInfo()
-
-            if(bCheckLocation)
+            if(m_IfCallback != null)
             {
-                var locationInfo = m_IfCallback!!.getLocation()
-                var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919...xxx
+                //시스템권한
+                var bLocationUseable:Boolean = m_IfCallback!!.checkLocationInfo()
+                if(!bLocationUseable)
+                {
 
-                var pInfo:group = group(userKey!!, "", "")
-                showInputDialog(pInfo)
+                }
+                else
+                {
+                    //앱권한
+                    var bPermissionVal:Boolean = m_IfCallback!!.checkPermission()
+                    if(bPermissionVal)
+                    {
+                        var locationInfo = m_IfCallback!!.getLocation()
+                        var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919...xxx
+
+                        var pInfo:group = group(userKey!!, "", "")
+                        showInputDialog(pInfo)
+                    }
+                }
             }
         }
     }

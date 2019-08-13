@@ -55,7 +55,7 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
 
     }
     //------------------------------------------------------------
-    //1개 장소 마커
+    //1개 장소 마커f
     fun settingPlaceOneData(pPlaceInfo:place)
     {
         if(pPlaceInfo == null)

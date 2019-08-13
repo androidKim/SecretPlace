@@ -266,10 +266,12 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                     {
                         for (i in permissions.indices)
                             perms[permissions[i]] = grantResults[i]
+
                         // Check for both permissions
                         if (perms[Manifest.permission.ACCESS_COARSE_LOCATION] == PackageManager.PERMISSION_GRANTED
                                 && perms[Manifest.permission.ACCESS_FINE_LOCATION] == PackageManager.PERMISSION_GRANTED)
                         {
+                            Toast.makeText(m_Context, m_Context!!.resources.getString(R.string.msg_set_location_permission), Toast.LENGTH_LONG).show()
                             checkPermissionLocation()
                         }
                         else//거부..
@@ -463,7 +465,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
         }
         else
         {
-            if(mLocation.latitude <= 0 || mLocation.longitude <= 0)
+            if(mLocation.latitude <= 0 || mLocation.longitude <= 0)//재요청
             {
                 var fusedLocationProviderClient : FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
                 fusedLocationProviderClient .getLastLocation().addOnSuccessListener(this, OnSuccessListener<Location> { location ->
@@ -476,15 +478,14 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                     }
                     else
                     {
-
+                        bResult = false
                     }
                 })
             }
             else
             {
-
+                bResult = true
             }
-            bResult = true
         }
         return bResult
     }
@@ -526,13 +527,13 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
     private fun showAlert()
     {
         val dialog = AlertDialog.Builder(this)
-        dialog.setTitle("Enable Location")
-                .setMessage("Your Locations Settings is set to 'Off'.\nPlease Enable Location to " + "use this app")
-                .setPositiveButton("Location Settings", DialogInterface.OnClickListener { paramDialogInterface, paramInt ->
+        dialog.setTitle("위치허용")
+                .setMessage("위치허용을 활성화 시켜주세요.")
+                .setPositiveButton("위치설정하기", DialogInterface.OnClickListener { paramDialogInterface, paramInt ->
                     val myIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                     startActivity(myIntent)
                 })
-                .setNegativeButton("Cancel", DialogInterface.OnClickListener { paramDialogInterface, paramInt -> })
+                .setNegativeButton("취소", DialogInterface.OnClickListener { paramDialogInterface, paramInt -> })
         dialog.show()
     }
 
@@ -559,7 +560,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
 
     /*********************** Interface Callback ***********************/
     //--------------------------------------------------------------
-    //frPlace, frDistance
+    //frPlace
     override fun checkPermission(): Boolean
     {
         var bResult:Boolean = false
