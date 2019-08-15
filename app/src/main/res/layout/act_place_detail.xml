@@ -75,6 +75,12 @@
             android:layout_marginBottom="@dimen/margin_bottom"
             android:background="@color/color_black" />
 
+        <TextView
+            android:visibility="gone"
+            tools:text="메모내용"
+            android:id="@+id/tvMemo"
+            style="@style/TextViewMedium" />
+
 
         <RelativeLayout
             android:layout_width="match_parent"

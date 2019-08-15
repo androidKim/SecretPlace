@@ -18,7 +18,7 @@
     <string name="appbar_menu_1">Share</string>
     <string name="appbar_menu_2">Share</string>
     <string name="appbar_menu_3">Map</string>
-    <string name="appbar_menu_4">Edit</string>
+    <string name="appbar_menu_4">Name Edit</string>
     <string name="appbar_menu_5">Photo</string>
 
     <string name="str_ok">Yes</string>
@@ -27,8 +27,8 @@
     <string name="support">Support</string>
     <string name="str_msg_1">Logout</string>
     <string name="str_msg_2">Logout?</string>
-    <string name="str_msg_3">Save this place?</string>
-    <string name="str_msg_4">Title</string>
+    <string name="str_msg_3">Save current location.</string>
+    <string name="str_msg_4">Place Name</string>
     <string name="str_msg_5">Save</string>
     <string name="str_msg_6">Add This Place</string>
     <string name="str_msg_7">Need Permission</string>

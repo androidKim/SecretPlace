@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Color
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
@@ -19,8 +20,7 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.google.firebase.database.*
@@ -29,11 +29,13 @@ import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
+import com.midas.secretplace.structure.core.category
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.act.ActMain
 import com.midas.secretplace.ui.act.ActMapDetail
 import com.midas.secretplace.ui.act.ActPlaceDetail
+import com.midas.secretplace.ui.adapter.CateSpinnerAdapter
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.frag_place.*
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
@@ -377,7 +379,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 {
                     var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()//G292919...xxx
                     var address:String? = Util.getAddress(m_Context!!, locationInfo.latitude, locationInfo.longitude)
-                    var pInfo:place = place(userKey!!, "", "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), "", address!!, "", "N")
+                    var pInfo:place = place(userKey!!, "", "", "", String.format("%s",locationInfo.latitude), String.format("%s",locationInfo.longitude), "", address!!, "", "N","","")
                     showPlaceInputDialog(pInfo)
                     return
                 }
@@ -394,66 +396,144 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //
     fun showPlaceInputDialog(pInfo:place)
     {
-        //val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
-        //"/"+currentFirebaseUser!!.uid
-
         if(pInfo == null)
             return
 
         val builder = AlertDialog.Builder(m_Context!!)
-        builder.setMessage(getString(R.string.str_msg_3))
+        builder.setTitle(getString(R.string.str_msg_3))
+
+        var layout:LinearLayout = LinearLayout(m_Context)
+        layout.orientation = LinearLayout.VERTICAL
+        layout.setPadding(20, 20, 0, 0)
+        layout.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        //Cate msg
+        var tvCateMsg:TextView = TextView(m_Context)
+        tvCateMsg.textSize = 15f
+        val black:String = "#000000"
+        tvCateMsg.setTextColor(Color.parseColor(black))
+        tvCateMsg.text = "구분을 선택하세요."
+        tvCateMsg.setPadding(20, 20, 0, 0)
+        tvCateMsg.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layout.addView(tvCateMsg)
+
+        //CateCode spinner
+        var spinner:Spinner = Spinner(m_Context)
+        spinner.setPadding(0, 20, 0, 0)
+        val categoryArray:ArrayList<category> = ArrayList()
+        categoryArray.add(category("MT1","대형마트"))
+        categoryArray.add(category("CS2","편의점"))
+        categoryArray.add(category("PS3","어린이집,유치원"))
+        categoryArray.add(category("SC4","학교"))
+        categoryArray.add(category("AC5","학원"))
+        categoryArray.add(category("PK6","주차장"))
+        categoryArray.add(category("OL7","주유소,전소"))
+        categoryArray.add(category("SW8","지하철역"))
+        categoryArray.add(category("BK9","은행"))
+        categoryArray.add(category("CT1","문화시설"))
+        categoryArray.add(category("AG2","중개업소"))
+        categoryArray.add(category("PO3","공공기관"))
+        categoryArray.add(category("AT4","관광명소"))
+        categoryArray.add(category("AD5","숙박"))
+        categoryArray.add(category("FD6","음식점"))
+        categoryArray.add(category("CE7","카페"))
+        categoryArray.add(category("HP8","병원"))
+        categoryArray.add(category("PM9","약국"))
+        categoryArray.add(category("DR0","직접 입력"))
+        var cateAdapter:CateSpinnerAdapter = CateSpinnerAdapter(m_Context!!, categoryArray!!)
+        spinner.adapter = cateAdapter
+        layout.addView(spinner)
+
+        var editDirectInput: EditText? = EditText(m_Context)
+        editDirectInput!!.visibility = View.VISIBLE
+        editDirectInput!!.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL//singline..
+        editDirectInput!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(30))//maxlength
+        editDirectInput!!.hint = "구분"
+        editDirectInput.visibility = View.GONE
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedItem: category? = cateAdapter.getItem(position)
+                pInfo.code = selectedItem!!.code
+                pInfo.codeName = selectedItem!!.name
+                if(pInfo.code.equals("DR0"))//구분
+                {
+                    editDirectInput.visibility = View.VISIBLE
+                }
+                else
+                {
+                    editDirectInput.visibility = View.GONE
+                }
+            }
+        }
+
+        layout.addView(editDirectInput)
+
+        //name
         var editName: EditText? = EditText(m_Context)
         editName!!.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL//singline..
         editName!!.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(30))//maxlength
         editName!!.hint = getString(R.string.str_msg_4)
-        builder.setView(editName)
+        layout.addView(editName)
+
+        builder.setView(layout)
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
-            pInfo!!.name = editName.text.toString()
-
-            var pDbRef:DatabaseReference? = null
-            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())!!
-                    .push()!!//insert..
-
-            pDbRef!!.setValue(pInfo!!)//insert
-            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
-                override fun onDataChange(dataSnapshot: DataSnapshot?)
+            if(editName.text.toString().equals(""))
+            {
+                Toast.makeText(m_Context, "장소이름을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                return@setPositiveButton
+            }
+            else
+            {
+                pInfo!!.name = editName.text.toString()
+                if(pInfo.code.equals("DR0"))//직접입력이면..
                 {
-                    if (dataSnapshot!!.exists())
+                    val str:String = editDirectInput?.text.toString()
+                    if(str.equals(""))
                     {
-                        //key update
-                        var key = dataSnapshot!!.key
-                        pInfo.place_key = key
-                        pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())!!
-                                .child(key)!!//
-
-                        pDbRef!!.setValue(pInfo)//insert
-                        m_Adapter!!.addFirst(pInfo!!)
-
-                        /*
-                        var dataPlace:data_place = data_place(0,
-                                pInfo!!.user_key!!,
-                                pInfo!!.place_key!!,
-                                pInfo!!.group_key!!,
-                                pInfo!!.name!!,
-                                pInfo!!.lat!!,
-                                pInfo!!.lng!!,
-                                pInfo!!.memo!!,
-                                pInfo!!.address!!,
-                                pInfo!!.img_url!!)
-                        mViewModelPlace?.insert(dataPlace)//
-                        */
-
-                        ly_Empty.visibility = View.GONE
+                        Toast.makeText(m_Context, "구분을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                        return@setPositiveButton
+                    }
+                    else
+                    {
+                        pInfo.codeName = str
                     }
                 }
 
-                override fun onCancelled(p0: DatabaseError?)
-                {
+                var pDbRef:DatabaseReference? = null
+                pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                        .child(m_App!!.m_SpCtrl!!.getSpUserKey())!!
+                        .push()!!//insert..
 
-                }
-            })
+                pDbRef!!.setValue(pInfo!!)//insert
+                pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onDataChange(dataSnapshot: DataSnapshot?)
+                    {
+                        if (dataSnapshot!!.exists())
+                        {
+                            //key update
+                            var key = dataSnapshot!!.key
+                            pInfo.place_key = key
+                            pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())!!
+                                    .child(key)!!//
+
+                            pDbRef!!.setValue(pInfo)//insert
+                            m_Adapter!!.addFirst(pInfo!!)
+                            ly_Empty.visibility = View.GONE
+                        }
+                    }
+
+                    override fun onCancelled(p0: DatabaseError?)
+                    {
+
+                    }
+                })
+            }
         }
 
         builder.setNegativeButton(getString(R.string.str_no)){dialog,which ->

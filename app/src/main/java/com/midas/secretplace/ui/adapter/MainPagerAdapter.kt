@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.view.ViewGroup
 import com.midas.secretplace.R
-import com.midas.secretplace.ui.frag.main.FrGroup
 import com.midas.secretplace.ui.frag.main.FrPlace
 
 
@@ -22,13 +21,10 @@ class MainPagerAdapter internal constructor(pContext: Context, fm: FragmentManag
     /************************** Define **************************/
 
     private var TAB_NAME_0 = pContext.resources.getString(R.string.str_tab_title_my)
-    private var TAB_NAME_1 = pContext.resources.getString(R.string.str_tab_title_group)
-    private var TAB_NAME_2 = pContext.resources.getString(R.string.str_tab_title_couple)
-    private var COUNT = 2
+    private var COUNT = 1
 
     /************************** Member **************************/
     private var fragPlace:FrPlace? = null
-    private var fragGroup:FrGroup? = null
     /************************** System Fucntion **************************/
     //--------------------------------------------------------
     //
@@ -38,7 +34,6 @@ class MainPagerAdapter internal constructor(pContext: Context, fm: FragmentManag
         when (position)
         {
             0 -> fragment = FrPlace()
-            1 -> fragment = FrGroup()
         }
 
         return fragment
@@ -57,10 +52,6 @@ class MainPagerAdapter internal constructor(pContext: Context, fm: FragmentManag
         {
             return TAB_NAME_0
         }
-        else if(position == 1)
-        {
-            return TAB_NAME_1
-        }
         else
         {
             return ""
@@ -74,7 +65,6 @@ class MainPagerAdapter internal constructor(pContext: Context, fm: FragmentManag
         // save the appropriate reference depending on position
         when (position) {
             TAB_INDEX_FRPALCE -> fragPlace = createdFragment as FrPlace
-            TAB_INDEX_FRGROUP -> fragGroup = createdFragment as FrGroup
         }
         return createdFragment
     }

@@ -232,11 +232,10 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
         var menuItem1: MenuItem = menu!!.findItem(R.id.action_share).setVisible(false)
-        var menuItem2: MenuItem = menu!!.findItem(R.id.share_location).setVisible(true)
-        var menuItem3: MenuItem = menu!!.findItem(R.id.show_map).setVisible(true)
-        var menuItem4: MenuItem = menu!!.findItem(R.id.edit).setVisible(true)
         var menuItem5: MenuItem = menu!!.findItem(R.id.add_photo).setVisible(true)
-
+        var menuItem3: MenuItem = menu!!.findItem(R.id.show_map).setVisible(true)
+        var menuItem2: MenuItem = menu!!.findItem(R.id.share_location).setVisible(true)
+        var menuItem4: MenuItem = menu!!.findItem(R.id.edit).setVisible(true)
         return super.onCreateOptionsMenu(menu)
     }
     //--------------------------------------------------------------
@@ -244,20 +243,20 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle presses on the action bar menu items
         when (item.itemId) {
-            R.id.share_location -> {
-                Util.sharePlaceLocationInfo(this, this, m_PlaceInfo!!)
-                return true
-            }
             R.id.show_map -> {
                 goMapDetail()
                 return true
             }
-            R.id.edit -> {
-                editContent()
-                return true
-            }
             R.id.add_photo -> {
                 addPhoto()
+                return true
+            }
+            R.id.share_location -> {
+                Util.sharePlaceLocationInfo(this, this, m_PlaceInfo!!)
+                return true
+            }
+            R.id.edit -> {
+                editContent()
                 return true
             }
         }
@@ -343,7 +342,16 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             return
 
         //setTitle..
-        toolbar.title = m_PlaceInfo!!.name
+        if(!m_PlaceInfo!!.codeName.equals(""))
+            toolbar.title = String.format("%s(%s)",m_PlaceInfo!!.name,m_PlaceInfo!!.codeName)
+        else
+            toolbar.title = String.format("%s",m_PlaceInfo!!.name)
+
+        if(!m_PlaceInfo!!.memo.equals(""))
+        {
+            tvMemo.visibility = View.VISIBLE
+            tvMemo.text = m_PlaceInfo!!.memo
+        }
 
         //favorite status
         if(m_PlaceInfo!!.favorite.equals("Y"))

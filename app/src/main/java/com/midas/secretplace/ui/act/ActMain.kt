@@ -59,7 +59,6 @@ import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.MainPagerAdapter
 import com.midas.secretplace.ui.custom.dlg_photo_filter
 import com.midas.secretplace.ui.custom.dlg_theme_setting
-import com.midas.secretplace.ui.frag.main.FrGroup
 import com.midas.secretplace.ui.frag.main.FrPlace
 import com.midas.secretplace.ui.setting.ActSetting
 import com.midas.secretplace.util.Util
@@ -73,7 +72,7 @@ import java.io.IOException
 
 
 class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, ThemeColorRvAdapter.ifCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener,
-        FrPlace.ifCallback, FrGroup.ifCallback
+        FrPlace.ifCallback
 {
 
     //----------------------------------------------------------
