@@ -1,36 +1,25 @@
 
 package com.midas.secretplace.ui.act
 
-import android.Manifest
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.ActionBar
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.location.*
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.Query
+import com.google.firebase.database.ValueEventListener
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
@@ -40,7 +29,6 @@ import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.act_favorite.*
 import java.io.Serializable
-import kotlin.collections.ArrayList
 
 /*
 내가 좋아요 한 위치 리스트
@@ -212,11 +200,11 @@ class ActFavorite : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,Pl
 
 
         var pQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
                 .orderByChild("favorite").equalTo("Y")//favorite 상태가 Y인것만 호출
 
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -234,7 +222,7 @@ class ActFavorite : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,Pl
                 progressBar.visibility = View.GONE
             }
 
-            override fun onCancelled(p0: DatabaseError?)
+            override fun onCancelled(p0: DatabaseError)
             {
 
             }

@@ -1,8 +1,8 @@
 package com.midas.secretplace.structure.vm
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import com.midas.secretplace.structure.repository.UserRepository
 import com.midas.secretplace.structure.room.data_user
 

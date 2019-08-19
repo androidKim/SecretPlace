@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <android.support.v7.widget.Toolbar
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 style="@style/ToolBarStyle.Base"
                 android:layout_width="match_parent"
@@ -41,7 +41,7 @@
                 tools:visibility="visible">
 
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/text_input_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -57,7 +57,7 @@
                         android:paddingBottom="@dimen/edit_padding"
                         android:singleLine="true"
                         android:textSize="15dp" />
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
 
                 <RelativeLayout
@@ -78,7 +78,7 @@
                         android:layout_centerVertical="true"
                         android:text="@string/str_msg_57" />
 
-                    <android.support.v7.widget.AppCompatImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/iv_Icon"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
@@ -112,7 +112,7 @@
                         android:gravity="center"
                         android:orientation="horizontal">
 
-                        <android.support.v7.widget.AppCompatImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/iv_RequestStatus"
                             android:layout_width="@dimen/icon_small_width"
                             android:layout_height="@dimen/icon_small_height"
@@ -165,7 +165,7 @@
                     android:onClick="showRequestForMe"
                     android:orientation="horizontal">
 
-                    <android.support.v7.widget.AppCompatImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_centerVertical="true"
@@ -197,7 +197,7 @@
                     android:padding="@dimen/padding">
 
 
-                    <android.support.v7.widget.AppCompatImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_centerVertical="true"
@@ -231,7 +231,7 @@
                     android:onClick="cancelProc"
                     android:orientation="horizontal">
 
-                    <android.support.v7.widget.AppCompatImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_centerVertical="true"
@@ -264,4 +264,4 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

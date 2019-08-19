@@ -4,13 +4,13 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.MessageRvAdapter
 import com.midas.secretplace.R
@@ -54,9 +54,9 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
 
         m_Imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
-        var pUserQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey())
+        var pUserQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
         pUserQuery.addListenerForSingleValueEvent(object :ValueEventListener{
-            override fun onDataChange(p0: DataSnapshot?) {
+            override fun onDataChange(p0: DataSnapshot) {
                 if(p0!!.exists())
                 {
                     val pInfo: user = p0!!.getValue(user::class.java)!!
@@ -64,7 +64,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?) {
+            override fun onCancelled(p0: DatabaseError) {
 
             }
         })
@@ -72,7 +72,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
         var pCoupleDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
         pCoupleDbRef.addValueEventListener(object :ValueEventListener
         {
-            override fun onDataChange(dataSnapshot:DataSnapshot?) {
+            override fun onDataChange(dataSnapshot:DataSnapshot) {
                 // Get Post object and use the values to update the UI
                 val children = dataSnapshot!!.children
                 children.forEach {
@@ -99,7 +99,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?) {
+            override fun onCancelled(p0: DatabaseError) {
 
             }
         })
@@ -119,7 +119,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
     //--------------------------------------------------------------
     //
     var messageChildEventListener:ChildEventListener = object:ChildEventListener{
-        override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
+        override fun onChildAdded(p0: DataSnapshot, p1: String?) {
             if(p0!!.exists())
             {
                 if(m_Adapter == null)
@@ -136,28 +136,28 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
             }
         }
 
-        override fun onChildChanged(p0: DataSnapshot?, p1: String?) {
+        override fun onChildChanged(p0: DataSnapshot, p1: String?) {
             if(p0!!.exists())
             {
 
             }
         }
 
-        override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
+        override fun onChildMoved(p0: DataSnapshot, p1: String?) {
             if(p0!!.exists())
             {
 
             }
         }
 
-        override fun onChildRemoved(p0: DataSnapshot?) {
+        override fun onChildRemoved(p0: DataSnapshot) {
             if(p0!!.exists())
             {
 
             }
         }
 
-        override fun onCancelled(p0: DatabaseError?) {
+        override fun onCancelled(p0: DatabaseError) {
 
         }
     }
@@ -209,7 +209,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
         recyclerView!!.layoutManager = pLayoutManager
         recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
         {
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int)
             {
                 val visibleItemCount = pLayoutManager.childCount
                 val totalItemCount = pLayoutManager.itemCount
@@ -233,7 +233,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
         var messageQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_MESSAGE)!!.orderByChild("chat_key").equalTo(m_strChayKey)
         messageQuery!!.addListenerForSingleValueEvent(object:ValueEventListener {
 
-            override fun onDataChange(p0: DataSnapshot?) {
+            override fun onDataChange(p0: DataSnapshot) {
                 val children = p0!!.children
                 children.forEach {
                     //UI update
@@ -249,7 +249,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
                 messageQuery.removeEventListener(this)
             }
 
-            override fun onCancelled(p0: DatabaseError?) {
+            override fun onCancelled(p0: DatabaseError) {
 
             }
         })
@@ -263,7 +263,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
 
         var pDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_CHAT)!!
         pDbRef.addListenerForSingleValueEvent(object:ValueEventListener{
-            override fun onDataChange(dataSnapshot:DataSnapshot?) {
+            override fun onDataChange(dataSnapshot:DataSnapshot) {
                 // Get Post object and use the values to update the UI
                 val children = dataSnapshot!!.children
                 children.forEach {
@@ -276,7 +276,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
                                 pInfo.responser_key.equals(m_CoupleInfo.responser_key))//커플정보와 일치하면
                         {
                             m_bExistChat = true
-                            m_strChayKey = it.key
+                            m_strChayKey = it.key!!
                             settingChatData()
                         }
                     }
@@ -293,7 +293,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
                     var pChatDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_CHAT)!!
                     pChatDbRef!!.push().setValue(pInfo!!)
                     pChatDbRef!!.addListenerForSingleValueEvent(object:ValueEventListener{
-                        override fun onDataChange(p0: DataSnapshot?) {
+                        override fun onDataChange(p0: DataSnapshot) {
                             if(p0!!.exists())
                             {
                                 val children = p0!!.children
@@ -303,7 +303,7 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
                                             pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))// 요청자또는 응답자가가 나일떄
                                     {
                                         pInfo.chat_key = it!!.key
-                                        pChatDbRef!!.child(it!!.key).setValue(pInfo)//update
+                                        pChatDbRef!!.child(it!!.key!!).setValue(pInfo)//update
                                     }
                                 }
                             }
@@ -313,14 +313,14 @@ class ActChat : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, Messa
                             }
                         }
 
-                        override fun onCancelled(p0: DatabaseError?) {
+                        override fun onCancelled(p0: DatabaseError) {
 
                         }
                     })
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?) {
+            override fun onCancelled(p0: DatabaseError) {
 
             }
         })

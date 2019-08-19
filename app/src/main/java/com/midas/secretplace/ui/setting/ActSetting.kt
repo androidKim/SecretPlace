@@ -4,7 +4,7 @@ package com.midas.secretplace.ui.setting
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.util.Util
 

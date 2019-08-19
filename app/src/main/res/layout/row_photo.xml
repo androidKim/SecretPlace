@@ -6,7 +6,7 @@
     android:layout_marginBottom="10dp"
     android:background="@color/color_white">
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:background="@color/cardview_light_background"
         style="@style/CardViewStyle"
         android:layout_width="match_parent"
@@ -42,6 +42,6 @@
                 android:background="@drawable/outline_sync_disabled_black_18dp"
                 android:visibility="gone" />
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>

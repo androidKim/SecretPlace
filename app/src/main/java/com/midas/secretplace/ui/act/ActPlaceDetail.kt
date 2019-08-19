@@ -13,17 +13,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.FileProvider
-import android.support.v4.view.ViewCompat
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.ActionBar
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -32,6 +21,15 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.AbsListView
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.view.ViewCompat
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
@@ -39,12 +37,19 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
+import com.kakao.kakaonavi.KakaoNaviParams
+import com.kakao.kakaonavi.KakaoNaviService
+import com.kakao.kakaonavi.Location
+import com.kakao.kakaonavi.NaviOptions
+import com.kakao.kakaonavi.options.CoordType
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
+import com.midas.secretplace.databinding.ActPlaceDetailBinding
 import com.midas.secretplace.structure.core.place
 import com.midas.secretplace.ui.MyApp
 import com.midas.secretplace.ui.adapter.PhotoRvAdapter
+import com.midas.secretplace.ui.custom.dlg_navi_popup
 import com.midas.secretplace.ui.custom.dlg_photo_filter
 import com.midas.secretplace.ui.custom.dlg_photo_view
 import com.midas.secretplace.util.Util
@@ -59,34 +64,29 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback{
+class ActPlaceDetail : ActBase<ActPlaceDetailBinding>(), SwipeRefreshLayout.OnRefreshListener,PhotoRvAdapter.ifCallback{
     /*********************** extention fun ***********************/
     //----------------------------------------------------------
-    //pinchToZoom
+    //dlg_photo_view
     inline fun Activity.showPhotoViewDialog(func: dlg_photo_view.() -> Unit): AlertDialog =
             dlg_photo_view(this).apply {
                 func()
             }.create()
-
-    inline fun Fragment.showPhotoViewDialog(func: dlg_photo_view.() -> Unit): AlertDialog =
-            dlg_photo_view(this.context!!).apply {
-                func()
-            }.create()
-
     //----------------------------------------------------------
-    //filter
+    //dlg_photo_filter
     inline fun Activity.showPhotoFilterDialog(func: dlg_photo_filter.() -> Unit): AlertDialog =
             dlg_photo_filter(this).apply {
                 func()
             }.create()
-
-    inline fun Fragment.showPhotoFilterDialog(func: dlg_photo_filter.() -> Unit): AlertDialog =
-            dlg_photo_filter(this.context!!).apply {
+    //----------------------------------------------------------
+    //dlg_navi_popup
+    inline fun Activity.showNaviPopupDialog(func: dlg_navi_popup.() -> Unit): AlertDialog =
+            dlg_navi_popup(this).apply {
                 func()
             }.create()
-
     /*********************** Define ***********************/
     /*********************** Member ***********************/
+    override val layoutResourceId: Int = R.layout.act_place_detail
     var m_App: MyApp? = null
     var m_Context: Context? = null
     var m_RequestManager:RequestManager? = null
@@ -107,6 +107,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     /*********************** Controller ***********************/
     var m_PhotoViewDialog:AlertDialog? = null
     var m_PhotoFilterDialog:AlertDialog? = null
+    var m_NaviPopupDialog:AlertDialog? = null
     /*********************** System Function ***********************/
     //--------------------------------------------------------------
     //
@@ -121,7 +122,6 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
             m_App!!.init(m_Context as ActPlaceDetail)
 
         Util.setTheme(m_Context!!, m_App!!.m_SpCtrl!!.getSpTheme()!!)
-        setContentView(R.layout.act_place_detail)
 
         initValue()
         recvIntentData()
@@ -312,15 +312,15 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     //
     fun getPlaceInfoProc(){
         var dbQuery:Query = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                .child(m_PlaceInfo!!.place_key)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                .child(m_PlaceInfo!!.place_key!!)
 
         dbQuery.addListenerForSingleValueEvent(object:ValueEventListener{
-            override fun onCancelled(p0: DatabaseError?) {
+            override fun onCancelled(p0: DatabaseError) {
 
             }
 
-            override fun onDataChange(p0: DataSnapshot?) {
+            override fun onDataChange(p0: DataSnapshot) {
                 if(p0!!.exists())
                 {
                     m_PlaceInfo = p0!!.getValue(place::class.java)!!
@@ -368,7 +368,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         recyclerView!!.setHasFixedSize(true)
         recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
         {
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int)
             {
                 val visibleItemCount = pLayoutManager.childCount
                 val totalItemCount = pLayoutManager.itemCount
@@ -401,7 +401,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 */
             }
 
-            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
 
                 if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {//손을 떼었지만 움직이는중
@@ -431,12 +431,12 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
     {
         //place Object
         var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
                 .child(seq)//where
 
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener
         {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -453,7 +453,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?)
+            override fun onCancelled(p0: DatabaseError)
             {
 
             }
@@ -471,38 +471,38 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //image list..
         var pQuery:Query?= null
         pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                .child(m_PlaceInfo!!.place_key).orderByKey()
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                .child(m_PlaceInfo!!.place_key!!).orderByKey()
 
         pQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
                 // A new message has been added
             }
 
-            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
                 //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
             }
 
-            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            override fun onChildRemoved(dataSnapshot: DataSnapshot)
             {
                 //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
             }
 
-            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
                 //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
             }
 
-            override fun onCancelled(databaseError: DatabaseError?)
+            override fun onCancelled(databaseError: DatabaseError)
             {
                 //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
             }
         })
 
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -546,7 +546,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 progressBar.visibility = View.GONE
             }
 
-            override fun onCancelled(p0: DatabaseError?)
+            override fun onCancelled(p0: DatabaseError)
             {
 
             }
@@ -703,11 +703,11 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         var pDbRef: DatabaseReference? = null
         pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey()).child(m_PlaceInfo!!.place_key)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!).child(m_PlaceInfo!!.place_key!!)
         pDbRef!!.setValue(m_PlaceInfo!!)
 
         pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot)
             {
                 if (dataSnapshot!!.exists())
                 {
@@ -716,7 +716,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?)
+            override fun onCancelled(p0: DatabaseError)
             {
 
             }
@@ -859,6 +859,32 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         //  and showing
         m_PhotoFilterDialog?.show()
     }
+    //----------------------------------------------------------
+    // navipopup
+    fun showNaviPopupDialog(pInfo:place)
+    {
+        m_NaviPopupDialog = showNaviPopupDialog {
+
+            kakaoNaviClickListener {
+                //길안내
+                // 경유지 설정
+                /*
+                List<Location> viaList = new ArrayList<Location>();
+                viaList.add(Location.newBuilder("서서울호수공원", 126.8322289016308, 37.528495607451205).build());
+                */
+
+                var builder:KakaoNaviParams.Builder = KakaoNaviParams.newBuilder(Location.newBuilder(pInfo.name, pInfo.lng!!.toDouble(),pInfo.lat!!.toDouble()).build()).setNaviOptions(NaviOptions.newBuilder().setCoordType(CoordType.WGS84).setStartX(126.5).setStartY(35.2).build())
+                KakaoNaviService.getInstance().navigate(m_Context, builder.build())
+            }
+
+            closeIconClickListener {
+                m_NaviPopupDialog!!.dismiss()
+            }
+
+        }
+        //  and showing
+        m_NaviPopupDialog?.show()
+    }
     //--------------------------------------------------------------------------------
     //
     fun uploadAlbumPhoto(bitmap:Bitmap)
@@ -882,11 +908,11 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             //img table update
             var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                    .child(m_PlaceInfo!!.place_key).push()//where
-            pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                    .child(m_PlaceInfo!!.place_key!!).push()//where
+            pDbRef!!.setValue(taskSnapshot.uploadSessionUri.toString())//insert
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot!!.exists()) {
                         m_bModify = true
                         setRefresh()
@@ -895,7 +921,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     }
                 }
 
-                override fun onCancelled(p0: DatabaseError?) {
+                override fun onCancelled(p0: DatabaseError) {
                     progressBar.visibility = View.GONE
                     tv_Progress.visibility = View.GONE
                 }
@@ -903,20 +929,20 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             //place table update
             var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                    .child(m_PlaceInfo!!.place_key)
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                    .child(m_PlaceInfo!!.place_key!!)
 
             pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot!!.exists()) {
 
                         val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                        pInfo!!.img_url = taskSnapshot.downloadUrl.toString()
+                        pInfo!!.img_url = taskSnapshot.uploadSessionUri.toString()
                         pPlaceDb.setValue(pInfo)
                     }
                 }
 
-                override fun onCancelled(p0: DatabaseError?) {
+                override fun onCancelled(p0: DatabaseError) {
 
                 }
             })
@@ -953,12 +979,12 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         .addOnSuccessListener { taskSnapshot ->
             //update
             var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                    .child(m_PlaceInfo!!.place_key).push()//where
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                    .child(m_PlaceInfo!!.place_key!!).push()//where
 
-            pDbRef!!.setValue(taskSnapshot.downloadUrl.toString())//insert
+            pDbRef!!.setValue(taskSnapshot.uploadSessionUri.toString())//insert
             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot!!.exists()) {
                         m_bModify = true
                         setRefresh()
@@ -967,7 +993,7 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
                     }
                 }
 
-                override fun onCancelled(p0: DatabaseError?) {
+                override fun onCancelled(p0: DatabaseError) {
                     progressBar.visibility = View.GONE
                     tv_Progress.visibility = View.GONE
                 }
@@ -975,20 +1001,20 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
             //place table update
             var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                    .child(m_PlaceInfo!!.place_key)
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                    .child(m_PlaceInfo!!.place_key!!)
 
             pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot!!.exists()) {
 
                         val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                        pInfo!!.img_url = taskSnapshot.downloadUrl.toString()
+                        pInfo!!.img_url = taskSnapshot.uploadSessionUri.toString()
                         pPlaceDb.setValue(pInfo)
                     }
                 }
 
-                override fun onCancelled(p0: DatabaseError?) {
+                override fun onCancelled(p0: DatabaseError) {
 
                 }
             })
@@ -1032,25 +1058,23 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
 
         //db update..
         var dbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                .child(m_PlaceInfo!!.place_key)
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                .child(m_PlaceInfo!!.place_key!!)
         dbRef!!.setValue(m_PlaceInfo!!)//db update
         dbRef!!.addListenerForSingleValueEvent(object: ValueEventListener
         {
-            override fun onCancelled(p0: DatabaseError?) {
+            override fun onCancelled(p0: DatabaseError) {
 
             }
 
-            override fun onDataChange(p0: DataSnapshot?) {
+            override fun onDataChange(p0: DataSnapshot) {
                 if(p0!!.exists())
                 {
                     m_PlaceInfo = p0!!.getValue(place::class.java)!!
                 }
             }
-
         })
     }
-
     //-----------------------------------------------------
     //메모 클릭
     fun onClickMoveMemo(view:View)
@@ -1058,6 +1082,11 @@ class ActPlaceDetail : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener
         var pIntent = Intent(m_Context, ActMemo::class.java)
         pIntent.putExtra(Constant.INTENT_DATA_PLACE_OBJECT, m_PlaceInfo as Serializable)
         startActivityForResult(pIntent, 0)
+    }
+    //-----------------------------------------------------
+    //navigation popup
+    fun onClickNaviPopup(view:View){
+        showNaviPopupDialog(m_PlaceInfo!!)
     }
     /************************* callback function *************************/
     //-----------------------------------------------------

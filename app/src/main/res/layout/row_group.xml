@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/color_white">
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         style="@style/CardViewStyle">
 
             <RelativeLayout
@@ -28,5 +28,5 @@
                 android:textColor="@color/color_black"
                 android:textSize="15dp" />
             </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

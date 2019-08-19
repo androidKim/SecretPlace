@@ -8,19 +8,19 @@ import android.graphics.Color
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.ShareCompat
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.InputFilter
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ShareCompat
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.google.firebase.database.*
@@ -61,7 +61,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     var m_bPagingFinish:Boolean = false
 
     /**************************** Controller ****************************/
-    var m_RecyclerView:RecyclerView? = null
+    var m_RecyclerView: RecyclerView? = null
 
     /**************************** System Function ****************************/
     //------------------------------------------------------------------------
@@ -214,7 +214,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         m_RecyclerView!!.layoutManager = pLayoutManager
         m_RecyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
         {
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int)
             {
                 val visibleItemCount = pLayoutManager.childCount
                 val totalItemCount = pLayoutManager.itemCount
@@ -248,9 +248,9 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         progressBar.visibility = View.VISIBLE
         m_bRunning = true
         var pQuery:Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_App!!.m_SpCtrl!!.getSpUserKey()).orderByKey()
+        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_App!!.m_SpCtrl!!.getSpUserKey()!!).orderByKey()
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -288,7 +288,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 progressBar.visibility = View.GONE
             }
 
-            override fun onCancelled(p0: DatabaseError?)
+            override fun onCancelled(p0: DatabaseError)
             {
 
             }
@@ -506,12 +506,12 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
                 var pDbRef:DatabaseReference? = null
                 pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                        .child(m_App!!.m_SpCtrl!!.getSpUserKey())!!
+                        .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)!!
                         .push()!!//insert..
 
                 pDbRef!!.setValue(pInfo!!)//insert
                 pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
-                    override fun onDataChange(dataSnapshot: DataSnapshot?)
+                    override fun onDataChange(dataSnapshot: DataSnapshot)
                     {
                         if (dataSnapshot!!.exists())
                         {
@@ -519,8 +519,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                             var key = dataSnapshot!!.key
                             pInfo.place_key = key
                             pDbRef =  m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())!!
-                                    .child(key)!!//
+                                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)!!
+                                    .child(key!!)!!//
 
                             pDbRef!!.setValue(pInfo)//insert
                             m_Adapter!!.addFirst(pInfo!!)
@@ -528,7 +528,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                         }
                     }
 
-                    override fun onCancelled(p0: DatabaseError?)
+                    override fun onCancelled(p0: DatabaseError)
                     {
 
                     }
@@ -569,11 +569,11 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
         var pQuery:Query? = null
         pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
                 .child(placeKey).orderByKey()
 
         pQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -585,33 +585,33 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 }
             }
 
-            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
                 //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
 
             }
 
-            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            override fun onChildRemoved(dataSnapshot: DataSnapshot)
             {
                 //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
 
             }
 
-            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
                 //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
 
 
             }
 
-            override fun onCancelled(databaseError: DatabaseError?)
+            override fun onCancelled(databaseError: DatabaseError)
             {
                 //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
             }
         })
 
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -645,7 +645,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?)
+            override fun onCancelled(p0: DatabaseError)
             {
 
             }
@@ -675,8 +675,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
             //place data remove
             var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                    .child(pInfo.place_key)//where
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                    .child(pInfo.place_key!!)//where
             pDbRef!!.removeValue()
 
             //file storage remove
@@ -684,8 +684,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
             //file data remove
             pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                    .child(pInfo.place_key)//where
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                    .child(pInfo.place_key!!)//where
 
             pDbRef!!.removeValue()
 

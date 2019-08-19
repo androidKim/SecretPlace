@@ -1,131 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/ly_Base"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/color_white"
-    tools:context=".ui.act.ActPlaceDetail">
-
+    xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
-        android:id="@+id/ly_Top"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            style="@style/ToolBarStyle.Base"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </RelativeLayout>
-
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/ly_SwipeRefresh"
+        android:id="@+id/ly_Base"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/ly_BottomBar"
-        android:layout_below="@+id/ly_Top"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
-    </android.support.v4.widget.SwipeRefreshLayout>
-
-    <LinearLayout
-        android:id="@+id/ly_NoData"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/ly_Top"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:background="@drawable/outline_info_black_18dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:gravity="center"
-            android:text="@string/str_msg_14"
-            android:textColor="@color/color_black" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ly_BottomBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/padding_left"
-        android:paddingRight="@dimen/padding_right"
-        android:paddingBottom="@dimen/padding_bottom">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="@dimen/margin_bottom"
-            android:background="@color/color_black" />
-
-        <TextView
-            android:visibility="gone"
-            tools:text="메모내용"
-            android:id="@+id/tvMemo"
-            style="@style/TextViewMedium" />
-
+        android:background="@color/color_white"
+        tools:context=".ui.act.ActPlaceDetail">
 
         <RelativeLayout
+            android:id="@+id/ly_Top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/ivFavorite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/ic_favorite_border_black_24dp"
-                android:onClick="onClickFavorite" />
-
-            <android.support.v7.widget.AppCompatImageView
-                android:layout_marginLeft="@dimen/margin_left"
-                android:id="@+id/ivMemo"
-                android:layout_toRightOf="@+id/ivFavorite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:background="@drawable/ic_description_black_24dp"
-                android:onClick="onClickMoveMemo" />
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                style="@style/ToolBarStyle.Base"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </RelativeLayout>
 
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/ly_SwipeRefresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/ly_BottomBar"
+            android:layout_below="@+id/ly_Top"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp">
 
-    </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"></androidx.recyclerview.widget.RecyclerView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <TextView
-        android:id="@+id/tv_Progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/progressBar"
-        android:layout_centerInParent="true"
-        android:textColor="@color/color_black"
-        android:textSize="13dp"
-        android:visibility="gone"
-        tools:text="60%.."
-        tools:visibility="visible" />
+        <LinearLayout
+            android:id="@+id/ly_NoData"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/ly_Top"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
-</RelativeLayout>
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/outline_info_black_18dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center"
+                android:text="@string/str_msg_14"
+                android:textColor="@color/color_black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ly_BottomBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/padding_left"
+            android:paddingRight="@dimen/padding_right"
+            android:paddingBottom="@dimen/padding_bottom">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/margin_bottom"
+                android:background="@color/color_black" />
+
+            <TextView
+                android:id="@+id/tvMemo"
+                style="@style/TextViewMedium"
+                android:visibility="gone"
+                tools:text="메모내용" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivFavorite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/ic_favorite_border_black_24dp"
+                    android:onClick="onClickFavorite" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivMemo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/margin_left"
+                    android:layout_toRightOf="@+id/ivFavorite"
+                    android:background="@drawable/ic_description_black_24dp"
+                    android:onClick="onClickMoveMemo" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivNaviPopup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/margin_left"
+                    android:layout_toRightOf="@+id/ivMemo"
+                    android:background="@drawable/ic_navigation_black_24dp"
+                    android:onClick="onClickNaviPopup" />
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_Progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/progressBar"
+            android:layout_centerInParent="true"
+            android:textColor="@color/color_black"
+            android:textSize="13dp"
+            android:visibility="gone"
+            tools:text="60%.."
+            tools:visibility="visible" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone" />
+    </RelativeLayout>
+</layout>

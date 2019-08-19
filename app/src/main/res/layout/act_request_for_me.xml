@@ -12,14 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             style="@style/ToolBarStyle.Base"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </RelativeLayout>
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/ly_SwipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,11 +27,11 @@
         android:visibility="gone"
         android:layout_below="@+id/ly_Top">
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
-    </android.support.v4.widget.SwipeRefreshLayout>
+            android:layout_height="wrap_content"></androidx.recyclerview.widget.RecyclerView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <LinearLayout
         android:id="@+id/ly_NoData"

@@ -4,14 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.support.v7.app.ActionBar
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
-import android.widget.Toolbar
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.*
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
@@ -56,11 +54,11 @@ class ActCouple : AppCompatActivity()
         m_pCoupleDbRef!!.addChildEventListener(coupleTableChildEventListener)
         m_pCoupleDbRef!!.addListenerForSingleValueEvent(object: ValueEventListener
         {
-            override fun onCancelled(p0: DatabaseError?) {
+            override fun onCancelled(p0: DatabaseError) {
 
             }
 
-            override fun onDataChange(p0: DataSnapshot?) {
+            override fun onDataChange(p0: DataSnapshot) {
                 progressBar.visibility = View.GONE
             }
         })
@@ -106,11 +104,11 @@ class ActCouple : AppCompatActivity()
         m_pCoupleDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
         m_pCoupleDbRef!!.addValueEventListener(object :ValueEventListener
         {
-            override fun onCancelled(p0: DatabaseError?) {
+            override fun onCancelled(p0: DatabaseError) {
 
             }
 
-            override fun onDataChange(p0: DataSnapshot?) {
+            override fun onDataChange(p0: DataSnapshot) {
                 if(p0!!.exists())
                 {
 
@@ -144,11 +142,11 @@ class ActCouple : AppCompatActivity()
         //firebase db access..
         var tbUser:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).child(strValue)!!
         tbUser.addListenerForSingleValueEvent(object :ValueEventListener{
-            override fun onCancelled(p0: DatabaseError?) {
+            override fun onCancelled(p0: DatabaseError) {
 
             }
 
-            override fun onDataChange(p0: DataSnapshot?) {
+            override fun onDataChange(p0: DataSnapshot) {
                 if(p0!!.exists())//해당키 유저가 존재하면..
                 {
                     var pInfo:couple = couple(m_App!!.m_SpCtrl!!.getSpUserKey()!! , strValue, couple.APPCET_N)
@@ -180,7 +178,7 @@ class ActCouple : AppCompatActivity()
 
             var pCoupleDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
             pCoupleDbRef!!.addListenerForSingleValueEvent(object :ValueEventListener{
-                override fun onDataChange(p0: DataSnapshot?) {
+                override fun onDataChange(p0: DataSnapshot) {
                     val children = p0!!.children
                     children.forEach {
                         val pInfo: couple = it!!.getValue(couple::class.java)!!
@@ -190,7 +188,7 @@ class ActCouple : AppCompatActivity()
                             if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey())
                                     || pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//
                             {
-                                var dbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key)
+                                var dbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key!!)
                                 dbRef!!.removeValue()
                             }
                         }
@@ -198,7 +196,7 @@ class ActCouple : AppCompatActivity()
                         {
                             if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//
                             {
-                                var dbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key)
+                                var dbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key!!)
                                 dbRef!!.removeValue()
                             }
                         }
@@ -208,7 +206,7 @@ class ActCouple : AppCompatActivity()
                     }
                 }
 
-                override fun onCancelled(p0: DatabaseError?) {
+                override fun onCancelled(p0: DatabaseError) {
 
                 }
             })
@@ -227,21 +225,21 @@ class ActCouple : AppCompatActivity()
     {
         var pCoupleDbRef:DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!
         pCoupleDbRef!!.addListenerForSingleValueEvent(object :ValueEventListener{
-            override fun onDataChange(p0: DataSnapshot?) {
+            override fun onDataChange(p0: DataSnapshot) {
                 val children = p0!!.children
                 children.forEach {
                     val pInfo: couple = it!!.getValue(couple::class.java)!!
                     if(pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))//
                     {
                         if(pInfo.accept.equals(couple.APPCET_N)) {
-                            var dbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key)
+                            var dbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key!!)
                             dbRef!!.removeValue()
                         }
                     }
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?) {
+            override fun onCancelled(p0: DatabaseError) {
 
             }
         })
@@ -273,7 +271,7 @@ class ActCouple : AppCompatActivity()
     //childEventListener..
     var coupleTableChildEventListener:ChildEventListener = object : ChildEventListener
     {
-        override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+        override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?)
         {
             // Get Post object and use the values to update the UI
             if(dataSnapshot!!.exists())
@@ -332,22 +330,22 @@ class ActCouple : AppCompatActivity()
             }
         }
 
-        override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+        override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?)
         {
             Log.d("onChildChanged", "")
         }
 
-        override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+        override fun onChildRemoved(dataSnapshot: DataSnapshot)
         {
             Log.d("onChildRemoved", "")
         }
 
-        override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+        override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?)
         {
             Log.d("onChildMoved", "")
         }
 
-        override fun onCancelled(databaseError: DatabaseError?)
+        override fun onCancelled(databaseError: DatabaseError)
         {
             Log.d("onCancelled", "")
         }

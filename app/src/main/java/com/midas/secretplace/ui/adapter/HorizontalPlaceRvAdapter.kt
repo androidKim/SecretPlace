@@ -2,17 +2,15 @@ package com.midas.mytimeline.ui.adapter
 
 
 import android.content.Context
-import android.content.Intent
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.RecyclerView
 import com.midas.secretplace.R
-import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.place
-import java.io.Serializable
 
 class HorizontalPlaceRvAdapter(val context: Context, var placeList: ArrayList<place>, var m_IfCallback:ifCallback) :
         RecyclerView.Adapter<HorizontalPlaceRvAdapter.Holder>()
@@ -42,7 +40,7 @@ class HorizontalPlaceRvAdapter(val context: Context, var placeList: ArrayList<pl
 
     //-----------------------------------------------------------
     //
-    inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView)
+    inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView!!)
     {
         var ly_Row = itemView?.findViewById<LinearLayout>(R.id.ly_Row)
 

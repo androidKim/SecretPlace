@@ -7,13 +7,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -184,7 +184,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                             val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
                             var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(currentFirebaseUser!!.uid)
                             pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(p0: DataSnapshot?) {
+                                override fun onDataChange(p0: DataSnapshot) {
                                     val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
                                     var strUserName: String? = mAuth!!.currentUser!!.displayName
                                     var strImgUrl: String = ""
@@ -210,7 +210,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                     m_App!!.goMain(m_Context!!)
                                 }
 
-                                override fun onCancelled(p0: DatabaseError?) {
+                                override fun onCancelled(p0: DatabaseError) {
                                     progressBar.visibility = View.GONE
                                 }
                             })
@@ -281,7 +281,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         userInfo.user_key = currentFirebaseUser!!.uid
                         userInfo.name = strUserName
                         userInfo.img_url = strImgUrl
-                        pDbRef!!.child(userInfo.user_key).setValue(userInfo!!)//insert
+                        pDbRef!!.child(userInfo.user_key!!).setValue(userInfo!!)//insert
                     }
                     else if(userInfo.sns_type.equals(user.JOIN_TYPE_FACEBOOK))
                     {
@@ -292,7 +292,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         userInfo.user_key = currentFirebaseUser!!.uid
                         userInfo.name = strUserName
                         userInfo.img_url = strImgUrl
-                        pDbRef!!.child(userInfo.user_key).setValue(userInfo!!)//insert
+                        pDbRef!!.child(userInfo.user_key!!).setValue(userInfo!!)//insert
                     }
                     else if(userInfo.sns_type.equals(user.JOIN_TYPE_GOOGLE))
                     {
@@ -303,7 +303,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         userInfo.user_key = currentFirebaseUser!!.uid
                         userInfo.name = strUserName
                         userInfo.img_url = strImgUrl
-                        pDbRef!!.child(userInfo.user_key).setValue(userInfo!!)//insert
+                        pDbRef!!.child(userInfo.user_key!!).setValue(userInfo!!)//insert
                     }
                 }
                 else
@@ -359,7 +359,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
                         var pQuery:Query= m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).orderByChild("sns_key").equalTo(snsKey)
                         pQuery.addChildEventListener(object : ChildEventListener {
-                            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                            override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?)
                             {
                                 if (dataSnapshot!!.exists())//exist..
                                 {
@@ -370,7 +370,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                     pRes.user_key = currentFirebaseUser!!.uid
                                     pRes.name = strUserName
                                     pRes.img_url = strImgUrl
-                                    m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key).setValue(pRes)//update..
+                                    m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key!!).setValue(pRes)//update..
                                     m_App!!.m_SpCtrl!!.setSpUserKey(pRes.user_key!!)
                                     m_App!!.m_SpCtrl!!.setSnsType(user.JOIN_TYPE_TWITTER)
                                     m_App!!.goMain(m_Context!!)
@@ -381,22 +381,22 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                 }
                             }
 
-                            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?)
                             {
                                 Log.d("onChildChanged", "")
                             }
 
-                            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+                            override fun onChildRemoved(dataSnapshot: DataSnapshot)
                             {
                                 Log.d("onChildRemoved", "")
                             }
 
-                            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?)
                             {
                                 Log.d("onChildMoved", "")
                             }
 
-                            override fun onCancelled(databaseError: DatabaseError?)
+                            override fun onCancelled(databaseError: DatabaseError)
                             {
                                 Log.d("onCancelled", "")
                             }
@@ -404,7 +404,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
 
                         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(dataSnapshot: DataSnapshot?)
+                            override fun onDataChange(dataSnapshot: DataSnapshot)
                             {
                                 if(dataSnapshot!!.exists())
                                 {
@@ -416,7 +416,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                 }
                             }
 
-                            override fun onCancelled(p0: DatabaseError?)
+                            override fun onCancelled(p0: DatabaseError)
                             {
                                 Log.d("onCancelled", "")
                             }
@@ -486,7 +486,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
                         var pQuery:Query= m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).orderByChild("sns_key").equalTo(snsKey)
                         pQuery.addChildEventListener(object : ChildEventListener {
-                            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                            override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?)
                             {
                                 if (dataSnapshot!!.exists())//exist..
                                 {
@@ -497,7 +497,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                     pRes.user_key = currentFirebaseUser!!.uid
                                     pRes.name = strUserName
                                     pRes.img_url = strImgUrl
-                                    m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key).setValue(pRes)//update..
+                                    m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key!!).setValue(pRes)//update..
                                     m_App!!.m_SpCtrl!!.setSpUserKey(pRes.user_key!!)
                                     m_App!!.m_SpCtrl!!.setSnsType(user.JOIN_TYPE_FACEBOOK)
                                     m_App!!.goMain(m_Context!!)
@@ -508,22 +508,22 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                 }
                             }
 
-                            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?)
                             {
                                 Log.d("onChildChanged", "")
                             }
 
-                            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+                            override fun onChildRemoved(dataSnapshot: DataSnapshot)
                             {
                                 Log.d("onChildRemoved", "")
                             }
 
-                            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?)
                             {
                                 Log.d("onChildMoved", "")
                             }
 
-                            override fun onCancelled(databaseError: DatabaseError?)
+                            override fun onCancelled(databaseError: DatabaseError)
                             {
                                 Log.d("onCancelled", "")
                             }
@@ -531,7 +531,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
 
                         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(dataSnapshot: DataSnapshot?)
+                            override fun onDataChange(dataSnapshot: DataSnapshot)
                             {
                                 if(dataSnapshot!!.exists())
                                 {
@@ -543,7 +543,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                                 }
                             }
 
-                            override fun onCancelled(p0: DatabaseError?)
+                            override fun onCancelled(p0: DatabaseError)
                             {
                                 Log.d("onCancelled", "")
                             }
@@ -570,10 +570,12 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                 .requestEmail()
                 .build()
         // Creating and Configuring Google Api Client.
+
         googleApiClient = GoogleApiClient.Builder(this@ActLogin)
                 .enableAutoManage(this@ActLogin  /* OnConnectionFailedListener */) { }
                 .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
                 .build()
+
     }
 
     //-------------------------------------------------------------
@@ -599,14 +601,14 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
                 var pQuery:Query= m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER).orderByChild("sns_key").equalTo(snsKey)
                 pQuery.addChildEventListener(object : ChildEventListener {
-                    override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                    override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?)
                     {
                         if (dataSnapshot!!.exists())//exist..
                         {
                             val pRes:user = dataSnapshot!!.getValue(user::class.java)!!
                             val currentFirebaseUser = FirebaseAuth.getInstance().currentUser
                             pRes.user_key = currentFirebaseUser!!.uid
-                            m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key).setValue(pRes)//update..
+                            m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!.child(pRes.user_key!!).setValue(pRes)//update..
                             m_App!!.m_SpCtrl!!.setSpUserKey(pRes.user_key!!)
                             m_App!!.m_SpCtrl!!.setSnsType(user.JOIN_TYPE_GOOGLE)
                             m_App!!.goMain(m_Context!!)
@@ -617,22 +619,22 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         }
                     }
 
-                    override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                    override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?)
                     {
                         Log.d("onChildChanged", "")
                     }
 
-                    override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+                    override fun onChildRemoved(dataSnapshot: DataSnapshot)
                     {
                         Log.d("onChildRemoved", "")
                     }
 
-                    override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+                    override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?)
                     {
                         Log.d("onChildMoved", "")
                     }
 
-                    override fun onCancelled(databaseError: DatabaseError?)
+                    override fun onCancelled(databaseError: DatabaseError)
                     {
                         Log.d("onCancelled", "")
                     }
@@ -640,7 +642,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
 
 
                 pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot?)
+                    override fun onDataChange(dataSnapshot: DataSnapshot)
                     {
                         if(dataSnapshot!!.exists())
                         {
@@ -652,7 +654,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         }
                     }
 
-                    override fun onCancelled(p0: DatabaseError?)
+                    override fun onCancelled(p0: DatabaseError)
                     {
                         Log.d("onCancelled", "")
                     }

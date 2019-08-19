@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.midas.secretplace">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -24,6 +23,14 @@
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
 
         <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="@string/kakao_app_key"/>
+
+        <meta-data
+            android:name="com.kakao.sdk.kakaonavi.useWebView"
+            android:value="true" />
+
+        <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
         <meta-data
@@ -45,21 +52,19 @@
         <activity
             android:screenOrientation="portrait"
             android:name=".ui.act.ActMain"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <data
+                    android:host="@string/kakaolink_host"
+                    android:scheme="@string/kakao_scheme"/>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.act.ActLogin"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.act.ActPlaceDetail"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".ui.act.ActGroupPlaceDetail"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".ui.act.ActGroupDetail"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
@@ -109,7 +114,7 @@
         </service>
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="com.midas.secretplace.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">

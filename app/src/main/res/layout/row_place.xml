@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@color/color_white">
 
-    <android.support.v7.widget.CardView style="@style/CardViewStyle">
+    <androidx.cardview.widget.CardView style="@style/CardViewStyle">
 
         <RelativeLayout
             android:id="@+id/ly_Row"
@@ -15,7 +15,7 @@
             android:layout_centerVertical="true">
 
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:layout_marginRight="5dp"
                 android:id="@+id/ivThumbnail"
                 android:layout_width="100dp"
@@ -76,5 +76,5 @@
 
 
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

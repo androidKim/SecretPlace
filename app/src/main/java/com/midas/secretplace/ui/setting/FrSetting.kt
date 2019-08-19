@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.preference.PreferenceManager
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import com.midas.secretplace.R
 import com.midas.secretplace.ui.MyApp
 import android.content.pm.PackageManager

@@ -6,7 +6,7 @@
         android:title="@string/appbar_menu_1"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
-        app:actionProviderClass="android.support.v7.widget.ShareActionProvider" />
+        app:actionProviderClass="androidx.appcompat.widget.ShareActionProvider" />
 
     <item
         android:id="@+id/add_photo"

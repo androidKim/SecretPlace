@@ -5,11 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.support.v7.app.ActionBar
-import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -178,12 +178,12 @@ class ActMemo : AppCompatActivity()
                 m_PlaceInfo?.memo = strMsg//메모
                 var pDbRef:DatabaseReference? = null
                 pDbRef =  m_App?.m_FirebaseDbCtrl?.m_FirebaseDb?.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                        .child(m_App?.m_SpCtrl?.getSpUserKey())!!
-                        .child(m_PlaceInfo?.place_key)
+                        .child(m_App?.m_SpCtrl?.getSpUserKey()!!)!!
+                        .child(m_PlaceInfo?.place_key!!)
 
                 pDbRef!!.setValue(m_PlaceInfo)//insert
                 pDbRef.addListenerForSingleValueEvent(object : ValueEventListener{
-                    override fun onDataChange(dataSnapshot: DataSnapshot?)
+                    override fun onDataChange(dataSnapshot: DataSnapshot)
                     {
                         if (dataSnapshot!!.exists())
                         {
@@ -196,7 +196,7 @@ class ActMemo : AppCompatActivity()
                         }
                     }
 
-                    override fun onCancelled(p0: DatabaseError?)
+                    override fun onCancelled(p0: DatabaseError)
                     {
 
                     }

@@ -2,13 +2,13 @@ package com.midas.secretplace.ui.adapter
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.support.v4.app.FragmentManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -112,7 +112,7 @@ class PhotoRvAdapter(val context: Context, var m_RequestManager:RequestManager, 
 
     //-----------------------------------------------------------
     //
-    inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView)
+    inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView!!)
     {
         var ly_Row = itemView?.findViewById<RelativeLayout>(R.id.ly_Row)
         var iv_Photo = itemView?.findViewById<ImageView>(R.id.iv_Photo)

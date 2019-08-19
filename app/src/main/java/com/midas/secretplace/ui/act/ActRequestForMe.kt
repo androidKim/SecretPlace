@@ -4,15 +4,15 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.ActionBar
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.firebase.database.*
 import com.midas.mytimeline.ui.adapter.RequestForMeRvAdapter
 import com.midas.secretplace.R
@@ -60,14 +60,14 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback, S
                                 else
                                     pInfo.accept = couple.APPCET_Y
 
-                                m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key).setValue(pInfo)
+                                m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key!!).setValue(pInfo)
                             }
                             else//선택되지않은아이템..
                             {
                                 if(targetInfo.accept.equals(couple.APPCET_Y))//커플설정이 된 아이템이 있으면 N으로 변경
                                 {
                                     targetInfo.accept = couple.APPCET_N
-                                    m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key).setValue(targetInfo)
+                                    m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key!!).setValue(targetInfo)
                                 }
                             }
                         }
@@ -146,7 +146,7 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback, S
     //childEventListener..
     var childEventListener: ChildEventListener = object : ChildEventListener
     {
-        override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+        override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?)
         {
             if (dataSnapshot!!.exists())//exist..
             {
@@ -163,22 +163,22 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback, S
             }
         }
 
-        override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+        override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?)
         {
             Log.d("onChildChanged", "")
         }
 
-        override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+        override fun onChildRemoved(dataSnapshot: DataSnapshot)
         {
             Log.d("onChildRemoved", "")
         }
 
-        override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+        override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?)
         {
             Log.d("onChildMoved", "")
         }
 
-        override fun onCancelled(databaseError: DatabaseError?)
+        override fun onCancelled(databaseError: DatabaseError)
         {
             Log.d("onCancelled", "")
         }
@@ -216,7 +216,7 @@ class ActRequestForMe : AppCompatActivity(), RequestForMeRvAdapter.ifCallback, S
         recyclerView!!.layoutManager = pLayoutManager
         recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener()
         {
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int)
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int)
             {
                 val visibleItemCount = pLayoutManager.childCount
                 val totalItemCount = pLayoutManager.itemCount

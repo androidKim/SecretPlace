@@ -17,19 +17,6 @@ import android.os.Environment
 import android.os.Handler
 import android.provider.MediaStore
 import android.provider.Settings
-import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
-import android.support.multidex.MultiDex
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.FileProvider
-import android.support.v4.view.GravityCompat
-import android.support.v4.view.ViewPager
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -38,6 +25,17 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.view.GravityCompat
+import androidx.fragment.app.Fragment
+import androidx.multidex.MultiDex
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.firebase.jobdispatcher.Constraint
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
@@ -46,6 +44,8 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
@@ -123,7 +123,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
     private var m_App: MyApp? = null
     private var m_Context: Context? = null
     private var m_FragPagerAdapter:MainPagerAdapter? = null
-    private var viewPager:ViewPager? = null
+    private var viewPager: ViewPager? = null
     private val mScaleGestureDetector: ScaleGestureDetector? = null
     private val mScaleFactor = 1.0f
 
@@ -386,7 +386,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
         {
             m_App!!.m_SpCtrl!!.setIsAnonLogin(false)//스낵바 알림을 띄운 후 초기화
             //show snackbar..
-            var snackbar:Snackbar?=null
+            var snackbar: Snackbar?=null
             snackbar = Snackbar.make(ly_Base, m_Context!!.resources.getString(R.string.anonymous_login_desc), 10000)
                     .setAction(m_Context!!.resources.getString(R.string.str_ok), View.OnClickListener {
                         snackbar!!.dismiss()
@@ -803,12 +803,12 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 .addOnSuccessListener { taskSnapshot ->
                     //img table update
                     var tbUser: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!
-                            .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
                             .child("img_url")//where
 
-                    tbUser!!.setValue(taskSnapshot.downloadUrl.toString())//insert
+                    tbUser!!.setValue(taskSnapshot.uploadSessionUri.toString())//insert
                     tbUser.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
                             if (dataSnapshot!!.exists()) {
                                 progressBar.visibility = View.GONE
                                 tv_Progress.visibility = View.GONE
@@ -817,7 +817,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                             }
                         }
 
-                        override fun onCancelled(p0: DatabaseError?) {
+                        override fun onCancelled(p0: DatabaseError) {
                             progressBar.visibility = View.GONE
                             tv_Progress.visibility = View.GONE
                         }
@@ -858,12 +858,12 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 .addOnSuccessListener { taskSnapshot ->
                     //img table update
                     var tbUser: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)!!
-                            .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                            .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
                             .child("img_url")//where
 
-                    tbUser!!.setValue(taskSnapshot.downloadUrl.toString())//insert
+                    tbUser!!.setValue(taskSnapshot.uploadSessionUri.toString())//insert
                     tbUser.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot?) {
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
                             if (dataSnapshot!!.exists()) {
                                 progressBar.visibility = View.GONE
                                 tv_Progress.visibility = View.GONE
@@ -872,7 +872,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                             }
                         }
 
-                        override fun onCancelled(p0: DatabaseError?) {
+                        override fun onCancelled(p0: DatabaseError) {
                             progressBar.visibility = View.GONE
                             tv_Progress.visibility = View.GONE
                         }
@@ -896,9 +896,9 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
     fun getUserDataProc()
     {
         var userKey:String? = m_App!!.m_SpCtrl!!.getSpUserKey()
-        var pDbRef:DatabaseReference? = m_App!!.m_FirebaseDbCtrl!!.getUserDbRef().child(userKey)//where
+        var pDbRef:DatabaseReference? = m_App!!.m_FirebaseDbCtrl!!.getUserDbRef().child(userKey!!)//where
         pDbRef!!.addListenerForSingleValueEvent(object : ValueEventListener{
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot)
             {
                 val pInfo: user = dataSnapshot!!.getValue(user::class.java)!!
                 if(pInfo != null)
@@ -907,7 +907,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?)
+            override fun onCancelled(p0: DatabaseError)
             {
 
             }
@@ -1099,7 +1099,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 .orderByKey().equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())
 
         pQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -1111,31 +1111,31 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 }
             }
 
-            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
 
 
             }
 
-            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            override fun onChildRemoved(dataSnapshot: DataSnapshot)
             {
 
             }
 
-            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
 
 
             }
 
-            override fun onCancelled(databaseError: DatabaseError?)
+            override fun onCancelled(databaseError: DatabaseError)
             {
 
             }
         })
 
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -1144,8 +1144,8 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                         var pInfo:place = it.getValue(place::class.java)!!
 
                         var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                                .child(pInfo.place_key)//where
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                                .child(pInfo.place_key!!)//where
                         pDbRef!!.removeValue()
 
                         //file storage remove
@@ -1153,8 +1153,8 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
 
                         //file data remove
                         pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
-                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                                .child(pInfo.place_key)//where
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                                .child(pInfo.place_key!!)//where
 
                         pDbRef!!.removeValue()
                     }
@@ -1165,7 +1165,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?)
+            override fun onCancelled(p0: DatabaseError)
             {
 
             }
@@ -1181,7 +1181,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 .orderByKey().equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())
 
         pQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -1193,32 +1193,32 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 }
             }
 
-            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
 
 
             }
 
-            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            override fun onChildRemoved(dataSnapshot: DataSnapshot)
             {
 
 
             }
 
-            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
 
 
             }
 
-            override fun onCancelled(databaseError: DatabaseError?)
+            override fun onCancelled(databaseError: DatabaseError)
             {
 
             }
         })
 
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -1227,10 +1227,10 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                         var pInfo:place = it.getValue(place::class.java)!!
 
                         var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
-                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                                .child(pInfo.group_key)
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                                .child(pInfo.group_key!!)
                                 .child("place_list")
-                                .child(pInfo.place_key)//where
+                                .child(pInfo.place_key!!)//where
 
                         pDbRef!!.removeValue()
 
@@ -1239,8 +1239,8 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
 
                         //file data remove
                         pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
-                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                                .child(pInfo.place_key)//where
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                                .child(pInfo.place_key!!)//where
 
                         pDbRef!!.removeValue()
                     }
@@ -1251,7 +1251,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?)
+            override fun onCancelled(p0: DatabaseError)
             {
 
             }
@@ -1266,7 +1266,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 .orderByKey().equalTo(m_App!!.m_SpCtrl!!.getSpUserKey())
 
         pQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -1278,31 +1278,31 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 }
             }
 
-            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
 
 
             }
 
-            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            override fun onChildRemoved(dataSnapshot: DataSnapshot)
             {
 
             }
 
-            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
 
 
             }
 
-            override fun onCancelled(databaseError: DatabaseError?)
+            override fun onCancelled(databaseError: DatabaseError)
             {
 
             }
         })
 
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -1311,8 +1311,8 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                         var pInfo:group = it.getValue(group::class.java)!!
 
                         var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_GROUP)!!
-                                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
-                                .child(pInfo.group_key)//where
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                                .child(pInfo.group_key!!)//where
 
                         pDbRef!!.removeValue()
 
@@ -1324,7 +1324,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?)
+            override fun onCancelled(p0: DatabaseError)
             {
 
             }
@@ -1338,11 +1338,11 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
 
         var pQuery:Query? = null
         pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
                 .child(placeKey).orderByKey()
 
         pQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -1354,33 +1354,33 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 }
             }
 
-            override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
                 //Log.e("TAG", "onChildChanged:" + dataSnapshot!!.key)
 
             }
 
-            override fun onChildRemoved(dataSnapshot: DataSnapshot?)
+            override fun onChildRemoved(dataSnapshot: DataSnapshot)
             {
                 //Log.e(TAG, "onChildRemoved:" + dataSnapshot!!.key)
 
             }
 
-            override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?)
+            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?)
             {
                 //Log.e(TAG, "onChildMoved:" + dataSnapshot!!.key)
 
 
             }
 
-            override fun onCancelled(databaseError: DatabaseError?)
+            override fun onCancelled(databaseError: DatabaseError)
             {
                 //Log.e(TAG, "postMessages:onCancelled", databaseError!!.toException())
             }
         })
 
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -1413,7 +1413,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?)
+            override fun onCancelled(p0: DatabaseError)
             {
 
             }
@@ -1425,7 +1425,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
     {
         var pQuery: Query? = null
         pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_USER)
-                .child(m_App!!.m_SpCtrl!!.getSpUserKey())
+                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
 
         pQuery.removeValue()
     }
@@ -1436,7 +1436,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
         var pQuery: Query? = null
         pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE).orderByKey()
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot?)
+            override fun onDataChange(dataSnapshot: DataSnapshot)
             {
                 if(dataSnapshot!!.exists())
                 {
@@ -1447,7 +1447,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                         if(pInfo.responser_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey())
                             || pInfo.requester_key.equals(m_App!!.m_SpCtrl!!.getSpUserKey()))
                         {
-                            var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key)//where
+                            var pDbRef = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_COUPLE)!!.child(it.key!!)//where
                             pDbRef!!.removeValue()
                         }
                     }
@@ -1458,7 +1458,7 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
                 }
             }
 
-            override fun onCancelled(p0: DatabaseError?)
+            override fun onCancelled(p0: DatabaseError)
             {
 
             }

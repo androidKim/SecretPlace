@@ -1,7 +1,7 @@
 package com.midas.secretplace.structure.repository
 
 import android.app.Application
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import android.os.AsyncTask
 import com.midas.secretplace.core.MyRoomDatabase
 import com.midas.secretplace.structure.room.dao_user

@@ -15,8 +15,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.support.v4.app.ShareCompat
-import android.support.v4.content.ContextCompat
+import androidx.core.app.ShareCompat
+import androidx.core.content.ContextCompat
 import android.util.DisplayMetrics
 import android.widget.Toast
 import com.midas.secretplace.R
@@ -92,7 +92,7 @@ class Util
         /****************************** toolbar ******************************/
         //--------------------------------------------------------------
         //set theme color
-        fun setToolbarBackgroundColor(pContext:Context, toolbar: android.support.v7.widget.Toolbar, strTheme:String)
+        fun setToolbarBackgroundColor(pContext:Context, toolbar: androidx.appcompat.widget.Toolbar, strTheme:String)
         {
             when(strTheme)
             {

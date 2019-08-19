@@ -4,6 +4,9 @@
     <string name="fb_login_protocol_scheme" translatable="false">fb1698683040237300</string>
     <string name="twitter_consumer_key" translatable="false">1Gqkat9htRhTfHP31DG64F1LK</string>
     <string name="twitter_consumer_secret" translatable="false">desMpaNzISR5xtGXAADUFm2xeckH1fWGQLFn1XHmqPHIIzlEox</string>
+    <string name="kakao_app_key" translatable="false">75191243e9555b9f4bc005b71dddcfa4</string>
+    <string name="kakao_scheme" translatable="false">kakaod9b37da628bdb4c0dbf98d8c9bf64273</string>
+    <string name="kakaolink_host" translatable="false">kakaolink</string>
 
     <string name="app_name">위치보관</string>
     <string name="app_url">https://play.google.com/store/apps/details?id=com.midas.secretplace</string>
@@ -112,4 +115,5 @@
     <string name="msg_no_memo">메모를 추가해보세요.</string>
     <string name="str_write">메모쓰기</string>
     <string name="msg_set_location_permission">위치권한이 허용되었습니다. 장소를 추가해보세요.</string>
+    <string name="kakao_navi">카카오 네비게이션</string>
 </resources>

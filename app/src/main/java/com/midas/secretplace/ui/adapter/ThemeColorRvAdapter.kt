@@ -2,13 +2,13 @@ package com.midas.mytimeline.ui.adapter
 
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.midas.secretplace.R
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.structure.core.theme
@@ -41,7 +41,7 @@ class ThemeColorRvAdapter(val context: Context, var themeList: ArrayList<theme>,
 
     //-----------------------------------------------------------
     //
-    inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView)
+    inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView!!)
     {
         var ly_Row = itemView?.findViewById<RelativeLayout>(R.id.ly_Row)
         var tv_ColorName = itemView?.findViewById<TextView>(R.id.tv_ColorName)

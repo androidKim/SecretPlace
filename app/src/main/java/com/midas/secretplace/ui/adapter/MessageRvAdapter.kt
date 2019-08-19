@@ -2,12 +2,12 @@ package com.midas.mytimeline.ui.adapter
 
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.message
 
@@ -39,7 +39,7 @@ class MessageRvAdapter(val context: Context, var messageList: ArrayList<message>
 
     //-----------------------------------------------------------
     //
-    inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView)
+    inner class Holder(itemView:View?) : RecyclerView.ViewHolder(itemView!!)
     {
         //left user 1(me)
         var ly_User1 = itemView?.findViewById<RelativeLayout>(R.id.ly_User1)

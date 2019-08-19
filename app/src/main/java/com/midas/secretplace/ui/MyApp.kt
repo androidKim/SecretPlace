@@ -3,8 +3,8 @@ package com.midas.secretplace.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.support.multidex.MultiDex
-import android.support.multidex.MultiDexApplication
+import androidx.multidex.MultiDex
+import androidx.multidex.MultiDexApplication
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar

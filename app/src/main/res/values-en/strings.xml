@@ -112,4 +112,5 @@
     <string name="msg_no_memo">Please add a note.</string>
     <string name="str_write">Write notes</string>
     <string name="msg_set_location_permission">Location permission granted. Try adding a place</string>
+    <string name="kakao_navi">kakao navigation</string>
 </resources>

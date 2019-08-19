@@ -2,7 +2,7 @@ package com.midas.secretplace.ui.custom
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.view.View
 
 //custom dialog helper

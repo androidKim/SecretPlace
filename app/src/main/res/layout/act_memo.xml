@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             style="@style/ToolBarStyle.Base"
             android:layout_width="match_parent"
@@ -38,7 +38,7 @@
             android:layout_margin="@dimen/margin"
             tools:text="가나다라마바사아자차카타파하" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivEditIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -99,7 +99,7 @@
             android:paddingTop="@dimen/padding_top"
             android:paddingBottom="@dimen/padding_bottom" />
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/uploadBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

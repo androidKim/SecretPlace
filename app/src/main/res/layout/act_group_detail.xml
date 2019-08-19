@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             style="@style/ToolBarStyle.Base"
             android:layout_width="match_parent"
@@ -19,17 +19,17 @@
     </RelativeLayout>
 
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/ly_SwipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ly_Top">
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
-    </android.support.v4.widget.SwipeRefreshLayout>
+            android:layout_height="match_parent"></androidx.recyclerview.widget.RecyclerView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
     <LinearLayout
@@ -57,7 +57,7 @@
     </LinearLayout>
 
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fbtn_SaveLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
