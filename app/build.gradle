@@ -10,8 +10,8 @@ android {
         applicationId "com.midas.secretplace"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 22
-        versionName "2.0.1"
+        versionCode 23
+        versionName "2.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -22,7 +22,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
