@@ -897,55 +897,60 @@ class ActPlaceDetail : ActBase<ActPlaceDetailBinding>(), SwipeRefreshLayout.OnRe
         //메모리데이터 업로드 방식
         val baos = ByteArrayOutputStream()
         bitmap!!.compress(Bitmap.CompressFormat.JPEG, 30, baos)//압축 0~100사이 품질 조절가능
-        val byteArr: ByteArray = baos.toByteArray()
+        val data: ByteArray = baos.toByteArray()
         var timestamp: Long = System.currentTimeMillis()
         var fileName: String = String.format("%s_%s", timestamp, "img")
 
-        val fileRef = imageReference!!.reference.child(fileName)
-        fileRef.putBytes(byteArr)
+        val uploadTask = imageReference!!.reference.child(fileName)
+        uploadTask.putBytes(data)
         .addOnSuccessListener { taskSnapshot ->
-            //val uri = taskSnapshot.downloadUrl
+                imageReference!!.reference.child(fileName).downloadUrl.addOnCompleteListener{
+                    if(it.isSuccessful)
+                    {
+                        //img table update
+                        var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                                .child(m_PlaceInfo!!.place_key!!).push()//where
 
-            //img table update
-            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
-                    .child(m_PlaceInfo!!.place_key!!).push()//where
-            pDbRef!!.setValue(taskSnapshot.uploadSessionUri.toString())//insert
-            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot!!.exists()) {
-                        m_bModify = true
-                        setRefresh()
-                        progressBar.visibility = View.GONE
-                        tv_Progress.visibility = View.GONE
+                        val downloadUrl:String = it.result.toString()
+                        pDbRef!!.setValue(downloadUrl)//insert
+                        pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                if (dataSnapshot!!.exists()) {
+                                    m_bModify = true
+                                    setRefresh()
+                                    progressBar.visibility = View.GONE
+                                    tv_Progress.visibility = View.GONE
+                                }
+                            }
+
+                            override fun onCancelled(p0: DatabaseError) {
+                                progressBar.visibility = View.GONE
+                                tv_Progress.visibility = View.GONE
+                            }
+                        })
+
+                        //place table update
+                        var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                                .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                                .child(m_PlaceInfo!!.place_key!!)
+
+                        pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                if (dataSnapshot!!.exists()) {
+
+                                    val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                                    pInfo!!.img_url = downloadUrl
+                                    pPlaceDb.setValue(pInfo)
+                                }
+                            }
+
+                            override fun onCancelled(p0: DatabaseError) {
+
+                            }
+                        })
                     }
                 }
-
-                override fun onCancelled(p0: DatabaseError) {
-                    progressBar.visibility = View.GONE
-                    tv_Progress.visibility = View.GONE
-                }
-            })
-
-            //place table update
-            var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
-                    .child(m_PlaceInfo!!.place_key!!)
-
-            pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot!!.exists()) {
-
-                        val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                        pInfo!!.img_url = taskSnapshot.uploadSessionUri.toString()
-                        pPlaceDb.setValue(pInfo)
-                    }
-                }
-
-                override fun onCancelled(p0: DatabaseError) {
-
-                }
-            })
         }
         .addOnFailureListener { exception ->
             Toast.makeText(this, exception.message, Toast.LENGTH_LONG).show()
@@ -958,7 +963,9 @@ class ActPlaceDetail : ActBase<ActPlaceDetailBinding>(), SwipeRefreshLayout.OnRe
             val intProgress = progress.toInt()
             tv_Progress.text = "Uploaded " + intProgress + "%..."
         }
-        .addOnPausedListener { System.out.println("Upload is paused!") }
+        .addOnPausedListener {
+            System.out.println("Upload is paused!")
+        }
     }
     //--------------------------------------------------------------------------------
     //
@@ -977,47 +984,53 @@ class ActPlaceDetail : ActBase<ActPlaceDetailBinding>(), SwipeRefreshLayout.OnRe
         val fileRef = imageReference!!.reference.child(fileName)
         fileRef.putBytes(byteArr)
         .addOnSuccessListener { taskSnapshot ->
-            //update
-            var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
-                    .child(m_PlaceInfo!!.place_key!!).push()//where
 
-            pDbRef!!.setValue(taskSnapshot.uploadSessionUri.toString())//insert
-            pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot!!.exists()) {
-                        m_bModify = true
-                        setRefresh()
-                        progressBar.visibility = View.GONE
-                        tv_Progress.visibility = View.GONE
-                    }
+            imageReference!!.reference.child(fileName).downloadUrl.addOnCompleteListener {
+                if (it.isSuccessful) {
+                    //update
+                    var pDbRef: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_IMG)!!
+                            .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                            .child(m_PlaceInfo!!.place_key!!).push()//where
+
+                    val downloadUrl:String = it.result.toString()
+                    pDbRef!!.setValue(downloadUrl)//insert
+                    pDbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+                            if (dataSnapshot!!.exists()) {
+                                m_bModify = true
+                                setRefresh()
+                                progressBar.visibility = View.GONE
+                                tv_Progress.visibility = View.GONE
+                            }
+                        }
+
+                        override fun onCancelled(p0: DatabaseError) {
+                            progressBar.visibility = View.GONE
+                            tv_Progress.visibility = View.GONE
+                        }
+                    })
+
+                    //place table update
+                    var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
+                            .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
+                            .child(m_PlaceInfo!!.place_key!!)
+
+                    pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+                            if (dataSnapshot!!.exists()) {
+
+                                val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
+                                pInfo!!.img_url = downloadUrl
+                                pPlaceDb.setValue(pInfo)
+                            }
+                        }
+
+                        override fun onCancelled(p0: DatabaseError) {
+
+                        }
+                    })
                 }
-
-                override fun onCancelled(p0: DatabaseError) {
-                    progressBar.visibility = View.GONE
-                    tv_Progress.visibility = View.GONE
-                }
-            })
-
-            //place table update
-            var pPlaceDb: DatabaseReference = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)!!
-                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!)
-                    .child(m_PlaceInfo!!.place_key!!)
-
-            pPlaceDb.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot!!.exists()) {
-
-                        val pInfo:place = dataSnapshot!!.getValue(place::class.java)!!
-                        pInfo!!.img_url = taskSnapshot.uploadSessionUri.toString()
-                        pPlaceDb.setValue(pInfo)
-                    }
-                }
-
-                override fun onCancelled(p0: DatabaseError) {
-
-                }
-            })
+            }
         }
         .addOnFailureListener { exception ->
             Toast.makeText(this, exception.message, Toast.LENGTH_LONG).show()
@@ -1030,7 +1043,9 @@ class ActPlaceDetail : ActBase<ActPlaceDetailBinding>(), SwipeRefreshLayout.OnRe
             val intProgress = progress.toInt()
             tv_Progress.text = "Uploaded " + intProgress + "%..."
         }
-        .addOnPausedListener { System.out.println("Upload is paused!") }
+        .addOnPausedListener {
+            System.out.println("Upload is paused!")
+        }
     }
 
 
