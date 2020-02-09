@@ -27,6 +27,7 @@ import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.midas.mytimeline.ui.adapter.PlaceRvAdapter
 import com.midas.secretplace.R
+import com.midas.secretplace.common.CategoryType
 import com.midas.secretplace.common.Constant
 import com.midas.secretplace.core.FirebaseDbCtrl
 import com.midas.secretplace.structure.core.category
@@ -36,6 +37,7 @@ import com.midas.secretplace.ui.act.ActMain
 import com.midas.secretplace.ui.act.ActMapDetail
 import com.midas.secretplace.ui.act.ActPlaceDetail
 import com.midas.secretplace.ui.adapter.CateSpinnerAdapter
+import com.midas.secretplace.ui.adapter.DialogSpinnerAdapter
 import com.midas.secretplace.util.Util
 import kotlinx.android.synthetic.main.frag_place.*
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
@@ -59,7 +61,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //var m_strPlaceLastSeq:String? = ""
     var m_bRunning:Boolean = false
     var m_bPagingFinish:Boolean = false
-
+    var categoryArray:ArrayList<category> = ArrayList()
+    var dialogCategoryArray:ArrayList<category> = ArrayList()
     /**************************** Controller ****************************/
     var m_RecyclerView: RecyclerView? = null
 
@@ -128,29 +131,55 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     {
         //m_strPlaceLastSeq = ""
         m_arrPlace = ArrayList<place>()
-    }
-    //------------------------------------------------------------------------
-    //
-    fun setViewModel(){
-        /*
-        mViewModelPlace = ViewModelProviders.of(this).get(vm_place::class.java)
-        mViewModelPlace?.deleteAll()//init..
-        mViewModelPlace?.placeList?.observe(this, object : Observer<List<data_place>> {
-            override fun onChanged(list: List<data_place>?) {
-                if(list != null)
-                {
-                    return
-                }
-            }
-        })
-        */
+
+
+        categoryArray.add(category("","전체"))
+        categoryArray.add(category(CategoryType.DR0.name,"직접 입력"))
+        categoryArray.add(category(CategoryType.MT1.name,"대형마트"))
+        categoryArray.add(category(CategoryType.CS2.name,"편의점"))
+        categoryArray.add(category(CategoryType.PS3.name,"어린이집,유치원"))
+        categoryArray.add(category(CategoryType.SC4.name,"학교"))
+        categoryArray.add(category(CategoryType.AC5.name,"학원"))
+        categoryArray.add(category(CategoryType.PK6.name,"주차장"))
+        categoryArray.add(category(CategoryType.OL7.name,"주유소,전소"))
+        categoryArray.add(category(CategoryType.SW8.name,"지하철역"))
+        categoryArray.add(category(CategoryType.BK9.name,"은행"))
+        categoryArray.add(category(CategoryType.CT1.name,"문화시설"))
+        categoryArray.add(category(CategoryType.AG2.name,"중개업소"))
+        categoryArray.add(category(CategoryType.PO3.name,"공공기관"))
+        categoryArray.add(category(CategoryType.AT4.name,"관광명소"))
+        categoryArray.add(category(CategoryType.AD5.name,"숙박"))
+        categoryArray.add(category(CategoryType.FD6.name,"음식점"))
+        categoryArray.add(category(CategoryType.CE7.name,"카페"))
+        categoryArray.add(category(CategoryType.HP8.name,"병원"))
+        categoryArray.add(category(CategoryType.PM9.name,"약국"))
+
+
+
+        dialogCategoryArray.add(category(CategoryType.DR0.name,"직접 입력"))
+        dialogCategoryArray.add(category(CategoryType.MT1.name,"대형마트"))
+        dialogCategoryArray.add(category(CategoryType.CS2.name,"편의점"))
+        dialogCategoryArray.add(category(CategoryType.PS3.name,"어린이집,유치원"))
+        dialogCategoryArray.add(category(CategoryType.SC4.name,"학교"))
+        dialogCategoryArray.add(category(CategoryType.AC5.name,"학원"))
+        dialogCategoryArray.add(category(CategoryType.PK6.name,"주차장"))
+        dialogCategoryArray.add(category(CategoryType.OL7.name,"주유소,전소"))
+        dialogCategoryArray.add(category(CategoryType.SW8.name,"지하철역"))
+        dialogCategoryArray.add(category(CategoryType.BK9.name,"은행"))
+        dialogCategoryArray.add(category(CategoryType.CT1.name,"문화시설"))
+        dialogCategoryArray.add(category(CategoryType.AG2.name,"중개업소"))
+        dialogCategoryArray.add(category(CategoryType.PO3.name,"공공기관"))
+        dialogCategoryArray.add(category(CategoryType.AT4.name,"관광명소"))
+        dialogCategoryArray.add(category(CategoryType.AD5.name,"숙박"))
+        dialogCategoryArray.add(category(CategoryType.FD6.name,"음식점"))
+        dialogCategoryArray.add(category(CategoryType.CE7.name,"카페"))
+        dialogCategoryArray.add(category(CategoryType.HP8.name,"병원"))
+        dialogCategoryArray.add(category(CategoryType.PM9.name,"약국"))
     }
     //------------------------------------------------------------------------
     //
     fun setInitLayout()
     {
-        setViewModel()
-
         //event..
         ly_SwipeRefresh.setOnRefreshListener(this)
 
@@ -176,6 +205,23 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             }
         })
 
+        //spinner
+        var adapter:CateSpinnerAdapter = CateSpinnerAdapter(activity!!, categoryArray!!)
+        cateSpinner.adapter = adapter
+        cateSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val cateInfo: category? = adapter.getItem(position)
+                if(cateInfo!!.code.equals("")){
+                    setRefresh()//전체
+                }else{
+                    setRefresh(cateInfo!!.code)//
+                }
+            }
+        }
         settingView()
     }
     //-----------------------------------------------------
@@ -238,17 +284,21 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         }
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(recyclerView)
-
-        getPlaceListProc()
     }
     //--------------------------------------------------------------
     //
-    fun getPlaceListProc()
+    fun getPlaceListProc(categoryCode:String)
     {
         progressBar.visibility = View.VISIBLE
         m_bRunning = true
         var pQuery:Query? = null
-        pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_App!!.m_SpCtrl!!.getSpUserKey()!!).orderByKey()
+        if(categoryCode.equals("")){
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE).child(m_App!!.m_SpCtrl!!.getSpUserKey()!!).orderByKey()
+        }else{
+            pQuery = m_App!!.m_FirebaseDbCtrl!!.m_FirebaseDb!!.getReference(FirebaseDbCtrl.TB_PLACE)
+                    .child(m_App!!.m_SpCtrl!!.getSpUserKey()!!).orderByChild("categoryCode").equalTo(categoryCode)
+        }
+
         pQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot)
             {
@@ -420,28 +470,8 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         //CateCode spinner
         var spinner:Spinner = Spinner(m_Context)
         spinner.setPadding(0, 20, 0, 0)
-        val categoryArray:ArrayList<category> = ArrayList()
-        categoryArray.add(category("MT1","대형마트"))
-        categoryArray.add(category("CS2","편의점"))
-        categoryArray.add(category("PS3","어린이집,유치원"))
-        categoryArray.add(category("SC4","학교"))
-        categoryArray.add(category("AC5","학원"))
-        categoryArray.add(category("PK6","주차장"))
-        categoryArray.add(category("OL7","주유소,전소"))
-        categoryArray.add(category("SW8","지하철역"))
-        categoryArray.add(category("BK9","은행"))
-        categoryArray.add(category("CT1","문화시설"))
-        categoryArray.add(category("AG2","중개업소"))
-        categoryArray.add(category("PO3","공공기관"))
-        categoryArray.add(category("AT4","관광명소"))
-        categoryArray.add(category("AD5","숙박"))
-        categoryArray.add(category("FD6","음식점"))
-        categoryArray.add(category("CE7","카페"))
-        categoryArray.add(category("HP8","병원"))
-        categoryArray.add(category("PM9","약국"))
-        categoryArray.add(category("DR0","직접 입력"))
-        var cateAdapter:CateSpinnerAdapter = CateSpinnerAdapter(m_Context!!, categoryArray!!)
-        spinner.adapter = cateAdapter
+        var dialogCateAdapter = DialogSpinnerAdapter(m_Context!!, dialogCategoryArray!!)
+        spinner.adapter = dialogCateAdapter
         layout.addView(spinner)
 
         var editDirectInput: EditText? = EditText(m_Context)
@@ -457,10 +487,10 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedItem: category? = cateAdapter.getItem(position)
-                pInfo.code = selectedItem!!.code
-                pInfo.codeName = selectedItem!!.name
-                if(pInfo.code.equals("DR0"))//구분
+                val cateInfo: category? = dialogCateAdapter.getItem(position)
+                pInfo.categoryCode = cateInfo!!.code
+                pInfo.categoryName = cateInfo!!.name
+                if(pInfo.categoryCode.equals(CategoryType.DR0.name))//구분
                 {
                     editDirectInput.visibility = View.VISIBLE
                 }
@@ -490,7 +520,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
             else
             {
                 pInfo!!.name = editName.text.toString()
-                if(pInfo.code.equals("DR0"))//직접입력이면..
+                if(pInfo.categoryCode.equals(CategoryType.DR0.name))//직접입력이면..
                 {
                     val str:String = editDirectInput?.text.toString()
                     if(str.equals(""))
@@ -500,7 +530,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
                     }
                     else
                     {
-                        pInfo.codeName = str
+                        pInfo.categoryName = str
                     }
                 }
 
@@ -559,7 +589,20 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
 
         ly_SwipeRefresh.isRefreshing = false
 
-        getPlaceListProc()
+        getPlaceListProc("")
+    }
+    //----------------------------------------------------------------------
+    //
+    fun setRefresh(categoryCode:String)
+    {
+        //m_strPlaceLastSeq = ""
+        m_arrPlace = ArrayList<place>()
+        if(m_Adapter != null)
+            m_Adapter!!.clearData()
+
+        ly_SwipeRefresh.isRefreshing = false
+
+        getPlaceListProc(categoryCode)
     }
     //----------------------------------------------------------------------
     //storage image delete

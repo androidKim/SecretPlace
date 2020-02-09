@@ -1,11 +1,10 @@
 package com.midas.secretplace.ui.adapter
 
 import android.content.Context
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import android.view.ViewGroup
-import com.midas.secretplace.R
 import com.midas.secretplace.ui.frag.main.FrPlace
 
 
@@ -14,13 +13,13 @@ import com.midas.secretplace.ui.frag.main.FrPlace
 class MainPagerAdapter internal constructor(pContext: Context, fm: FragmentManager) : FragmentPagerAdapter(fm)
 {
     companion object {
-        val TAB_INDEX_FRPALCE = 0;
-        val TAB_INDEX_FRGROUP = 0;
+        val TAB_INDEX_FRPALCE = 0
+        val TAB_INDEX_FRGROUP = 0
     }
 
     /************************** Define **************************/
 
-    private var TAB_NAME_0 = pContext.resources.getString(R.string.str_tab_title_my)
+    private var TAB_NAME_0 = "장소 리스트"
     private var COUNT = 1
 
     /************************** Member **************************/

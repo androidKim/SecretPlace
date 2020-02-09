@@ -49,6 +49,7 @@
             android:layout_marginTop="10dp" />
 
         <Button
+            android:visibility="gone"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="5dp"
             android:id="@+id/btnAnonymousLogin"

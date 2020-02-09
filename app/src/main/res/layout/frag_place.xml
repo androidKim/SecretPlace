@@ -13,27 +13,35 @@
         android:orientation="vertical"
         tools:ignore="MissingConstraints">
 
-        <FrameLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="10dp">
+            android:layout_height="match_parent">
 
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/ly_SwipeRefresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_below="@+id/cateSpinner"
                 android:visibility="visible"
                 tools:visibility="visible">
 
                 <androidx.recyclerview.widget.RecyclerView
-
                     android:id="@+id/recyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
                 </androidx.recyclerview.widget.RecyclerView>
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-        </FrameLayout>
+
+
+            <Spinner
+                android:id="@+id/cateSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true" />
+        </RelativeLayout>
     </LinearLayout>
 
     <LinearLayout

@@ -10,7 +10,7 @@ import android.widget.TextView
 import com.midas.secretplace.R
 import com.midas.secretplace.structure.core.category
 
-class CateSpinnerAdapter(val context: Context, var list: ArrayList<category>): BaseAdapter() {
+class DialogSpinnerAdapter(val context: Context, var list: ArrayList<category>): BaseAdapter() {
     val inflater:LayoutInflater = LayoutInflater.from(context)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {

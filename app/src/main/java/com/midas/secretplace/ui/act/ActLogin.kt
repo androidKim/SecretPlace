@@ -175,6 +175,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
         getHashKey()
 
         //익명로그인은 앱을 재설치하면 키가 바뀜..
+        /*
         btnAnonymousLogin.setOnClickListener {
             mAuth!!.signInAnonymously()
                     .addOnCompleteListener(this) { task ->
@@ -220,6 +221,7 @@ class ActLogin:AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, 
                         }
                     }
         }
+        */
     }
 
     //-----------------------------------------------
