@@ -20,7 +20,6 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
     private lateinit var mMap: GoogleMap
     private val m_nZoomLevel = 13.0f //This goes up to 21
     private var m_IfCallback:ifCallback? = null
-    /********************** System function **********************/
     //------------------------------------------------------------
     //
     @SuppressLint("MissingPermission")

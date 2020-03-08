@@ -119,7 +119,6 @@ class ActMain:AppCompatActivity(), NavigationView.OnNavigationItemSelectedListen
 
     lateinit var locationManager: LocationManager
 
-
     private var m_App: MyApp? = null
     private var m_Context: Context? = null
     private var m_FragPagerAdapter:MainPagerAdapter? = null

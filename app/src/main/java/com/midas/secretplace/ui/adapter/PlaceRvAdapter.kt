@@ -3,14 +3,14 @@ package com.midas.mytimeline.ui.adapter
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -160,8 +160,7 @@ RecyclerView.Adapter<PlaceRvAdapter.ViewHolder>()
             if(bPermission)
             {
                 val pInfo:place = view.tag as place
-                if(m_IfCallback != null)
-                {
+                if(m_IfCallback != null) {
                     m_IfCallback!!.moveDetailActivity(pInfo)
                 }
             }

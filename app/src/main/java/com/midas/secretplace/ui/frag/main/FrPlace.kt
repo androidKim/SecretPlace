@@ -61,8 +61,6 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //var m_strPlaceLastSeq:String? = ""
     var m_bRunning:Boolean = false
     var m_bPagingFinish:Boolean = false
-    var categoryArray:ArrayList<category> = ArrayList()
-    var dialogCategoryArray:ArrayList<category> = ArrayList()
     /**************************** Controller ****************************/
     var m_RecyclerView: RecyclerView? = null
 
@@ -133,48 +131,30 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         m_arrPlace = ArrayList<place>()
 
 
-        categoryArray.add(category("","전체"))
-        categoryArray.add(category(CategoryType.DR0.name,"직접 입력"))
-        categoryArray.add(category(CategoryType.MT1.name,"대형마트"))
-        categoryArray.add(category(CategoryType.CS2.name,"편의점"))
-        categoryArray.add(category(CategoryType.PS3.name,"어린이집,유치원"))
-        categoryArray.add(category(CategoryType.SC4.name,"학교"))
-        categoryArray.add(category(CategoryType.AC5.name,"학원"))
-        categoryArray.add(category(CategoryType.PK6.name,"주차장"))
-        categoryArray.add(category(CategoryType.OL7.name,"주유소,전소"))
-        categoryArray.add(category(CategoryType.SW8.name,"지하철역"))
-        categoryArray.add(category(CategoryType.BK9.name,"은행"))
-        categoryArray.add(category(CategoryType.CT1.name,"문화시설"))
-        categoryArray.add(category(CategoryType.AG2.name,"중개업소"))
-        categoryArray.add(category(CategoryType.PO3.name,"공공기관"))
-        categoryArray.add(category(CategoryType.AT4.name,"관광명소"))
-        categoryArray.add(category(CategoryType.AD5.name,"숙박"))
-        categoryArray.add(category(CategoryType.FD6.name,"음식점"))
-        categoryArray.add(category(CategoryType.CE7.name,"카페"))
-        categoryArray.add(category(CategoryType.HP8.name,"병원"))
-        categoryArray.add(category(CategoryType.PM9.name,"약국"))
-
-
-
-        dialogCategoryArray.add(category(CategoryType.DR0.name,"직접 입력"))
-        dialogCategoryArray.add(category(CategoryType.MT1.name,"대형마트"))
-        dialogCategoryArray.add(category(CategoryType.CS2.name,"편의점"))
-        dialogCategoryArray.add(category(CategoryType.PS3.name,"어린이집,유치원"))
-        dialogCategoryArray.add(category(CategoryType.SC4.name,"학교"))
-        dialogCategoryArray.add(category(CategoryType.AC5.name,"학원"))
-        dialogCategoryArray.add(category(CategoryType.PK6.name,"주차장"))
-        dialogCategoryArray.add(category(CategoryType.OL7.name,"주유소,전소"))
-        dialogCategoryArray.add(category(CategoryType.SW8.name,"지하철역"))
-        dialogCategoryArray.add(category(CategoryType.BK9.name,"은행"))
-        dialogCategoryArray.add(category(CategoryType.CT1.name,"문화시설"))
-        dialogCategoryArray.add(category(CategoryType.AG2.name,"중개업소"))
-        dialogCategoryArray.add(category(CategoryType.PO3.name,"공공기관"))
-        dialogCategoryArray.add(category(CategoryType.AT4.name,"관광명소"))
-        dialogCategoryArray.add(category(CategoryType.AD5.name,"숙박"))
-        dialogCategoryArray.add(category(CategoryType.FD6.name,"음식점"))
-        dialogCategoryArray.add(category(CategoryType.CE7.name,"카페"))
-        dialogCategoryArray.add(category(CategoryType.HP8.name,"병원"))
-        dialogCategoryArray.add(category(CategoryType.PM9.name,"약국"))
+    }
+    fun getCategoryList():ArrayList<category>{
+        var array:ArrayList<category> = ArrayList()
+        array.add(category("","전체"))
+        array.add(category(CategoryType.DR0.name,"직접 입력"))
+        array.add(category(CategoryType.MT1.name,"대형마트"))
+        array.add(category(CategoryType.CS2.name,"편의점"))
+        array.add(category(CategoryType.PS3.name,"어린이집,유치원"))
+        array.add(category(CategoryType.SC4.name,"학교"))
+        array.add(category(CategoryType.AC5.name,"학원"))
+        array.add(category(CategoryType.PK6.name,"주차장"))
+        array.add(category(CategoryType.OL7.name,"주유소,전소"))
+        array.add(category(CategoryType.SW8.name,"지하철역"))
+        array.add(category(CategoryType.BK9.name,"은행"))
+        array.add(category(CategoryType.CT1.name,"문화시설"))
+        array.add(category(CategoryType.AG2.name,"중개업소"))
+        array.add(category(CategoryType.PO3.name,"공공기관"))
+        array.add(category(CategoryType.AT4.name,"관광명소"))
+        array.add(category(CategoryType.AD5.name,"숙박"))
+        array.add(category(CategoryType.FD6.name,"음식점"))
+        array.add(category(CategoryType.CE7.name,"카페"))
+        array.add(category(CategoryType.HP8.name,"병원"))
+        array.add(category(CategoryType.PM9.name,"약국"))
+        return array
     }
     //------------------------------------------------------------------------
     //
@@ -206,7 +186,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         })
 
         //spinner
-        var adapter:CateSpinnerAdapter = CateSpinnerAdapter(activity!!, categoryArray!!)
+        var adapter:CateSpinnerAdapter = CateSpinnerAdapter(activity!!, getCategoryList())
         cateSpinner.adapter = adapter
         cateSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -347,14 +327,12 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
     //----------------------------------------------------------------------
     //
     fun menuItemShowMap(){
-        if(m_Adapter == null)
-        {
+        if(m_Adapter == null) {
             Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_no_exit_location), Toast.LENGTH_SHORT).show()
             return
         }
 
-        if(m_Adapter!!.itemCount <= 0)
-        {
+        if(m_Adapter!!.itemCount <= 0) {
             Toast.makeText(m_Context!!, m_Context!!.resources.getString(R.string.str_no_exit_location), Toast.LENGTH_SHORT).show()
             return
         }
@@ -470,7 +448,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         //CateCode spinner
         var spinner:Spinner = Spinner(m_Context)
         spinner.setPadding(0, 20, 0, 0)
-        var dialogCateAdapter = DialogSpinnerAdapter(m_Context!!, dialogCategoryArray!!)
+        var dialogCateAdapter = DialogSpinnerAdapter(m_Context!!, getCategoryList())
         spinner.adapter = dialogCateAdapter
         layout.addView(spinner)
 

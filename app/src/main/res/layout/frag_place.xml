@@ -33,13 +33,12 @@
                 </androidx.recyclerview.widget.RecyclerView>
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-
             <Spinner
                 android:id="@+id/cateSpinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true" />
         </RelativeLayout>
     </LinearLayout>
