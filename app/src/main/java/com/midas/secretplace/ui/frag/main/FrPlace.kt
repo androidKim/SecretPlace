@@ -492,7 +492,7 @@ class FrPlace : Fragment(), SwipeRefreshLayout.OnRefreshListener, PlaceRvAdapter
         builder.setPositiveButton(getString(R.string.str_ok)){dialog, which ->
             if(editName.text.toString().equals(""))
             {
-                Toast.makeText(m_Context, "장소이름을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(m_Context, "위치이름을 입력해주세요.", Toast.LENGTH_SHORT).show()
                 return@setPositiveButton
             }
             else

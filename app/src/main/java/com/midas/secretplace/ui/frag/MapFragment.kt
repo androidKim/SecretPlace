@@ -37,12 +37,10 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback
         mMap = map as GoogleMap
         mMap!!.isMyLocationEnabled = true//현위치 옵션
 
-        if(pPlaceList!!.size > 0)
-        {
+        if(pPlaceList!!.size > 0) {
             settingPlaceListData(pPlaceList)
         }
-        else if(pPlaceInfo != null)
-        {
+        else if(pPlaceInfo != null) {
             settingPlaceOneData(pPlaceInfo!!)
         }
     }
